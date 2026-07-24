@@ -70,9 +70,10 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
+  height: 100vh;
+  height: 100dvh;
   color: var(--text-heading);
-  overflow-x: hidden;
+  overflow: hidden;
   transition: background-color var(--transition-speed) var(--transition-cubic);
 }
 
@@ -80,7 +81,9 @@ body {
 .app-container {
   width: 100%;
   max-width: 450px;
-  height: 920px;
+  height: 95vh;
+  height: 95dvh;
+  max-height: 920px;
   background-color: var(--bg-color);
   border-radius: 40px;
   position: relative;
@@ -101,9 +104,11 @@ body.dark .app-container {
 @media (max-width: 480px) {
   body {
     background-color: var(--bg-color);
+    overflow: hidden;
   }
   .app-container {
     height: 100vh;
+    height: 100dvh;
     border-radius: 0;
     border: none;
     max-width: 100%;
