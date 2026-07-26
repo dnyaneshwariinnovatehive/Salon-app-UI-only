@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,11 +8,12 @@
   <!-- Main Stylesheet -->
   <link rel="stylesheet" href="css/styles.css">
 </head>
+
 <body>
 
   <!-- Main Mobile App Wrapper -->
   <div class="app-container" id="appShell">
-    
+
     <!-- Top System Status Bar -->
     <div class="status-bar">
       <span id="statusBarTime">09:41</span>
@@ -27,6 +29,35 @@
 
     <!-- Main Scrollable Screen Workspace -->
     <div class="main-content" id="mainContent">
+
+      <!-- ================= SCREEN 0: ONBOARDING SPLASH ================= -->
+      <div class="screen onboarding-screen" id="screen_onboarding">
+        <div class="onboarding-image-container">
+          <div class="onboarding-bg-glow"></div>
+          <div class="onboarding-image-frame">
+            <img src="https://images.unsplash.com/photo-1622286342621-4bd786c2447c?auto=format&fit=crop&w=450&q=80" alt="Professional Stylist" class="onboarding-main-img">
+          </div>
+          <div class="onboarding-thumbs">
+            <div class="thumb-frame"><img src="https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?auto=format&fit=crop&w=150&q=80" alt="Facial Treatment"></div>
+            <div class="thumb-frame"><img src="https://images.unsplash.com/photo-1621605815971-fbc98d665033?auto=format&fit=crop&w=150&q=80" alt="Hair Styling"></div>
+            <div class="thumb-frame"><img src="https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&fit=crop&w=150&q=80" alt="Skin Care"></div>
+          </div>
+        </div>
+        <div class="onboarding-body">
+          <h2 class="onboarding-title">Beauty Made Simple<br>Wellness Made Essential</h2>
+          <p class="onboarding-desc">Transform Your Look, Transform Your Life.<br>Your Ultimate Beauty Awaits Here.</p>
+          
+          <div class="onboarding-dots">
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot active"></span>
+          </div>
+          
+          <button class="btn-primary" style="border-radius: 16px; font-weight: 700; text-transform: none; font-size: 16px; padding: 16px 24px;" onclick="startApp()">
+            Get Started
+          </button>
+        </div>
+      </div>
 
       <!-- ================= SCREEN 1: LOGIN & SIGNUP ================= -->
       <div class="screen login-screen" id="screen_login">
@@ -47,7 +78,8 @@
           <div id="loginFormFields">
             <div class="form-group">
               <label for="loginEmail">Email Address</label>
-              <input type="email" id="loginEmail" class="input-field" placeholder="name@domain.com" value="omkar.deshmukh@gmail.com">
+              <input type="email" id="loginEmail" class="input-field" placeholder="name@domain.com"
+                value="omkar.deshmukh@gmail.com">
             </div>
             <div class="form-group">
               <label for="loginPassword">Password</label>
@@ -58,7 +90,8 @@
                 </button>
               </div>
             </div>
-            <a href="#" class="forgot-password-link" onclick="triggerToast('Reset link sent to your email!')">Forgot password?</a>
+            <a href="#" class="forgot-password-link" onclick="triggerToast('Reset link sent to your email!')">Forgot
+              password?</a>
           </div>
 
           <!-- Signup Fields (Hidden initially) -->
@@ -85,7 +118,7 @@
               </div>
             </div>
           </div>
-          
+
           <!-- OTP Simulation Fields (Hidden initially) -->
           <div id="otpFormFields" style="display: none;">
             <div class="form-group">
@@ -97,7 +130,8 @@
                 <input type="text" id="otp4" maxlength="1" class="otp-input">
               </div>
             </div>
-            <p style="font-size:12px; color:var(--text-body); text-align:center; margin-bottom: 20px;">Resend code in <strong class="time-countdown">00:45</strong></p>
+            <p style="font-size:12px; color:var(--text-body); text-align:center; margin-bottom: 20px;">Resend code in
+              <strong class="time-countdown">00:45</strong></p>
           </div>
         </div>
 
@@ -111,17 +145,29 @@
         <!-- Social Logins -->
         <div class="social-logins" id="authSocials">
           <button class="social-btn" onclick="performSocialAuth('Google')">
-            <svg viewBox="0 0 24 24" width="20" height="20"><path fill="#EA4335" d="M12 5.04c1.64 0 3.12.56 4.28 1.67l3.2-3.2C17.52 1.64 14.96 1 12 1 7.35 1 3.4 3.65 1.5 7.53l3.85 3c.9-2.73 3.45-4.49 6.65-4.49z"/><path fill="#4285F4" d="M23.49 12.27c0-.82-.07-1.6-.2-2.36H12v4.51h6.46c-.28 1.47-1.11 2.71-2.36 3.55l3.66 2.84c2.14-1.97 3.39-4.88 3.39-8.54z"/><path fill="#FBBC05" d="M5.35 14.47c-.24-.73-.38-1.5-.38-2.3s.14-1.57.38-2.3L1.5 6.87C.54 8.77 0 10.9 0 13.13s.54 4.36 1.5 6.26l3.85-3.02z"/><path fill="#34A853" d="M12 23c3.24 0 5.97-1.07 7.96-2.91l-3.66-2.84c-1.01.68-2.31 1.09-4.3 1.09-3.2 0-5.75-1.76-6.65-4.49l-3.85 3C3.4 20.35 7.35 23 12 23z"/></svg>
+            <svg viewBox="0 0 24 24" width="20" height="20">
+              <path fill="#EA4335"
+                d="M12 5.04c1.64 0 3.12.56 4.28 1.67l3.2-3.2C17.52 1.64 14.96 1 12 1 7.35 1 3.4 3.65 1.5 7.53l3.85 3c.9-2.73 3.45-4.49 6.65-4.49z" />
+              <path fill="#4285F4"
+                d="M23.49 12.27c0-.82-.07-1.6-.2-2.36H12v4.51h6.46c-.28 1.47-1.11 2.71-2.36 3.55l3.66 2.84c2.14-1.97 3.39-4.88 3.39-8.54z" />
+              <path fill="#FBBC05"
+                d="M5.35 14.47c-.24-.73-.38-1.5-.38-2.3s.14-1.57.38-2.3L1.5 6.87C.54 8.77 0 10.9 0 13.13s.54 4.36 1.5 6.26l3.85-3.02z" />
+              <path fill="#34A853"
+                d="M12 23c3.24 0 5.97-1.07 7.96-2.91l-3.66-2.84c-1.01.68-2.31 1.09-4.3 1.09-3.2 0-5.75-1.76-6.65-4.49l-3.85 3C3.4 20.35 7.35 23 12 23z" />
+            </svg>
             Google
           </button>
           <button class="social-btn" onclick="performSocialAuth('Apple')">
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M18.71,19.5C17.88,20.74,17,21.95,15.66,22c-1.34,0-1.77-.82-3.3-.82s-2,.8-3.3,1c-1.34,0-2.31-1.33-3.14-2.52C4.25,17,2.94,12.45,4.7,9.39C5.57,7.87,7.13,6.91,8.82,6.88c1.28,0,2.5,1,3.29,1c.78,0,2.26-1.07,3.81-.91a5.66,5.66,0,0,1,4.43,2.5,5.51,5.51,0,0,0-2.61,4.61,5.44,5.44,0,0,0,3.31,4.94A11.53,11.53,0,0,1,18.71,19.5M15.94,4.17A5.26,5.26,0,0,0,17.2,1.38a5.55,5.55,0,0,0-3.59,1.84,5,5,0,0,0-1.35,2.9A4.59,4.59,0,0,0,15.94,4.17Z"/></svg>
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+              <path
+                d="M18.71,19.5C17.88,20.74,17,21.95,15.66,22c-1.34,0-1.77-.82-3.3-.82s-2,.8-3.3,1c-1.34,0-2.31-1.33-3.14-2.52C4.25,17,2.94,12.45,4.7,9.39C5.57,7.87,7.13,6.91,8.82,6.88c1.28,0,2.5,1,3.29,1c.78,0,2.26-1.07,3.81-.91a5.66,5.66,0,0,1,4.43,2.5,5.51,5.51,0,0,0-2.61,4.61,5.44,5.44,0,0,0,3.31,4.94A11.53,11.53,0,0,1,18.71,19.5M15.94,4.17A5.26,5.26,0,0,0,17.2,1.38a5.55,5.55,0,0,0-3.59,1.84,5,5,0,0,0-1.35,2.9A4.59,4.59,0,0,0,15.94,4.17Z" />
+            </svg>
             Apple
           </button>
         </div>
 
         <div class="login-footer-text" id="authFooterOption">
-          <span id="authFooterLabel">Don't have an account?</span> 
+          <span id="authFooterLabel">Don't have an account?</span>
           <a href="#" id="authFooterLink" onclick="togglePhoneOrFields()">Continue with phone number</a>
         </div>
       </div>
@@ -129,7 +175,7 @@
 
       <!-- ================= SCREEN 2: HOME ================= -->
       <div class="screen" id="screen_home">
-        
+
         <!-- Pull to Refresh Simulated Loading -->
         <div class="pull-refresh-indicator" id="pullRefreshIndicator">
           <div class="spinner"></div>
@@ -138,7 +184,8 @@
         <!-- Home Dynamic Header -->
         <div class="home-header">
           <div class="user-profile-section" onclick="navigateToTab('profile')">
-            <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80" alt="Avatar" class="user-avatar" id="homeUserAvatar">
+            <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80"
+              alt="Avatar" class="user-avatar" id="homeUserAvatar">
             <div class="location-picker">
               <span class="greeting">Hi Omkar 👋</span>
               <span class="location-name" onclick="event.stopPropagation(); openLocationDrawer()">
@@ -147,7 +194,7 @@
               </span>
             </div>
           </div>
-          
+
           <div class="header-actions">
             <button class="header-btn" onclick="openNotificationsDrawer()">
               <i data-lucide="bell"></i>
@@ -178,7 +225,9 @@
         </div>
 
         <!-- Categories Row (Horizontal Scroll) -->
-        <div class="px-20 mt-15"><h3 style="font-size:16px; font-weight:800;">Categories</h3></div>
+        <div class="px-20 mt-15">
+          <h3 style="font-size:16px; font-weight:800;">Categories</h3>
+        </div>
         <div class="horizontal-scroll" id="homeCategoriesList" style="padding-top: 12px; padding-bottom: 12px;">
           <!-- Dynamic Categories list -->
         </div>
@@ -216,15 +265,16 @@
 
       <!-- ================= SCREEN 3: EXPLORE ================= -->
       <div class="screen" id="screen_explore">
-        
+
         <!-- Pinned Search & Sort Header -->
         <div class="explore-header px-20">
           <div class="flex-row-between" style="gap: 12px;">
             <div class="search-bar-wrapper" style="flex:1;">
               <i data-lucide="search"></i>
-              <input type="text" id="exploreSearchInput" placeholder="Search salons or services..." oninput="handleSearchFilter()">
+              <input type="text" id="exploreSearchInput" placeholder="Search salons or services..."
+                oninput="handleSearchFilter()">
             </div>
-            
+
             <!-- Map Toggle Button -->
             <button class="header-btn map-toggle-btn" id="btnMapToggle" onclick="toggleMapView()">
               <i data-lucide="map" id="mapToggleIcon"></i>
@@ -244,13 +294,16 @@
         <!-- View 1: List view of Salons -->
         <div id="exploreListView" class="px-20 mt-15">
           <div id="exploreFavouritesSection" style="margin-bottom: 20px; display: none;">
-            <h4 style="font-size:14px; font-weight:800; color:var(--text-body); margin-bottom:12px;">Most Visited by You</h4>
-            <div class="horizontal-scroll" id="exploreFavouritesRow" style="padding: 0 0 10px 0; margin-left: 0; margin-right:0;">
+            <h4 style="font-size:14px; font-weight:800; color:var(--text-body); margin-bottom:12px;">Most Visited by You
+            </h4>
+            <div class="horizontal-scroll" id="exploreFavouritesRow"
+              style="padding: 0 0 10px 0; margin-left: 0; margin-right:0;">
               <!-- Favourites list cards -->
             </div>
           </div>
-          
-          <h4 style="font-size:14px; font-weight:800; color:var(--text-body); margin-bottom:12px;" id="exploreResultsCountHeader">All Nearby Salons</h4>
+
+          <h4 style="font-size:14px; font-weight:800; color:var(--text-body); margin-bottom:12px;"
+            id="exploreResultsCountHeader">All Nearby Salons</h4>
           <div id="exploreSalonsList">
             <!-- Dynamic full salon card elements -->
           </div>
@@ -278,9 +331,11 @@
                   <i data-lucide="star" style="width:11px; height:11px; fill:#FFB300; stroke:none; display:inline;"></i>
                   <span id="mapDrawerRating">4.8</span> • <span id="mapDrawerDistance">1.2 km</span>
                 </p>
-                <p style="font-size: 11px; font-weight: 700; color: var(--accent-color); margin-top: 4px;">Starting at ₹<span id="mapDrawerPrice">350</span></p>
+                <p style="font-size: 11px; font-weight: 700; color: var(--accent-color); margin-top: 4px;">Starting at
+                  ₹<span id="mapDrawerPrice">350</span></p>
               </div>
-              <button class="btn-secondary" style="padding: 6px 12px; font-size:11px;" id="mapDrawerBookBtn">Book</button>
+              <button class="btn-secondary" style="padding: 6px 12px; font-size:11px;"
+                id="mapDrawerBookBtn">Book</button>
             </div>
 
           </div>
@@ -297,7 +352,8 @@
 
         <div class="tab-switcher-header">
           <div class="tab-switcher">
-            <button class="tab-switch-btn active" id="btnBookingsUpcoming" onclick="toggleBookingsTab(true)">Upcoming</button>
+            <button class="tab-switch-btn active" id="btnBookingsUpcoming"
+              onclick="toggleBookingsTab(true)">Upcoming</button>
             <button class="tab-switch-btn" id="btnBookingsHistory" onclick="toggleBookingsTab(false)">History</button>
           </div>
         </div>
@@ -327,7 +383,7 @@
             <!-- Saved salons cards -->
           </div>
         </div>
-        
+
         <div id="favServicesView" style="display: none;">
           <div class="fav-services-list" id="favServicesList">
             <!-- Saved individual services cards -->
@@ -343,7 +399,7 @@
         </div>
 
         <div class="profile-scroll">
-          
+
           <!-- User detail layout -->
           <div class="profile-card-header">
             <img src="" class="profile-avatar-large" id="profileUserAvatar" alt="Profile">
@@ -425,7 +481,7 @@
                 </label>
               </div>
             </div>
-            
+
             <div class="option-row">
               <div class="option-row-left">
                 <i data-lucide="scan-face"></i>
@@ -469,7 +525,8 @@
           <!-- Payment Methods Lists section -->
           <div class="flex-row-between" style="margin-bottom: 12px; margin-top: 10px;">
             <div class="settings-section-title" style="margin-bottom: 0;">Payment Methods</div>
-            <button class="btn-secondary" style="padding:4px 10px; font-size:11px;" onclick="openAddCardDrawer()">+ Add New</button>
+            <button class="btn-secondary" style="padding:4px 10px; font-size:11px;" onclick="openAddCardDrawer()">+ Add
+              New</button>
           </div>
           <div class="options-list" id="profilePaymentCardsList">
             <!-- Saved User Payment Cards -->
@@ -509,10 +566,14 @@
           </div>
 
           <!-- Logout and Delete Account Actions buttons -->
-          <button class="btn-secondary" style="background-color: var(--color-danger-bg); color: var(--color-danger); width: 100%; border-radius:14px; padding: 12px; margin-bottom: 14px; font-weight:700;" onclick="performLogout()">
+          <button class="btn-secondary"
+            style="background-color: var(--color-danger-bg); color: var(--color-danger); width: 100%; border-radius:14px; padding: 12px; margin-bottom: 14px; font-weight:700;"
+            onclick="performLogout()">
             Logout Account
           </button>
-          <button class="btn-secondary" style="background: none; color: var(--text-light); width: 100%; font-size: 12px; border:none; padding: 8px; margin-bottom: 40px;" onclick="confirmDeleteAccount()">
+          <button class="btn-secondary"
+            style="background: none; color: var(--text-light); width: 100%; font-size: 12px; border:none; padding: 8px; margin-bottom: 40px;"
+            onclick="confirmDeleteAccount()">
             Delete Account Permanently
           </button>
 
@@ -550,13 +611,14 @@
 
   <!-- ================= DETAILED BOTTOM SHEET / DRAWER (SALON DETAILS) ================= -->
   <div class="overlay" id="drawerOverlay" onclick="closeAllDrawers()">
-    
+
     <!-- Salon details bottom sheet drawer -->
     <div class="drawer" id="salonDetailDrawer" onclick="event.stopPropagation()">
       <div class="drawer-drag-bar" onclick="closeAllDrawers()"></div>
       <div class="drawer-header">
         <h3 id="detailSalonName" style="font-size: 18px; font-weight:800;">Luxe Studio Salon</h3>
-        <button class="drawer-close-btn" onclick="closeAllDrawers()"><i data-lucide="x" style="width:16px; height:16px;"></i></button>
+        <button class="drawer-close-btn" onclick="closeAllDrawers()"><i data-lucide="x"
+            style="width:16px; height:16px;"></i></button>
       </div>
 
       <div class="drawer-content">
@@ -565,14 +627,17 @@
           <img src="" id="detailCoverImage" alt="Salon Cover">
           <div class="salon-detail-cover-meta">
             <span class="salon-detail-cover-type" id="detailSalonType">Unisex</span>
-            <span class="badge-status badge-amber" style="backdrop-filter: blur(4px); background-color: rgba(255, 255, 255, 0.85); color: var(--text-heading);">
-              <i data-lucide="star" style="width:12px; height:12px; fill:#FFB300; stroke:none; display:inline; margin-right: 2px;"></i>
+            <span class="badge-status badge-amber"
+              style="backdrop-filter: blur(4px); background-color: rgba(255, 255, 255, 0.85); color: var(--text-heading);">
+              <i data-lucide="star"
+                style="width:12px; height:12px; fill:#FFB300; stroke:none; display:inline; margin-right: 2px;"></i>
               <span id="detailSalonRating">4.8</span> (<span id="detailReviewsCount">382</span>)
             </span>
           </div>
         </div>
 
-        <p style="font-size: 13px; color: var(--text-body); line-height: 1.5; margin-bottom: 18px;" id="detailSalonAbout">
+        <p style="font-size: 13px; color: var(--text-body); line-height: 1.5; margin-bottom: 18px;"
+          id="detailSalonAbout">
           Description about the salon services...
         </p>
 
@@ -604,12 +669,13 @@
 
   <!-- ================= DETAILED BOTTOM SHEET / DRAWER (CHOOSE TIME SLOT) ================= -->
   <div class="overlay" id="slotPickerOverlay" onclick="closeSlotPickerDrawer()">
-    
+
     <div class="drawer" id="slotPickerDrawer" onclick="event.stopPropagation()">
       <div class="drawer-drag-bar" onclick="closeSlotPickerDrawer()"></div>
       <div class="drawer-header">
         <h3 style="font-size: 18px; font-weight:800;">Choose Date & Slot</h3>
-        <button class="drawer-close-btn" onclick="closeSlotPickerDrawer()"><i data-lucide="x" style="width:16px; height:16px;"></i></button>
+        <button class="drawer-close-btn" onclick="closeSlotPickerDrawer()"><i data-lucide="x"
+            style="width:16px; height:16px;"></i></button>
       </div>
 
       <div class="drawer-content">
@@ -674,7 +740,8 @@
             <input type="password" class="input-field" placeholder="•••" maxlength="3">
           </div>
         </div>
-        <button class="btn-primary" style="margin-top: 10px;" onclick="submitNewPaymentCard()">Save Payment Method</button>
+        <button class="btn-primary" style="margin-top: 10px;" onclick="submitNewPaymentCard()">Save Payment
+          Method</button>
       </div>
     </div>
   </div>
@@ -690,11 +757,14 @@
       <div class="drawer-content" style="padding: 16px 20px;">
         <div class="search-bar-wrapper" style="margin-bottom: 16px;">
           <i data-lucide="search"></i>
-          <input type="text" placeholder="Search locality or landmark in Pune..." id="locationSearchBox" oninput="filterLocationResults()">
+          <input type="text" placeholder="Search locality or landmark in Pune..." id="locationSearchBox"
+            oninput="filterLocationResults()">
         </div>
-        
+
         <!-- Popular locations list -->
-        <h4 style="font-size: 12px; font-weight:800; color:var(--text-body); text-transform:uppercase; margin-bottom: 8px;">Popular Neighborhoods</h4>
+        <h4
+          style="font-size: 12px; font-weight:800; color:var(--text-body); text-transform:uppercase; margin-bottom: 8px;">
+          Popular Neighborhoods</h4>
         <div class="options-list" id="locationResultsList">
           <div class="option-row" onclick="selectNewLocation('Koregaon Park, Pune')">
             <div class="option-row-left"><i data-lucide="navigation"></i><span>Koregaon Park, Pune</span></div>
@@ -727,8 +797,10 @@
       <div class="drawer-content" style="padding: 16px 20px;">
         <div class="slot-section-title">Sort By</div>
         <div class="time-grid" style="grid-template-columns: repeat(2,1fr); margin-bottom: 15px;">
-          <button class="time-slot-btn active" id="sortRating" onclick="selectFilterSort('rating')">Rating: High to Low</button>
-          <button class="time-slot-btn" id="sortDistance" onclick="selectFilterSort('distance')">Distance: Near to Far</button>
+          <button class="time-slot-btn active" id="sortRating" onclick="selectFilterSort('rating')">Rating: High to
+            Low</button>
+          <button class="time-slot-btn" id="sortDistance" onclick="selectFilterSort('distance')">Distance: Near to
+            Far</button>
         </div>
 
         <div class="slot-section-title">Target Gender</div>
@@ -742,7 +814,8 @@
         <div class="time-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 20px;">
           <button class="time-slot-btn active" id="priceAll" onclick="selectFilterPrice('all')">Any Price</button>
           <button class="time-slot-btn" id="priceUnder500" onclick="selectFilterPrice('500')">Under ₹500</button>
-          <button class="time-slot-btn" id="pricePremium" onclick="selectFilterPrice('premium')">Premium (₹1000+)</button>
+          <button class="time-slot-btn" id="pricePremium" onclick="selectFilterPrice('premium')">Premium
+            (₹1000+)</button>
         </div>
 
         <button class="btn-primary" onclick="applyAdvancedFilters()">Apply Filter Criteria</button>
@@ -765,7 +838,8 @@
               <i data-lucide="tag" style="color:var(--accent-color); margin-top:2px;"></i>
               <div>
                 <strong style="font-size:13px; display:block;">Special Discount Coupon</strong>
-                <span style="font-size:11px; color:var(--text-body);">Get ₹150 off on next spa service. Code SPA150.</span>
+                <span style="font-size:11px; color:var(--text-body);">Get ₹150 off on next spa service. Code
+                  SPA150.</span>
               </div>
             </div>
           </div>
@@ -774,7 +848,8 @@
               <i data-lucide="check-circle" style="color:var(--color-success); margin-top:2px;"></i>
               <div>
                 <strong style="font-size:13px; display:block;">Booking Confirmed!</strong>
-                <span style="font-size:11px; color:var(--text-body);">Your haircut at Luxe Studio is confirmed for 11:30 AM.</span>
+                <span style="font-size:11px; color:var(--text-body);">Your haircut at Luxe Studio is confirmed for 11:30
+                  AM.</span>
               </div>
             </div>
           </div>
@@ -800,7 +875,8 @@
         <i data-lucide="badge-check"></i>
       </div>
       <h3>Booking Confirmed!</h3>
-      <p>Your appointment has been successfully scheduled. We have sent the confirmation invoice details to your email.</p>
+      <p>Your appointment has been successfully scheduled. We have sent the confirmation invoice details to your email.
+      </p>
 
       <!-- Short invoice list -->
       <div class="modal-invoice-summary">
@@ -822,8 +898,10 @@
         </div>
       </div>
 
-      <button class="btn-primary" style="margin-bottom: 10px;" onclick="closeSuccessModalAndNavigate()">View My Bookings</button>
-      <button class="btn-secondary" style="background: none; width:100%; border:none;" onclick="closeSuccessModal()">Close</button>
+      <button class="btn-primary" style="margin-bottom: 10px;" onclick="closeSuccessModalAndNavigate()">View My
+        Bookings</button>
+      <button class="btn-secondary" style="background: none; width:100%; border:none;"
+        onclick="closeSuccessModal()">Close</button>
     </div>
   </div>
 
@@ -837,4 +915,5 @@
   <script src="js/app.js"></script>
 
 </body>
+
 </html>

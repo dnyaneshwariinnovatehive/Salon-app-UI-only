@@ -6,7 +6,7 @@ const AppState = {
   authMode: 'login', // 'login', 'signup', 'otp'
   currentTab: 'home',
   selectedLocation: "Koregaon Park, Pune",
-  
+
   // Search & Filter Settings on Explore
   searchQuery: "",
   activeCategoryFilter: "all",
@@ -16,7 +16,7 @@ const AppState = {
     gender: 'all', // 'all', 'men', 'women'
     price: 'all' // 'all', '500', 'premium'
   },
-  
+
   // Map View Toggles
   isMapView: false,
   activeMapPinId: null,
@@ -31,7 +31,7 @@ const AppState = {
   selectedSalonId: null,
   selectedDetailCategory: "all",
   selectedServices: [], // Array of service objects selected
-  
+
   // Selected Slots checkout details
   selectedDateNum: null,
   selectedTimeSlot: null,
@@ -45,7 +45,7 @@ window.addEventListener('DOMContentLoaded', () => {
   setInterval(updateSystemTime, 60000);
 
   // Initialize display
-  showScreen('login');
+  showScreen('onboarding');
   document.getElementById('navigationBar').style.display = 'none';
 
   // Initialize Category Icons in Home screen
@@ -54,6 +54,11 @@ window.addEventListener('DOMContentLoaded', () => {
   // Setup Pull to Refresh gesture mock listeners
   setupPullToRefresh();
 });
+
+// Start application from onboarding splash
+function startApp() {
+  showScreen('login');
+}
 
 // Update status bar digital clock
 function updateSystemTime() {
@@ -160,7 +165,7 @@ function toggleAuthTab(mode) {
 
 function togglePhoneOrFields() {
   const linkText = document.getElementById('authFooterLink').innerText;
-  
+
   if (linkText === "Continue with phone number") {
     // Show OTP screen
     document.getElementById('loginFormFields').style.display = 'none';
@@ -201,7 +206,7 @@ function performAuth() {
   // Validate values briefly and proceed
   AppState.isAuthenticated = true;
   document.getElementById('navigationBar').style.display = 'flex';
-  
+
   // Update names in layout based on forms
   const nameInput = document.getElementById('signupName').value.trim();
   if (AppState.authMode === 'signup' && nameInput !== "") {
@@ -231,7 +236,7 @@ function performLogout() {
 }
 
 function confirmDeleteAccount() {
-  if(confirm("Are you sure you want to delete your account permanently? This action is irreversible.")) {
+  if (confirm("Are you sure you want to delete your account permanently? This action is irreversible.")) {
     performLogout();
     triggerToast("Account deleted successfully.");
   }
@@ -245,14 +250,12 @@ function renderHomeCategories() {
   container.innerHTML = "";
 
   SalonHubData.categories.forEach(cat => {
-    const el = document.createElement('div');
-    el.className = 'category-item';
+    const el = document.createElement('button');
+    el.className = `category-chip ${AppState.activeCategoryFilter === cat.id ? 'active' : ''}`;
     el.onclick = () => filterHomeCategory(cat.id);
     el.innerHTML = `
-      <div class="category-icon-circle">
-        <i data-lucide="${cat.icon}"></i>
-      </div>
-      <span class="category-name">${cat.name}</span>
+      <i data-lucide="${cat.icon}"></i>
+      <span>${cat.name}</span>
     `;
     container.appendChild(el);
   });
@@ -285,7 +288,7 @@ function renderHomeScreen() {
   const spotlightContainer = document.getElementById('homeUpcomingSpotlight');
   spotlightContainer.innerHTML = "";
   const upcoming = SalonHubData.bookings.find(b => b.isUpcoming);
-  
+
   if (upcoming) {
     const el = document.createElement('div');
     el.className = 'appointment-banner-card';
@@ -314,7 +317,7 @@ function renderHomeScreen() {
   const bookAgainContainer = document.getElementById('homeBookAgainList');
   bookAgainContainer.innerHTML = "";
   const historyBookings = SalonHubData.bookings.filter(b => !b.isUpcoming);
-  
+
   historyBookings.forEach(hb => {
     const salon = SalonHubData.salons.find(s => s.id === hb.salonId);
     if (!salon) return;
@@ -344,7 +347,7 @@ function renderHomeScreen() {
   featuredContainer.innerHTML = "";
 
   // Sort salons by rating descending for featured section
-  const sortedSalons = [...SalonHubData.salons].sort((a,b) => b.rating - a.rating);
+  const sortedSalons = [...SalonHubData.salons].sort((a, b) => b.rating - a.rating);
   sortedSalons.forEach(s => {
     const isFav = SalonHubData.favourites.salonIds.includes(s.id);
     const el = document.createElement('div');
@@ -411,7 +414,7 @@ function renderHomeScreen() {
 
   // Determine user category preferences based on bookings & favorites
   const preferredCategories = new Set();
-  
+
   // Analyze bookings
   SalonHubData.bookings.forEach(b => {
     const salon = SalonHubData.salons.find(s => s.id === b.salonId);
@@ -442,7 +445,7 @@ function renderHomeScreen() {
     s.services.forEach(serv => {
       const isFavSalon = SalonHubData.favourites.salonIds.includes(s.id);
       const isPrefCat = preferredCategories.has(serv.category);
-      
+
       if (isPrefCat || isFavSalon) {
         // Avoid recommending services they've already scheduled upcoming
         const isUpcoming = SalonHubData.bookings.some(b => b.isUpcoming && b.salonId === s.id && b.serviceName.includes(serv.name));
@@ -475,7 +478,7 @@ function renderHomeScreen() {
     const s = item.salon;
     const serv = item.service;
     const coverPhoto = serviceImages[serv.category] || serviceImages['haircut'];
-    
+
     const el = document.createElement('div');
     el.className = 'recommended-card';
     el.innerHTML = `
@@ -519,7 +522,7 @@ function focusSearchExplore() {
 function setupPullToRefresh() {
   const scrollContainer = document.getElementById('mainContent');
   const indicator = document.getElementById('pullRefreshIndicator');
-  
+
   let startY = 0;
   let isPulling = false;
 
@@ -534,7 +537,7 @@ function setupPullToRefresh() {
     if (!isPulling) return;
     const currentY = e.touches[0].pageY;
     const diff = currentY - startY;
-    
+
     if (diff > 50 && scrollContainer.scrollTop === 0) {
       indicator.classList.add('active');
     }
@@ -683,7 +686,7 @@ function renderExploreScreen() {
   const favSection = document.getElementById('exploreFavouritesSection');
   const favRow = document.getElementById('exploreFavouritesRow');
   favRow.innerHTML = "";
-  
+
   const savedSalons = SalonHubData.salons.filter(s => SalonHubData.favourites.salonIds.includes(s.id));
   if (savedSalons.length > 0) {
     favSection.style.display = 'block';
@@ -716,7 +719,7 @@ function renderExploreScreen() {
 function renderExploreList() {
   const container = document.getElementById('exploreSalonsList');
   const resultsHeader = document.getElementById('exploreResultsCountHeader');
-  
+
   // Show skeleton loading effect briefly to simulate api
   container.innerHTML = `
     <div class="skeleton-card skeleton"></div>
@@ -727,7 +730,7 @@ function renderExploreList() {
   setTimeout(() => {
     const list = getFilteredSalons();
     container.innerHTML = "";
-    
+
     if (list.length === 0) {
       resultsHeader.innerText = "No Results Match";
       container.innerHTML = `
@@ -745,7 +748,7 @@ function renderExploreList() {
     }
 
     resultsHeader.innerText = `${list.length} Salon${list.length > 1 ? 's' : ''} near you`;
-    
+
     list.forEach(s => {
       const isFav = SalonHubData.favourites.salonIds.includes(s.id);
       const el = document.createElement('div');
@@ -798,9 +801,9 @@ function resetExploreFilters() {
   AppState.activeCategoryFilter = "all";
   AppState.activeQuickFilter = "all";
   AppState.advancedFilters = { sort: 'rating', gender: 'all', price: 'all' };
-  
+
   document.getElementById('exploreSearchInput').value = "";
-  
+
   // Reset filter chips
   const chips = document.querySelectorAll('#exploreFilterChips .filter-chip');
   chips.forEach(c => c.classList.remove('active'));
@@ -842,7 +845,7 @@ function selectMapPin(salonId) {
   document.getElementById('mapDrawerRating').innerText = salon.rating;
   document.getElementById('mapDrawerDistance').innerText = salon.distance;
   document.getElementById('mapDrawerPrice').innerText = salon.startingPrice;
-  
+
   // Bind click checkout booking
   document.getElementById('mapDrawerBookBtn').onclick = () => {
     closeMapDrawer();
@@ -873,7 +876,7 @@ function renderBookingsScreen() {
   container.innerHTML = "";
 
   const list = SalonHubData.bookings.filter(b => b.isUpcoming === AppState.isUpcomingBookingsTab);
-  
+
   if (list.length === 0) {
     container.innerHTML = `
       <div class="empty-state">
@@ -984,7 +987,7 @@ function cancelBooking(bookingId) {
       // Remove it or set as History Completed
       SalonHubData.bookings.splice(bookingIndex, 1);
       renderBookingsScreen();
-      
+
       // Simulate Undo Toast action
       triggerToast("Booking cancelled successfully.", "Undo", () => {
         SalonHubData.bookings.push(removed);
@@ -1000,16 +1003,16 @@ function rescheduleBooking(bookingId) {
   if (!booking) return;
 
   AppState.selectedSalonId = booking.salonId;
-  
+
   // Set target service parameters
   const salon = SalonHubData.salons.find(s => s.id === booking.salonId);
   const service = salon.services.find(s => s.name === booking.serviceName) || salon.services[0];
-  
+
   AppState.selectedServices = [service];
-  
+
   // Remove original booking once user reschedules
   openSlotPickerDrawer();
-  
+
   // Override success path to update rescheduled booking
   AppState.reschedulingId = bookingId;
 }
@@ -1042,7 +1045,7 @@ function renderFavouritesScreen() {
     // 1. Render Salons
     const grid = document.getElementById('favSalonsGrid');
     grid.innerHTML = "";
-    
+
     const list = SalonHubData.salons.filter(s => SalonHubData.favourites.salonIds.includes(s.id));
     if (list.length === 0) {
       grid.parentNode.innerHTML = `
@@ -1079,7 +1082,7 @@ function renderFavouritesScreen() {
     // 2. Render Services
     const listContainer = document.getElementById('favServicesList');
     listContainer.innerHTML = "";
-    
+
     // Services lookup
     const list = [];
     SalonHubData.salons.forEach(s => {
@@ -1133,7 +1136,7 @@ function toggleFavSalon(salonId) {
     SalonHubData.favourites.salonIds.push(salonId);
     triggerToast("Added salon to favourites!");
   }
-  
+
   // Re-render relevant active tab screen views
   if (AppState.currentTab === 'home') renderHomeScreen();
   if (AppState.currentTab === 'explore') renderExploreScreen();
@@ -1157,7 +1160,7 @@ function toggleFavService(serviceId) {
 // ----------------------------------------------------
 function renderProfileScreen() {
   const user = SalonHubData.user;
-  
+
   // Bind details elements
   document.getElementById('profileUserAvatar').src = user.avatar;
   document.getElementById('profileUserName').innerText = user.name;
@@ -1304,7 +1307,7 @@ function renderDetailServicesTabs(salon) {
 
 function selectDetailCategory(catKey) {
   AppState.selectedDetailCategory = catKey;
-  
+
   // update tabs highlight
   const tabs = document.querySelectorAll('#detailServicesTabs .salon-detail-tab-btn');
   tabs.forEach(t => {
@@ -1346,8 +1349,8 @@ function renderDetailServicesList(salon) {
       <p class="service-item-desc">${s.desc}</p>
       <div class="service-item-price-btn">
         <span class="service-item-price">₹${s.price}</span>
-        <button class="btn-secondary" style="border-radius:10px; padding:6px 12px; font-size:12px; background-color:${isSelected ? '#2A2320' : 'var(--accent-soft)'}; color:${isSelected ? '#FAF3EA' : 'var(--accent-color)'};" onclick="toggleServiceSelection('${s.id}')">
-          ${isSelected ? 'Selected ✓' : 'Select'}
+        <button class="service-select-btn ${isSelected ? 'selected' : ''}" onclick="toggleServiceSelection('${s.id}')">
+          <i data-lucide="${isSelected ? 'check' : 'plus'}"></i>
         </button>
       </div>
     `;
@@ -1365,7 +1368,7 @@ function toggleDetailServiceFav(serviceId) {
     SalonHubData.favourites.serviceIds.push(serviceId);
     triggerToast("Added service to favourites!");
   }
-  
+
   const salon = SalonHubData.salons.find(s => s.id === AppState.selectedSalonId);
   renderDetailServicesList(salon);
 }
@@ -1373,7 +1376,7 @@ function toggleDetailServiceFav(serviceId) {
 function toggleServiceSelection(serviceId) {
   const salon = SalonHubData.salons.find(s => s.id === AppState.selectedSalonId);
   const service = salon.services.find(s => s.id === serviceId);
-  
+
   const idx = AppState.selectedServices.findIndex(s => s.id === serviceId);
   if (idx !== -1) {
     AppState.selectedServices.splice(idx, 1);
@@ -1387,7 +1390,7 @@ function toggleServiceSelection(serviceId) {
 
 function updateStickyFooterBar() {
   const bar = document.getElementById('detailStickyFooter');
-  
+
   if (AppState.selectedServices.length === 0) {
     bar.style.display = 'none';
     return;
@@ -1410,10 +1413,10 @@ function updateStickyFooterBar() {
 function openSlotPickerDrawer() {
   // Hide details drawer overlays and open Slot Picker
   closeAllDrawers();
-  
+
   const overlay = document.getElementById('slotPickerOverlay');
   const drawer = document.getElementById('slotPickerDrawer');
-  
+
   overlay.classList.add('open');
   drawer.classList.add('open');
 
@@ -1440,10 +1443,10 @@ function renderDateSlots() {
 
   const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  
+
   // Render next 7 days
   const today = new Date();
-  
+
   if (!AppState.selectedDateNum) {
     AppState.selectedDateNum = today.getDate();
   }
@@ -1479,7 +1482,7 @@ function renderTimeSlots() {
   container.innerHTML = "";
 
   const slots = ["09:30 AM", "10:30 AM", "11:30 AM", "01:00 PM", "02:30 PM", "04:00 PM", "05:30 PM", "07:00 PM"];
-  
+
   if (!AppState.selectedTimeSlot) {
     AppState.selectedTimeSlot = slots[2]; // default 11:30 AM
   }
@@ -1504,7 +1507,7 @@ function renderStylistsPicker() {
 
   // Add any stylist option first
   const anyStylist = { id: 'any', name: 'Any Stylist', role: 'Allocated on arrival', avatar: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=150&q=80' };
-  
+
   const salon = SalonHubData.salons.find(s => s.id === AppState.selectedSalonId);
   const stylists = [anyStylist, ...SalonHubData.stylists.filter(st => salon.stylistIds.includes(st.id))];
 
@@ -1550,7 +1553,7 @@ function confirmAppointmentCheckout() {
   const salon = SalonHubData.salons.find(s => s.id === AppState.selectedSalonId);
   const servicesText = AppState.selectedServices.map(s => s.name).join(", ");
   const totalPrice = AppState.selectedServices.reduce((sum, s) => sum + s.price, 0);
-  
+
   let stylistName = "Any Stylist";
   if (AppState.selectedStylistId !== 'any') {
     stylistName = SalonHubData.stylists.find(st => st.id === AppState.selectedStylistId).name;
@@ -1587,7 +1590,7 @@ function confirmAppointmentCheckout() {
   SalonHubData.bookings.unshift(newBooking);
 
   // Modify slots today count slightly to simulate vacancy urgency
-  if(salon.slotsLeft > 0) salon.slotsLeft--;
+  if (salon.slotsLeft > 0) salon.slotsLeft--;
 
   // Open booking confirmation invoice success modal
   const invoiceSalon = document.getElementById('invoiceSalonName');
@@ -1625,7 +1628,7 @@ function quickBookService(salonId, serviceId) {
 
   AppState.selectedSalonId = salonId;
   AppState.selectedServices = [service];
-  
+
   openSlotPickerDrawer();
 }
 
@@ -1647,7 +1650,7 @@ function selectNewLocation(locName) {
   document.getElementById('currentLocationText').innerText = locName;
   closeLocationDrawer();
   triggerToast(`Location updated to ${locName}`);
-  
+
   // Filter or reload lists matching distance if necessary
   renderHomeScreen();
 }
@@ -1655,10 +1658,10 @@ function selectNewLocation(locName) {
 function filterLocationResults() {
   const input = document.getElementById('locationSearchBox').value.toLowerCase();
   const rows = document.querySelectorAll('#locationResultsList .option-row');
-  
+
   rows.forEach(r => {
     const text = r.innerText.toLowerCase();
-    if(text.includes(input)) {
+    if (text.includes(input)) {
       r.style.display = 'flex';
     } else {
       r.style.display = 'none';
@@ -1691,9 +1694,9 @@ function triggerToast(message, actionLabel = "", actionCallback = null) {
   const container = document.getElementById('toastContainer');
   const toast = document.createElement('div');
   toast.className = 'toast';
-  
+
   let actionHtml = "";
-  if(actionLabel !== "" && actionCallback) {
+  if (actionLabel !== "" && actionCallback) {
     actionHtml = `<span style="color:var(--accent-color); font-weight:700; margin-left: 10px; text-decoration: underline; cursor:pointer;" class="toast-action">${actionLabel}</span>`;
   }
 
@@ -1704,7 +1707,7 @@ function triggerToast(message, actionLabel = "", actionCallback = null) {
   `;
 
   // Bind toast actions if applicable
-  if(actionCallback) {
+  if (actionCallback) {
     toast.querySelector('.toast-action').onclick = (e) => {
       e.stopPropagation();
       actionCallback();
@@ -1718,7 +1721,7 @@ function triggerToast(message, actionLabel = "", actionCallback = null) {
 
   // Slide Out after 3.5 seconds
   setTimeout(() => {
-    if(toast && toast.parentNode) {
+    if (toast && toast.parentNode) {
       toast.classList.add('fade-out');
       setTimeout(() => toast.remove(), 300);
     }

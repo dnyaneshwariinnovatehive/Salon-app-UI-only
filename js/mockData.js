@@ -32,7 +32,7 @@ const SalonHubData = {
       title: "First Booking Offer",
       desc: "Flat 20% off up to ₹250 on your first booking",
       code: "WELCOME20",
-      bgGradient: "linear-gradient(135deg, #D4A24C 0%, #C98A2E 100%)",
+      bgGradient: "linear-gradient(135deg, #8A3FFC 0%, #E0267D 100%)",
       textColor: "#FFFFFF"
     },
     {
@@ -40,7 +40,7 @@ const SalonHubData = {
       title: "Monsoon Pampering",
       desc: "Save ₹500 on premium hair spa & facial combos",
       code: "RAINSPA",
-      bgGradient: "linear-gradient(135deg, #2A2320 0%, #4E403B 100%)",
+      bgGradient: "linear-gradient(135deg, #1C1236 0%, #42307D 100%)",
       textColor: "#FAF3EA"
     },
     {
@@ -48,7 +48,7 @@ const SalonHubData = {
       title: "Nail Art Fest",
       desc: "Buy 1 Get 1 free on Gel Extensions",
       code: "NAILART",
-      bgGradient: "linear-gradient(135deg, #E6A7A7 0%, #C67272 100%)",
+      bgGradient: "linear-gradient(135deg, #9C54F2 0%, #FFA2D2 100%)",
       textColor: "#FFFFFF"
     }
   ],
