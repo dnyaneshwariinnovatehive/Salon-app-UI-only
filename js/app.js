@@ -424,12 +424,19 @@ function renderHomeCategories() {
 function renderHomeScreen() {
   // 1. Promo banners list
   const promoContainer = document.getElementById('homePromoCarousel');
+  const promoDotsContainer = document.getElementById('homePromoDots');
   promoContainer.innerHTML = "";
-  SalonHubData.promos.forEach(p => {
+  if (promoDotsContainer) promoDotsContainer.innerHTML = "";
+
+  SalonHubData.promos.forEach((p, idx) => {
     const el = document.createElement('div');
     el.className = 'promo-card';
-    el.style.background = p.bgGradient;
-    el.style.color = p.textColor;
+    if (p.bgImage) {
+      el.style.backgroundImage = `url(${p.bgImage})`;
+    } else {
+      el.style.background = p.bgGradient;
+    }
+    el.style.color = p.textColor || '#FFFFFF';
     el.innerHTML = `
       <div>
         <h3>${p.title}</h3>
@@ -441,6 +448,21 @@ function renderHomeScreen() {
       </div>
     `;
     promoContainer.appendChild(el);
+
+    if (promoDotsContainer) {
+      const dot = document.createElement('span');
+      dot.className = `hero-carousel-dot ${idx === 0 ? 'active' : ''}`;
+      dot.onclick = (e) => {
+        e.stopPropagation();
+        const cardWidth = el.offsetWidth;
+        promoContainer.scrollTo({
+          left: idx * cardWidth,
+          behavior: 'smooth'
+        });
+        updateCarouselDots(idx);
+      };
+      promoDotsContainer.appendChild(dot);
+    }
   });
 
   // 2. Upcoming spotlight card (Find next active booking)
@@ -496,6 +518,7 @@ function renderHomeScreen() {
       <div class="book-again-img-wrapper" onclick="openSalonDetail('${salon.id}')">
         <img src="${salon.image}" alt="${salon.name}">
         <span class="book-again-distance">${salon.distance}</span>
+        ${salon.type === 'Unisex' ? '<span class="book-again-badge-unisex">Unisex</span>' : ''}
       </div>
       <div class="book-again-info">
         <div class="book-again-title-row">
@@ -532,6 +555,7 @@ function renderHomeScreen() {
       <div class="salon-img-wrapper">
         <img src="${s.image}" alt="${s.name}">
         <span class="salon-status-tag ${s.isOpen ? 'badge-open' : 'badge-closed'}">${s.openStatus}</span>
+        ${s.type === 'Unisex' ? '<span class="salon-badge-unisex">Unisex</span>' : ''}
         <button class="salon-favorite-btn ${isFav ? 'active' : ''}" onclick="event.stopPropagation(); toggleFavSalon('${s.id}')">
           <i data-lucide="heart"></i>
         </button>
@@ -714,19 +738,31 @@ function initPromoAutoSlide() {
     if (cards.length <= 1) return;
 
     currentPromoIndex = (currentPromoIndex + 1) % cards.length;
-    const cardWidth = cards[0].offsetWidth + 14;
+    const cardWidth = cards[0].offsetWidth;
     container.scrollTo({
       left: currentPromoIndex * cardWidth,
       behavior: 'smooth'
     });
+    
+    updateCarouselDots(currentPromoIndex);
   }, 5000);
 
   // Sync index on manual scroll
   container.addEventListener('scroll', () => {
     const cards = container.querySelectorAll('.promo-card');
     if (cards.length === 0) return;
-    const cardWidth = cards[0].offsetWidth + 14;
+    const cardWidth = cards[0].offsetWidth;
     currentPromoIndex = Math.round(container.scrollLeft / cardWidth);
+    updateCarouselDots(currentPromoIndex);
+  });
+}
+
+function updateCarouselDots(index) {
+  const dotsContainer = document.getElementById('homePromoDots');
+  if (!dotsContainer) return;
+  const dots = dotsContainer.querySelectorAll('.hero-carousel-dot');
+  dots.forEach((dot, idx) => {
+    dot.classList.toggle('active', idx === index);
   });
 }
 
@@ -1004,6 +1040,7 @@ function renderExploreList() {
         <div class="salon-img-wrapper" style="height:140px;">
           <img src="${s.image}" alt="${s.name}">
           <span class="salon-status-tag ${s.isOpen ? 'badge-open' : 'badge-closed'}">${s.openStatus}</span>
+          ${s.type === 'Unisex' ? '<span class="salon-badge-unisex">Unisex</span>' : ''}
           <button class="salon-favorite-btn ${isFav ? 'active' : ''}" onclick="event.stopPropagation(); toggleFavSalon('${s.id}')">
             <i data-lucide="heart"></i>
           </button>

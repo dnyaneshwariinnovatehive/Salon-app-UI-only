@@ -29,39 +29,39 @@ const SalonHubData = {
   promos: [
     {
       id: "promo_1",
-      title: "First Booking Offer",
-      desc: "Flat 20% off up to ₹250 on your first booking",
-      code: "WELCOME20",
-      bgGradient: "linear-gradient(135deg, #8A3FFC 0%, #E0267D 100%)",
+      title: "Summer Glow Specials",
+      desc: "Get up to 30% off on all Premium Facials",
+      code: "GLOW30",
+      bgImage: "https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?auto=format&fit=crop&w=600&q=80",
       textColor: "#FFFFFF"
     },
     {
       id: "promo_2",
-      title: "Monsoon Pampering",
-      desc: "Save ₹500 on premium hair spa & facial combos",
+      title: "Monsoon Hair Spa Combo",
+      desc: "Flat ₹500 off on L'Oreal Hair Spa Treatments",
       code: "RAINSPA",
-      bgGradient: "linear-gradient(135deg, #1C1236 0%, #42307D 100%)",
-      textColor: "#FAF3EA"
+      bgImage: "https://images.unsplash.com/photo-1562322140-8baeececf3df?auto=format&fit=crop&w=600&q=80",
+      textColor: "#FFFFFF"
     },
     {
       id: "promo_3",
-      title: "Nail Art Fest",
-      desc: "Buy 1 Get 1 free on Gel Extensions",
-      code: "NAILART",
-      bgGradient: "linear-gradient(135deg, #9C54F2 0%, #FFA2D2 100%)",
+      title: "Wedding Preps & Makeovers",
+      desc: "Book customized bridal or groom packages",
+      code: "BRIDAL20",
+      bgImage: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=600&q=80",
       textColor: "#FFFFFF"
     }
   ],
 
   categories: [
+    { id: "combos", name: "Combos", icon: "gift" },
     { id: "haircut", name: "Haircut", icon: "scissors" },
     { id: "makeup", name: "Makeup", icon: "sparkles" },
     { id: "nails", name: "Nails", icon: "hand" },
     { id: "spa", name: "Spa", icon: "wind" },
     { id: "colour", name: "Hair Colour", icon: "palette" },
     { id: "facial", name: "Facial", icon: "face-smile" },
-    { id: "bridal", name: "Bridal", icon: "award" },
-    { id: "combos", name: "Combos", icon: "gift" }
+    { id: "bridal", name: "Bridal", icon: "award" }
   ],
 
   stylists: [
