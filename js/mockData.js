@@ -60,7 +60,8 @@ const SalonHubData = {
     { id: "spa", name: "Spa", icon: "wind" },
     { id: "colour", name: "Hair Colour", icon: "palette" },
     { id: "facial", name: "Facial", icon: "face-smile" },
-    { id: "bridal", name: "Bridal", icon: "award" }
+    { id: "bridal", name: "Bridal", icon: "award" },
+    { id: "combos", name: "Combos", icon: "gift" }
   ],
 
   stylists: [
@@ -94,7 +95,8 @@ const SalonHubData = {
         { id: "s1_2", name: "Global Hair Colouring (L'Oreal)", category: "colour", price: 2499, time: "120 mins", desc: "All-over permanent colour matching your preference, includes conditioning." },
         { id: "s1_3", name: "Detox Face Glow Treatment", category: "facial", price: 999, time: "60 mins", desc: "Hydrating deep cleanse exfoliation and face massage with active serums." },
         { id: "s1_4", name: "Luxury Pedicure & Foot Massage", category: "nails", price: 799, time: "50 mins", desc: "Relaxing warm water herbal soak, nail shaping, scrubbing, mask and massage." },
-        { id: "s1_5", name: "Bridal HD Makeup Trial", category: "bridal", price: 3999, time: "90 mins", desc: "HD makeup consultation and setup by senior artists for your special day." }
+        { id: "s1_5", name: "Bridal HD Makeup Trial", category: "bridal", price: 3999, time: "90 mins", desc: "HD makeup consultation and setup by senior artists for your special day." },
+        { id: "s1_6", name: "Haircut + Face Glow Combo", category: "combos", price: 1299, time: "90 mins", desc: "Premium haircut, wash, and detox facial combo." }
       ],
       stylistIds: ["st_1", "st_2", "st_4"]
     },
@@ -119,7 +121,8 @@ const SalonHubData = {
         { id: "s2_1", name: "Classic Haircut & Beard Grooming", category: "haircut", price: 350, time: "40 mins", desc: "Standard haircut with personalized beard trim, hot towel massage." },
         { id: "s2_2", name: "Beard Spa & Steam", category: "haircut", price: 200, time: "20 mins", desc: "Organic oils massage, hot steam, line trim and conditioning balm application." },
         { id: "s2_3", name: "Deep Conditioning Hair Spa", category: "haircut", price: 899, time: "60 mins", desc: "Nourishing cream mask application, steam, massage and serum spray." },
-        { id: "s2_4", name: "Root Touch-up (No Ammonia)", category: "colour", price: 799, time: "60 mins", desc: "Precision grey coverage roots coloring for natural looking shine." }
+        { id: "s2_4", name: "Root Touch-up (No Ammonia)", category: "colour", price: 799, time: "60 mins", desc: "Precision grey coverage roots coloring for natural looking shine." },
+        { id: "s2_5", name: "Trend Haircut + Beard Spa Combo", category: "combos", price: 499, time: "60 mins", desc: "Trendy haircut, wash, and organic beard spa combo package." }
       ],
       stylistIds: ["st_1", "st_3"]
     },

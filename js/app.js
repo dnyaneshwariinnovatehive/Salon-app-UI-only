@@ -6,6 +6,7 @@ const AppState = {
   authMode: 'login', // 'login', 'signup', 'otp'
   currentTab: 'home',
   selectedLocation: "Koregaon Park, Pune",
+  homeGender: 'unisex', // 'unisex', 'male', 'female'
 
   // Search & Filter Settings on Explore
   searchQuery: "",
@@ -397,9 +398,17 @@ function performRegister() {
 // ----------------------------------------------------
 function renderHomeCategories() {
   const container = document.getElementById('homeCategoriesList');
+  if (!container) return;
   container.innerHTML = "";
 
-  SalonHubData.categories.forEach(cat => {
+  let list = [...SalonHubData.categories];
+  
+  // Filter categories for Men Only to omit Bridal, Nails, Makeup
+  if (AppState.homeGender === 'male') {
+    list = list.filter(cat => cat.id !== 'bridal' && cat.id !== 'nails' && cat.id !== 'makeup');
+  }
+
+  list.forEach(cat => {
     const el = document.createElement('button');
     el.className = `category-chip ${AppState.activeCategoryFilter === cat.id ? 'active' : ''}`;
     el.onclick = () => filterHomeCategory(cat.id);
@@ -463,10 +472,20 @@ function renderHomeScreen() {
     spotlightContainer.appendChild(el);
   }
 
-  // 3. Book Again row
+  // 3. Book Again row - Filtered by active gender
   const bookAgainContainer = document.getElementById('homeBookAgainList');
   bookAgainContainer.innerHTML = "";
-  const historyBookings = SalonHubData.bookings.filter(b => !b.isUpcoming);
+  
+  const historyBookings = SalonHubData.bookings.filter(b => !b.isUpcoming).filter(hb => {
+    const salon = SalonHubData.salons.find(s => s.id === hb.salonId);
+    if (!salon) return false;
+    if (AppState.homeGender === 'male') {
+      return salon.type === 'Men Only' || salon.type === 'Unisex';
+    } else if (AppState.homeGender === 'female') {
+      return salon.type === 'Women Only' || salon.type === 'Unisex';
+    }
+    return true;
+  });
 
   historyBookings.forEach(hb => {
     const salon = SalonHubData.salons.find(s => s.id === hb.salonId);
@@ -492,12 +511,18 @@ function renderHomeScreen() {
     bookAgainContainer.appendChild(el);
   });
 
-  // 4. Featured Salons vertical list
+  // 4. Featured Salons vertical list - Filtered by active gender
   const featuredContainer = document.getElementById('homeFeaturedSalonsList');
   featuredContainer.innerHTML = "";
 
-  // Sort salons by rating descending for featured section
-  const sortedSalons = [...SalonHubData.salons].sort((a, b) => b.rating - a.rating);
+  let filteredSalons = [...SalonHubData.salons];
+  if (AppState.homeGender === 'male') {
+    filteredSalons = filteredSalons.filter(s => s.type === "Men Only" || s.type === "Unisex");
+  } else if (AppState.homeGender === 'female') {
+    filteredSalons = filteredSalons.filter(s => s.type === "Women Only" || s.type === "Unisex");
+  }
+
+  const sortedSalons = filteredSalons.sort((a, b) => b.rating - a.rating);
   sortedSalons.forEach(s => {
     const isFav = SalonHubData.favourites.salonIds.includes(s.id);
     const el = document.createElement('div');
@@ -548,7 +573,7 @@ function renderHomeScreen() {
     featuredContainer.appendChild(el);
   });
 
-  // 5. Recommended section based on past bookings and favourites
+  // 5. Recommended section - Filtered by active gender
   const recContainer = document.getElementById('homeRecommendedList');
   recContainer.innerHTML = "";
 
@@ -559,10 +584,10 @@ function renderHomeScreen() {
     nails: "https://images.unsplash.com/photo-1604654894610-df63bc536371?auto=format&fit=crop&w=300&q=80",
     spa: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=300&q=80",
     makeup: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=300&q=80",
-    bridal: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=300&q=80"
+    bridal: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=300&q=80",
+    combos: "https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?auto=format&fit=crop&w=300&q=80"
   };
 
-  // Determine user category preferences based on bookings & favorites
   const preferredCategories = new Set();
 
   // Analyze bookings
@@ -589,15 +614,18 @@ function renderHomeScreen() {
     preferredCategories.add("facial");
   }
 
-  // Filter salons to recommend services matching preferences
   const recommendations = [];
-  SalonHubData.salons.forEach(s => {
+  filteredSalons.forEach(s => {
     s.services.forEach(serv => {
+      // Exclude gender-specific categories for male recommendations
+      if (AppState.homeGender === 'male' && (serv.category === 'bridal' || serv.category === 'nails' || serv.category === 'makeup')) {
+        return;
+      }
+      
       const isFavSalon = SalonHubData.favourites.salonIds.includes(s.id);
       const isPrefCat = preferredCategories.has(serv.category);
 
       if (isPrefCat || isFavSalon) {
-        // Avoid recommending services they've already scheduled upcoming
         const isUpcoming = SalonHubData.bookings.some(b => b.isUpcoming && b.salonId === s.id && b.serviceName.includes(serv.name));
         if (!isUpcoming) {
           recommendations.push({ salon: s, service: serv });
@@ -614,8 +642,12 @@ function renderHomeScreen() {
 
   // Fill in with defaults if we have fewer than 4 matches
   if (finalRecs.length < 4) {
-    SalonHubData.salons.forEach(s => {
+    filteredSalons.forEach(s => {
       s.services.forEach(serv => {
+        // Exclude gender-specific categories for male recommendations
+        if (AppState.homeGender === 'male' && (serv.category === 'bridal' || serv.category === 'nails' || serv.category === 'makeup')) {
+          return;
+        }
         if (finalRecs.length < 4 && !finalRecs.some(r => r.service.id === serv.id)) {
           finalRecs.push({ salon: s, service: serv });
         }
@@ -656,6 +688,70 @@ function renderHomeScreen() {
   });
 
   lucide.createIcons();
+  
+  // Initialize auto-sliding for banners
+  initPromoAutoSlide();
+}
+
+// ----------------------------------------------------
+// AUTO-SLIDING BANNER HERO CAROUSEL
+// ----------------------------------------------------
+let currentPromoIndex = 0;
+let promoTimer = null;
+
+function initPromoAutoSlide() {
+  const container = document.getElementById('homePromoCarousel');
+  if (!container) return;
+
+  if (promoTimer) clearInterval(promoTimer);
+
+  promoTimer = setInterval(() => {
+    // Only slide if the home screen is active
+    const homeScreen = document.getElementById('screen_home');
+    if (!homeScreen || !homeScreen.classList.contains('active')) return;
+
+    const cards = container.querySelectorAll('.promo-card');
+    if (cards.length <= 1) return;
+
+    currentPromoIndex = (currentPromoIndex + 1) % cards.length;
+    const cardWidth = cards[0].offsetWidth + 14;
+    container.scrollTo({
+      left: currentPromoIndex * cardWidth,
+      behavior: 'smooth'
+    });
+  }, 5000);
+
+  // Sync index on manual scroll
+  container.addEventListener('scroll', () => {
+    const cards = container.querySelectorAll('.promo-card');
+    if (cards.length === 0) return;
+    const cardWidth = cards[0].offsetWidth + 14;
+    currentPromoIndex = Math.round(container.scrollLeft / cardWidth);
+  });
+}
+
+// ----------------------------------------------------
+// HOMEPAGE GENDER FILTERING TOGGLE
+// ----------------------------------------------------
+function setGenderFilter(gender) {
+  AppState.homeGender = gender;
+
+  // Toggle active class on toggle buttons
+  const btnFemale = document.getElementById('btnGenderFemale');
+  const btnUnisex = document.getElementById('btnGenderUnisex');
+  const btnMale = document.getElementById('btnGenderMale');
+
+  if (btnFemale && btnUnisex && btnMale) {
+    btnFemale.classList.toggle('active', gender === 'female');
+    btnUnisex.classList.toggle('active', gender === 'unisex');
+    btnMale.classList.toggle('active', gender === 'male');
+  }
+
+  // Re-render categories (since categories shown change based on gender)
+  renderHomeCategories();
+
+  // Re-render the Home screen elements
+  renderHomeScreen();
 }
 
 function filterHomeCategory(catId) {

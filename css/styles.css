@@ -1070,23 +1070,48 @@ body.dark .app-container {
   color: var(--text-body);
 }
 
-.filter-btn {
-  width: 46px;
+/* Gender toggle container & buttons */
+.gender-toggle-container {
+  display: flex;
+  background-color: var(--border-color);
+  padding: 3px;
+  border-radius: 23px;
+  width: 140px;
   height: 46px;
-  background-color: var(--accent-soft);
+  flex-shrink: 0;
+  box-shadow: var(--shadow-card);
+}
+
+.gender-btn {
+  flex: 1;
+  background: none;
   border: none;
-  border-radius: 50%;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-body);
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  color: var(--accent-color);
-  box-shadow: var(--shadow-card);
-  transition: background-color 0.2s;
+  gap: 4px;
+  border-radius: 20px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.filter-btn:active {
-  background-color: var(--accent-soft-hover);
+.gender-btn svg {
+  width: 14px;
+  height: 14px;
+  stroke-width: 2.5;
+}
+
+.gender-btn:hover {
+  color: var(--text-heading);
+}
+
+.gender-btn.active {
+  background-color: var(--surface-color);
+  color: var(--accent-color);
+  box-shadow: 0 4px 10px rgba(156, 84, 242, 0.12);
 }
 
 /* Promotion banner carousel */

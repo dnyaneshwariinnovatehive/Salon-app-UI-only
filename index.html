@@ -312,9 +312,17 @@
             <i data-lucide="search"></i>
             <input type="text" placeholder="Search salons, services..." readonly onclick="focusSearchExplore()">
           </div>
-          <button class="filter-btn" onclick="openFilterDrawer()">
-            <i data-lucide="sliders-horizontal"></i>
-          </button>
+          <div class="gender-toggle-container">
+            <button class="gender-btn" id="btnGenderFemale" onclick="setGenderFilter('female')" title="Female Services">
+              <i data-lucide="venus"></i>
+            </button>
+            <button class="gender-btn active" id="btnGenderUnisex" onclick="setGenderFilter('unisex')" title="All Services">
+              <span>All</span>
+            </button>
+            <button class="gender-btn" id="btnGenderMale" onclick="setGenderFilter('male')" title="Male Services">
+              <i data-lucide="mars"></i>
+            </button>
+          </div>
         </div>
 
         <!-- Promotional Carousel Offers (Horizontal Scroll) -->
