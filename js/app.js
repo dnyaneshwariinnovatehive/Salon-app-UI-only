@@ -1558,6 +1558,9 @@ function openSalonDetail(salonId) {
   // Render Category Services menu
   renderDetailServicesList(salon);
 
+  // Render Recommended Combos
+  renderRecommendedCombos();
+
   // Update sticky bottom checkout bar
   updateStickyFooterBar();
 
@@ -1619,6 +1622,7 @@ function renderDetailServicesList(salon) {
     const isFavourited = SalonHubData.favourites.serviceIds.includes(s.id);
     const el = document.createElement('div');
     el.className = 'drawer-service-item';
+    el.onclick = () => toggleServiceSelection(s.id);
     el.innerHTML = `
       <div class="service-item-title-row">
         <div class="service-item-info">
@@ -1632,7 +1636,7 @@ function renderDetailServicesList(salon) {
       <p class="service-item-desc">${s.desc}</p>
       <div class="service-item-price-btn">
         <span class="service-item-price">₹${s.price}</span>
-        <button class="service-select-btn ${isSelected ? 'selected' : ''}" onclick="toggleServiceSelection('${s.id}')">
+        <button class="service-select-btn ${isSelected ? 'selected' : ''}" onclick="event.stopPropagation(); toggleServiceSelection('${s.id}')">
           <i data-lucide="${isSelected ? 'check' : 'plus'}"></i>
         </button>
       </div>
@@ -1668,6 +1672,89 @@ function toggleServiceSelection(serviceId) {
   }
 
   renderDetailServicesList(salon);
+  renderRecommendedCombos();
+  updateStickyFooterBar();
+}
+
+// ----------------------------------------------------
+// DYNAMIC RECOMMENDED COMBOS UPGRADE PANEL
+// ----------------------------------------------------
+function renderRecommendedCombos() {
+  const container = document.getElementById('detailRecommendedCombosContainer');
+  const listContainer = document.getElementById('detailRecommendedCombosList');
+  if (!container || !listContainer) return;
+
+  if (AppState.selectedServices.length === 0) {
+    container.style.display = 'none';
+    return;
+  }
+
+  const salon = SalonHubData.salons.find(s => s.id === AppState.selectedSalonId);
+  if (!salon) {
+    container.style.display = 'none';
+    return;
+  }
+
+  // Find combos that aren't already selected
+  const comboServices = salon.services.filter(s => s.category === 'combos' && !AppState.selectedServices.some(sel => sel.id === s.id));
+
+  if (comboServices.length === 0) {
+    container.style.display = 'none';
+    return;
+  }
+
+  container.style.display = 'block';
+  listContainer.innerHTML = "";
+
+  comboServices.forEach(s => {
+    const isFavourited = SalonHubData.favourites.serviceIds.includes(s.id);
+    const el = document.createElement('div');
+    el.className = 'drawer-service-item';
+    el.style.border = '1px solid var(--accent-soft)';
+    el.style.backgroundColor = 'rgba(156, 84, 242, 0.03)';
+    el.onclick = () => addComboToCart(s.id);
+    el.innerHTML = `
+      <div class="service-item-title-row">
+        <div class="service-item-info">
+          <span style="background-color: var(--accent-color); color: #fff; font-size: 8px; padding: 2px 6px; border-radius: 4px; font-weight: 700; text-transform: uppercase; display: inline-block; margin-bottom: 4px;">Save Big Combo!</span>
+          <h4>${s.name}</h4>
+          <span class="service-item-time"><i data-lucide="clock"></i>${s.time}</span>
+        </div>
+        <button class="salon-favorite-btn ${isFavourited ? 'active' : ''}" style="position:static; border:1px solid var(--border-color);" onclick="event.stopPropagation(); toggleDetailServiceFav('${s.id}')">
+          <i data-lucide="heart" style="width:15px; height:15px;"></i>
+        </button>
+      </div>
+      <p class="service-item-desc">${s.desc}</p>
+      <div class="service-item-price-btn">
+        <span class="service-item-price" style="color:var(--accent-color); font-weight:800;">₹${s.price}</span>
+        <button class="btn-primary" style="padding: 6px 12px; font-size: 11px; width: auto; box-shadow: none;" onclick="event.stopPropagation(); addComboToCart('${s.id}')">
+          Upgrade to Combo
+        </button>
+      </div>
+    `;
+    listContainer.appendChild(el);
+  });
+
+  lucide.createIcons();
+}
+
+function addComboToCart(comboId) {
+  const salon = SalonHubData.salons.find(s => s.id === AppState.selectedSalonId);
+  const service = salon.services.find(s => s.id === comboId);
+  if (!service) return;
+
+  // Swap similar category/name services with the combo service (e.g. if we have a haircut selected, remove it when upgrading to Haircut Combo)
+  const comboWords = service.name.toLowerCase().split(/[\s+\&]+/).filter(w => w.length > 3);
+  AppState.selectedServices = AppState.selectedServices.filter(sel => {
+    if (sel.category === 'combos') return true;
+    const sharesWord = comboWords.some(w => sel.name.toLowerCase().includes(w) || sel.category.toLowerCase().includes(w));
+    return !sharesWord;
+  });
+  AppState.selectedServices.push(service);
+
+  triggerToast(`Upgraded to ${service.name}!`);
+  renderDetailServicesList(salon);
+  renderRecommendedCombos();
   updateStickyFooterBar();
 }
 
@@ -1739,7 +1826,7 @@ function renderDateSlots() {
     futureDate.setDate(today.getDate() + i);
 
     const dayNum = futureDate.getDate();
-    const dayName = i === 0 ? 'Today' : weekdays[futureDate.getDay()];
+    const dayName = i === 0 ? 'Today' : i === 1 ? 'Tomorrow' : weekdays[futureDate.getDay()];
     const isActive = AppState.selectedDateNum === dayNum;
 
     const btn = document.createElement('button');
@@ -1784,6 +1871,14 @@ function renderTimeSlots() {
   });
 }
 
+const StylistSpecialties = {
+  st_1: ['haircut', 'colour', 'combos'], // Master Hair Stylist
+  st_2: ['facial', 'spa'],              // Senior Skin Consultant
+  st_3: ['nails'],                       // Nail Art Specialist
+  st_4: ['makeup', 'bridal'],            // Bridal Makeup Lead
+  st_5: ['spa']                          // Massage Therapist
+};
+
 function renderStylistsPicker() {
   const container = document.getElementById('slotStylistPickerList');
   container.innerHTML = "";
@@ -1800,6 +1895,14 @@ function renderStylistsPicker() {
 
   stylists.forEach(st => {
     const isActive = AppState.selectedStylistId === st.id;
+    
+    // Check specialties
+    let isSpecialist = false;
+    if (st.id !== 'any') {
+      const specialties = StylistSpecialties[st.id] || [];
+      isSpecialist = AppState.selectedServices.some(s => specialties.includes(s.category));
+    }
+
     const card = document.createElement('div');
     card.className = `stylist-picker-card ${isActive ? 'active' : ''}`;
     card.onclick = () => {
@@ -1809,8 +1912,11 @@ function renderStylistsPicker() {
     };
     card.innerHTML = `
       <img src="${st.avatar}" class="stylist-picker-avatar" alt="${st.name}">
-      <div class="stylist-picker-info">
-        <h4 class="stylist-picker-name">${st.name}</h4>
+      <div class="stylist-picker-info" style="flex:1;">
+        <div style="display:flex; align-items:center; justify-content:space-between; width:100%; gap:4px;">
+          <h4 class="stylist-picker-name" style="margin:0;">${st.name}</h4>
+          ${isSpecialist ? '<span class="specialist-badge">Specialist</span>' : st.id !== 'any' ? '<span class="free-badge">Free</span>' : ''}
+        </div>
         <span class="stylist-picker-role">${st.role}</span>
       </div>
     `;

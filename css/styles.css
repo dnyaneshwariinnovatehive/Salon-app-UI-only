@@ -2528,6 +2528,13 @@ input:checked+.slider:before {
   padding: 14px;
   border: 1px solid var(--border-color);
   box-shadow: var(--shadow-card);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.drawer-service-item:hover {
+  border-color: var(--accent-color);
+  box-shadow: 0 4px 14px rgba(156, 84, 242, 0.08);
 }
 
 .service-item-title-row {
@@ -2752,6 +2759,28 @@ input:checked+.slider:before {
 .stylist-picker-card.active {
   background-color: var(--accent-soft);
   border-color: var(--accent-color);
+}
+
+.specialist-badge {
+  background-color: rgba(255, 179, 0, 0.12);
+  color: #E6A100;
+  font-size: 8px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.free-badge {
+  background-color: rgba(76, 175, 80, 0.12);
+  color: #388E3C;
+  font-size: 8px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .stylist-picker-avatar {
