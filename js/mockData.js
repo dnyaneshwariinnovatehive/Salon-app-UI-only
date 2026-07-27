@@ -1,8 +1,8 @@
 const SalonHubData = {
   user: {
-    name: "Omkar",
+    name: "Dnyaneshwari",
     phone: "+91 98765 43210",
-    email: "omkar.deshmukh@gmail.com",
+    email: "dnyaneshwari@gmail.com",
     avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80",
     membership: {
       tier: "Gold Tier Member",
@@ -17,8 +17,8 @@ const SalonHubData = {
       ]
     },
     savedCards: [
-      { id: "card_1", brand: "visa", last4: "4321", exp: "12/29", holder: "OMKAR DESHMUKH" },
-      { id: "card_2", brand: "mastercard", last4: "8765", exp: "06/28", holder: "OMKAR DESHMUKH" }
+      { id: "card_1", brand: "visa", last4: "4321", exp: "12/29", holder: "DNYANESHWARI" },
+      { id: "card_2", brand: "mastercard", last4: "8765", exp: "06/28", holder: "DNYANESHWARI" }
     ],
     addresses: [
       { label: "Home", text: "Flat 402, Royal Palms, Aundh, Pune - 411007" },

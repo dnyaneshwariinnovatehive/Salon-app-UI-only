@@ -44,9 +44,17 @@ window.addEventListener('DOMContentLoaded', () => {
   updateSystemTime();
   setInterval(updateSystemTime, 60000);
 
-  // Initialize display
-  showScreen('onboarding');
+  // Initialize display with Splash Screen
+  showScreen('splash');
   document.getElementById('navigationBar').style.display = 'none';
+
+  // Transition to Login screen after 2.5 seconds (like Instagram logo pop)
+  setTimeout(() => {
+    const splashScreen = document.getElementById('screen_splash');
+    if (splashScreen && splashScreen.classList.contains('active')) {
+      showScreen('login');
+    }
+  }, 2500);
 
   // Initialize Category Icons in Home screen
   renderHomeCategories();
@@ -128,6 +136,18 @@ function navigateToTab(tabId) {
 // SCREEN 1: LOGIN / SIGNUP LOGIC
 // ----------------------------------------------------
 function toggleAuthTab(mode) {
+  if (mode === 'signup') {
+    showRegisterScreen();
+    // Keep login tab active visually on login screen, in case they return
+    const loginTab = document.getElementById('btnTabLogin');
+    const signupTab = document.getElementById('btnTabSignup');
+    if (loginTab && signupTab) {
+      loginTab.classList.add('active');
+      signupTab.classList.remove('active');
+    }
+    return;
+  }
+
   AppState.authMode = mode;
   const loginTab = document.getElementById('btnTabLogin');
   const signupTab = document.getElementById('btnTabSignup');
@@ -240,6 +260,136 @@ function confirmDeleteAccount() {
     performLogout();
     triggerToast("Account deleted successfully.");
   }
+}
+
+// ----------------------------------------------------
+// NEW REGISTRATION & ROLE VALIDATION FLOWS
+// ----------------------------------------------------
+let selectedRegRole = 'customer';
+
+function showRegisterScreen() {
+  showScreen('register');
+  
+  // Reset form fields
+  document.getElementById('regName').value = '';
+  document.getElementById('regPhone').value = '';
+  document.getElementById('regEmail').value = '';
+  document.getElementById('regPassword').value = '';
+  document.getElementById('regConfirmPassword').value = '';
+  
+  // Set default role
+  selectRole('customer');
+  
+  // Re-create icons in case Lucide needs to render inside the new screen
+  lucide.createIcons();
+}
+
+function selectRole(role) {
+  selectedRegRole = role;
+  
+  // Update chip active classes
+  const chips = document.querySelectorAll('.role-chip');
+  chips.forEach(chip => {
+    const chipText = chip.textContent.trim().toLowerCase();
+    const roleLower = role.toLowerCase();
+    
+    if (chipText === roleLower || 
+        (role === 'ServiceProvider' && chip.textContent.trim() === 'ServiceProvider') ||
+        (role === 'SuperAdmin' && chip.textContent.trim() === 'SuperAdmin')) {
+      chip.classList.add('active');
+    } else {
+      chip.classList.remove('active');
+    }
+  });
+  
+  // If the user selected any role except customer, immediately show the construction screen
+  if (role !== 'customer') {
+    const displayRole = role === 'ServiceProvider' ? 'Service Provider' : (role === 'SuperAdmin' ? 'Super Admin' : role);
+    document.getElementById('selectedRoleName').textContent = displayRole;
+    showScreen('not_built');
+  }
+}
+
+function goBackToRegistration() {
+  showScreen('register');
+  
+  // Reset active role to customer visually and logically
+  selectedRegRole = 'customer';
+  const chips = document.querySelectorAll('.role-chip');
+  chips.forEach(chip => {
+    if (chip.textContent.trim().toLowerCase() === 'customer') {
+      chip.classList.add('active');
+    } else {
+      chip.classList.remove('active');
+    }
+  });
+}
+
+function performRegister() {
+  const name = document.getElementById('regName').value.trim();
+  const phone = document.getElementById('regPhone').value.trim();
+  const email = document.getElementById('regEmail').value.trim();
+  const password = document.getElementById('regPassword').value;
+  const confirmPassword = document.getElementById('regConfirmPassword').value;
+  
+  // 1. Validation
+  if (!name) {
+    triggerToast("Please enter your Full Name.");
+    return;
+  }
+  if (!phone) {
+    triggerToast("Please enter your Phone Number.");
+    return;
+  }
+  if (!email) {
+    triggerToast("Please enter your Email Address.");
+    return;
+  }
+  if (!email.includes('@') || !email.includes('.')) {
+    triggerToast("Please enter a valid Email Address.");
+    return;
+  }
+  if (!password) {
+    triggerToast("Please enter a Password.");
+    return;
+  }
+  if (password.length < 6) {
+    triggerToast("Password must be at least 6 characters.");
+    return;
+  }
+  if (password !== confirmPassword) {
+    triggerToast("Passwords do not match.");
+    return;
+  }
+  
+  // 2. Role Check (backup check)
+  if (selectedRegRole !== 'customer') {
+    const displayRole = selectedRegRole === 'ServiceProvider' ? 'Service Provider' : (selectedRegRole === 'SuperAdmin' ? 'Super Admin' : selectedRegRole);
+    document.getElementById('selectedRoleName').textContent = displayRole;
+    showScreen('not_built');
+    return;
+  }
+  
+  // 3. Complete customer registration & log in
+  AppState.isAuthenticated = true;
+  document.getElementById('navigationBar').style.display = 'flex';
+  
+  // Save credentials to mock state
+  SalonHubData.user.name = name;
+  SalonHubData.user.phone = phone;
+  SalonHubData.user.email = email;
+  
+  // Load avatar image into home profile
+  document.getElementById('homeUserAvatar').src = SalonHubData.user.avatar;
+  
+  // Reset the home screen profile names
+  const greetingEl = document.querySelector('.location-picker .greeting');
+  if (greetingEl) {
+    greetingEl.textContent = `Hi ${name} 👋`;
+  }
+  
+  triggerToast(`Welcome to SalonHub, ${name}!`);
+  navigateToTab('home');
 }
 
 // ----------------------------------------------------

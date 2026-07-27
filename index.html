@@ -30,32 +30,19 @@
     <!-- Main Scrollable Screen Workspace -->
     <div class="main-content" id="mainContent">
 
-      <!-- ================= SCREEN 0: ONBOARDING SPLASH ================= -->
-      <div class="screen onboarding-screen" id="screen_onboarding">
-        <div class="onboarding-image-container">
-          <div class="onboarding-bg-glow"></div>
-          <div class="onboarding-image-frame">
-            <img src="https://images.unsplash.com/photo-1622286342621-4bd786c2447c?auto=format&fit=crop&w=450&q=80" alt="Professional Stylist" class="onboarding-main-img">
+      <!-- ================= SCREEN 0: SPLASH SCREEN ================= -->
+      <div class="screen splash-screen" id="screen_splash">
+        <div class="splash-logo-container">
+          <div class="splash-logo-glow"></div>
+          <div class="splash-logo">
+            <h1>Salon<span>Hub</span></h1>
+            <p class="splash-tagline">Premium Grooming & Beauty Discovery</p>
           </div>
-          <div class="onboarding-thumbs">
-            <div class="thumb-frame"><img src="https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?auto=format&fit=crop&w=150&q=80" alt="Facial Treatment"></div>
-            <div class="thumb-frame"><img src="https://images.unsplash.com/photo-1621605815971-fbc98d665033?auto=format&fit=crop&w=150&q=80" alt="Hair Styling"></div>
-            <div class="thumb-frame"><img src="https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&fit=crop&w=150&q=80" alt="Skin Care"></div>
+          <div class="splash-loader">
+            <span class="loader-dot"></span>
+            <span class="loader-dot"></span>
+            <span class="loader-dot"></span>
           </div>
-        </div>
-        <div class="onboarding-body">
-          <h2 class="onboarding-title">Beauty Made Simple<br>Wellness Made Essential</h2>
-          <p class="onboarding-desc">Transform Your Look, Transform Your Life.<br>Your Ultimate Beauty Awaits Here.</p>
-          
-          <div class="onboarding-dots">
-            <span class="dot"></span>
-            <span class="dot"></span>
-            <span class="dot active"></span>
-          </div>
-          
-          <button class="btn-primary" style="border-radius: 16px; font-weight: 700; text-transform: none; font-size: 16px; padding: 16px 24px;" onclick="startApp()">
-            Get Started
-          </button>
         </div>
       </div>
 
@@ -79,7 +66,7 @@
             <div class="form-group">
               <label for="loginEmail">Email Address</label>
               <input type="email" id="loginEmail" class="input-field" placeholder="name@domain.com"
-                value="omkar.deshmukh@gmail.com">
+                value="dnyaneshwari@gmail.com">
             </div>
             <div class="form-group">
               <label for="loginPassword">Password</label>
@@ -98,7 +85,7 @@
           <div id="signupFormFields" style="display: none;">
             <div class="form-group">
               <label for="signupName">Full Name</label>
-              <input type="text" id="signupName" class="input-field" placeholder="Omkar Deshmukh">
+              <input type="text" id="signupName" class="input-field" placeholder="Dnyaneshwari">
             </div>
             <div class="form-group">
               <label for="signupPhone">Phone Number</label>
@@ -166,9 +153,125 @@
           </button>
         </div>
 
-        <div class="login-footer-text" id="authFooterOption">
+        <div class="login-footer-text" id="authFooterOption" style="display: none;">
           <span id="authFooterLabel">Don't have an account?</span>
           <a href="#" id="authFooterLink" onclick="togglePhoneOrFields()">Continue with phone number</a>
+        </div>
+        <div class="login-footer-text" id="authRegisterOption" style="margin-top: 12px;">
+          <span>New to SalonHub? </span>
+          <a href="#" id="authRegisterLink" onclick="showRegisterScreen()">Register</a>
+        </div>
+      </div>
+
+      <!-- ================= SCREEN: REGISTER SCREEN ================= -->
+      <div class="screen register-screen" id="screen_register">
+        <div class="register-logo">
+          <h1>Salon<span>Hub</span></h1>
+          <p style="color: var(--text-body); font-size: 14px; margin-top: 5px;">Premium Grooming & Beauty Discovery</p>
+        </div>
+
+        <div class="register-header">
+          <h2>Create your SalonHub account</h2>
+          <p>Register as a SuperAdmin, Admin, ServiceProvider, or customer.</p>
+        </div>
+
+        <div class="register-form-fields">
+          <div class="form-group">
+            <label for="regName">Full Name *</label>
+            <div class="input-icon-wrapper">
+              <input type="text" id="regName" class="input-field has-left-icon" placeholder="Full name">
+              <i data-lucide="user" class="input-icon-left"></i>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="regPhone">Phone Number *</label>
+            <div class="input-icon-wrapper">
+              <input type="tel" id="regPhone" class="input-field has-left-icon" placeholder="Phone number">
+              <i data-lucide="phone" class="input-icon-left"></i>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Role</label>
+            <div class="role-selector-container">
+              <button type="button" class="role-chip active" onclick="selectRole('customer')">Customer</button>
+              <button type="button" class="role-chip" onclick="selectRole('ServiceProvider')">ServiceProvider</button>
+              <button type="button" class="role-chip" onclick="selectRole('Admin')">Admin</button>
+              <button type="button" class="role-chip" onclick="selectRole('SuperAdmin')">SuperAdmin</button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="regEmail">Email Address *</label>
+            <div class="input-icon-wrapper">
+              <input type="email" id="regEmail" class="input-field has-left-icon" placeholder="name@domain.com">
+              <i data-lucide="mail" class="input-icon-left"></i>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="regPassword">Password *</label>
+            <div class="input-icon-wrapper">
+              <input type="password" id="regPassword" class="input-field has-left-icon" placeholder="••••••••">
+              <i data-lucide="lock" class="input-icon-left"></i>
+              <button class="input-icon-btn" onclick="togglePasswordVisibility('regPassword')">
+                <i data-lucide="eye" id="regPasswordEye"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="regConfirmPassword">Confirm Password *</label>
+            <div class="input-icon-wrapper">
+              <input type="password" id="regConfirmPassword" class="input-field has-left-icon" placeholder="••••••••">
+              <i data-lucide="lock" class="input-icon-left"></i>
+              <button class="input-icon-btn" onclick="togglePasswordVisibility('regConfirmPassword')">
+                <i data-lucide="eye" id="regConfirmPasswordEye"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn-primary" onclick="performRegister()" style="margin-top: 10px;">
+          <span>Create Account</span>
+          <i data-lucide="user-plus"></i>
+        </button>
+
+        <div class="or-divider">OR</div>
+
+        <div class="social-logins">
+          <button class="social-btn" onclick="performSocialAuth('Google')" style="width: 100%;">
+            <svg viewBox="0 0 24 24" width="20" height="20">
+              <path fill="#EA4335" d="M12 5.04c1.64 0 3.12.56 4.28 1.67l3.2-3.2C17.52 1.64 14.96 1 12 1 7.35 1 3.4 3.65 1.5 7.53l3.85 3c.9-2.73 3.45-4.49 6.65-4.49z" />
+              <path fill="#4285F4" d="M23.49 12.27c0-.82-.07-1.6-.2-2.36H12v4.51h6.46c-.28 1.47-1.11 2.71-2.36 3.55l3.66 2.84c2.14-1.97 3.39-4.88 3.39-8.54z" />
+              <path fill="#FBBC05" d="M5.35 14.47c-.24-.73-.38-1.5-.38-2.3s.14-1.57.38-2.3L1.5 6.87C.54 8.77 0 10.9 0 13.13s.54 4.36 1.5 6.26l3.85-3.02z" />
+              <path fill="#34A853" d="M12 23c3.24 0 5.97-1.07 7.96-2.91l-3.66-2.84c-1.01.68-2.31 1.09-4.3 1.09-3.2 0-5.75-1.76-6.65-4.49l-3.85 3C3.4 20.35 7.35 23 12 23z" />
+            </svg>
+            Continue with Google
+          </button>
+        </div>
+
+        <div class="login-footer-text">
+          <span>Already have an account? </span>
+          <a href="#" onclick="showScreen('login')" style="color: var(--accent-color); font-weight: 600; text-decoration: none;">Sign in</a>
+        </div>
+      </div>
+
+      <!-- ================= SCREEN: ROLE NOT BUILT ================= -->
+      <div class="screen not-built-screen" id="screen_not_built">
+        <div class="not-built-container">
+          <div class="not-built-icon-wrapper">
+            <i data-lucide="construction" class="not-built-icon"></i>
+          </div>
+          <h2 class="not-built-title">Under Construction</h2>
+          <p class="not-built-desc">The <strong id="selectedRoleName">ServiceProvider</strong> role is yet to be built.</p>
+          <p class="not-built-subdesc">We are working hard to bring you the best experience. Currently, only the Customer dashboard is available.</p>
+          
+          <button class="btn-primary" onclick="goBackToRegistration()" style="width: 100%; max-width: 250px; margin: 24px auto 0;">
+            <i data-lucide="arrow-left"></i>
+            <span>Back to Registration</span>
+          </button>
         </div>
       </div>
 
@@ -187,7 +290,7 @@
             <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80"
               alt="Avatar" class="user-avatar" id="homeUserAvatar">
             <div class="location-picker">
-              <span class="greeting">Hi Omkar 👋</span>
+              <span class="greeting">Hi Dnyaneshwari 👋</span>
               <span class="location-name" onclick="event.stopPropagation(); openLocationDrawer()">
                 <span id="currentLocationText">Koregaon Park, Pune</span>
                 <i data-lucide="chevron-down"></i>
@@ -404,7 +507,7 @@
           <div class="profile-card-header">
             <img src="" class="profile-avatar-large" id="profileUserAvatar" alt="Profile">
             <div class="profile-name-tier">
-              <h3 id="profileUserName">Omkar Deshmukh</h3>
+              <h3 id="profileUserName">Dnyaneshwari</h3>
               <span class="member-badge">
                 <i data-lucide="crown" style="width:13px; height:13px;"></i>
                 <span id="profileUserBadge">Gold Tier Member</span>
@@ -724,7 +827,7 @@
       <div class="drawer-content" style="padding: 18px 20px;">
         <div class="form-group">
           <label>Cardholder Name</label>
-          <input type="text" id="newCardHolder" class="input-field" placeholder="OMKAR DESHMUKH" value="OMKAR DESHMUKH">
+          <input type="text" id="newCardHolder" class="input-field" placeholder="DNYANESHWARI" value="DNYANESHWARI">
         </div>
         <div class="form-group">
           <label>Card Number</label>
