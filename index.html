@@ -804,6 +804,32 @@
   </div>
 
 
+  <!-- ================= CART BOTTOM SHEET / DRAWER ================= -->
+  <div class="overlay" id="cartOverlay" onclick="closeCartDrawer()">
+    <div class="drawer" id="cartDrawer" onclick="event.stopPropagation()">
+      <div class="drawer-drag-bar" onclick="closeCartDrawer()"></div>
+      <div class="drawer-header">
+        <h3 style="font-size: 18px; font-weight:800;">Your Cart</h3>
+        <button class="drawer-close-btn" onclick="closeCartDrawer()"><i data-lucide="x"
+            style="width:16px; height:16px;"></i></button>
+      </div>
+
+      <div class="drawer-content" id="cartContent">
+        <!-- Dynamic cart items rendered here -->
+      </div>
+
+      <!-- Cart sticky footer -->
+      <div class="sticky-bottom-bar" id="cartFooterBar">
+        <div class="sticky-bottom-bar-left">
+          <span id="cartServiceCount">0 services</span>
+          <strong id="cartTotalPrice">₹0</strong>
+        </div>
+        <button class="btn-primary" onclick="proceedToSchedule()">Proceed to Schedule</button>
+      </div>
+    </div>
+  </div>
+
+
   <!-- ================= DETAILED BOTTOM SHEET / DRAWER (CHOOSE TIME SLOT) ================= -->
   <div class="overlay" id="slotPickerOverlay" onclick="closeSlotPickerDrawer()">
 

@@ -49,11 +49,13 @@ window.addEventListener('DOMContentLoaded', () => {
   showScreen('splash');
   document.getElementById('navigationBar').style.display = 'none';
 
-  // Transition to Login screen after 2.5 seconds (like Instagram logo pop)
+  // Transition directly to Home screen after splash (no login required upfront)
   setTimeout(() => {
     const splashScreen = document.getElementById('screen_splash');
     if (splashScreen && splashScreen.classList.contains('active')) {
-      showScreen('login');
+      document.getElementById('navigationBar').style.display = 'flex';
+      showScreen('home');
+      renderHomeScreen();
     }
   }, 2500);
 
@@ -1797,13 +1799,124 @@ function updateStickyFooterBar() {
 // ----------------------------------------------------
 // TIME SLOT SELECTION & CHECKOUT CONFIRMATION
 // ----------------------------------------------------
+// ----------------------------------------------------
+// CART DRAWER & BOOKING FLOW
+// ----------------------------------------------------
 function openSlotPickerDrawer() {
   if (!AppState.isAuthenticated) {
     showGuestLoginPrompt();
     return;
   }
-  // Hide details drawer overlays and open Slot Picker
+  if (AppState.selectedServices.length === 0) {
+    triggerToast("Please select at least one service first!");
+    return;
+  }
   closeAllDrawers();
+  openCartDrawer();
+}
+
+function openCartDrawer() {
+  document.getElementById('cartOverlay').classList.add('open');
+  document.getElementById('cartDrawer').classList.add('open');
+  renderCart();
+}
+
+function closeCartDrawer() {
+  document.getElementById('cartOverlay').classList.remove('open');
+  document.getElementById('cartDrawer').classList.remove('open');
+}
+
+function renderCart() {
+  const container = document.getElementById('cartContent');
+  container.innerHTML = "";
+
+  if (AppState.selectedServices.length === 0) {
+    container.innerHTML = `
+      <div class="empty-state" style="padding: 40px 20px;">
+        <div class="empty-state-icon"><i data-lucide="shopping-cart"></i></div>
+        <h4>Your cart is empty</h4>
+        <p>Add services from the salon menu to get started.</p>
+        <button class="btn-primary" style="max-width:220px;" onclick="closeCartDrawer(); openSalonDetail('${AppState.selectedSalonId}');">Browse Services</button>
+      </div>
+    `;
+    lucide.createIcons();
+    return;
+  }
+
+  const salon = SalonHubData.salons.find(s => s.id === AppState.selectedSalonId);
+
+  // Salon info header
+  if (salon) {
+    const salonHeader = document.createElement('div');
+    salonHeader.className = 'cart-salon-header';
+    salonHeader.innerHTML = `
+      <img src="${salon.image}" class="cart-salon-img" alt="${salon.name}">
+      <div class="cart-salon-info">
+        <h4>${salon.name}</h4>
+        <span>${salon.location} • <i data-lucide="star" style="width:11px; height:11px; fill:#FFB300; stroke:none; display:inline; vertical-align:middle;"></i> ${salon.rating}</span>
+      </div>
+    `;
+    container.appendChild(salonHeader);
+  }
+
+  // Service items
+  const itemsWrapper = document.createElement('div');
+  itemsWrapper.className = 'cart-items-wrapper';
+
+  AppState.selectedServices.forEach(service => {
+    const el = document.createElement('div');
+    el.className = 'cart-item';
+    el.innerHTML = `
+      <div class="cart-item-details">
+        <h4 class="cart-item-name">${service.name}</h4>
+        <span class="cart-item-time"><i data-lucide="clock"></i>${service.time}</span>
+      </div>
+      <div class="cart-item-right">
+        <span class="cart-item-price">₹${service.price}</span>
+        <button class="cart-item-remove-btn" onclick="removeFromCart('${service.id}')">
+          <i data-lucide="trash-2"></i>
+        </button>
+      </div>
+    `;
+    itemsWrapper.appendChild(el);
+  });
+
+  // Add more services button
+  const addMoreBtn = document.createElement('button');
+  addMoreBtn.className = 'cart-add-more-btn';
+  addMoreBtn.onclick = () => { closeCartDrawer(); openSalonDetail(AppState.selectedSalonId); };
+  addMoreBtn.innerHTML = `<i data-lucide="plus-circle"></i> Add More Services`;
+  itemsWrapper.appendChild(addMoreBtn);
+
+  container.appendChild(itemsWrapper);
+
+  // Update footer totals
+  const total = AppState.selectedServices.reduce((sum, s) => sum + s.price, 0);
+  const count = AppState.selectedServices.length;
+  document.getElementById('cartServiceCount').textContent = `${count} service${count > 1 ? 's' : ''}`;
+  document.getElementById('cartTotalPrice').textContent = `₹${total}`;
+
+  lucide.createIcons();
+}
+
+function removeFromCart(serviceId) {
+  AppState.selectedServices = AppState.selectedServices.filter(s => s.id !== serviceId);
+  if (AppState.selectedServices.length === 0) {
+    closeCartDrawer();
+    updateStickyFooterBar();
+    triggerToast("Cart is now empty.");
+    return;
+  }
+  renderCart();
+  updateStickyFooterBar();
+}
+
+function proceedToSchedule() {
+  if (AppState.selectedServices.length === 0) {
+    triggerToast("Please add at least one service!");
+    return;
+  }
+  closeCartDrawer();
 
   const overlay = document.getElementById('slotPickerOverlay');
   const drawer = document.getElementById('slotPickerDrawer');
@@ -1811,15 +1924,9 @@ function openSlotPickerDrawer() {
   overlay.classList.add('open');
   drawer.classList.add('open');
 
-  // Render Date Scroll list starting today
   renderDateSlots();
-
-  // Render time slots grids
   renderTimeSlots();
-
-  // Render Stylist Pickers list
   renderStylistsPicker();
-
   updateSlotConfirmDetails();
 }
 
