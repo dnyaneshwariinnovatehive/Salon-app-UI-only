@@ -101,8 +101,8 @@ function showScreen(screenId) {
 }
 
 function navigateToTab(tabId) {
-  if (!AppState.isAuthenticated) {
-    triggerToast("Please login to navigate options!");
+  if (!AppState.isAuthenticated && (tabId === 'bookings' || tabId === 'favourites' || tabId === 'profile')) {
+    showGuestLoginPrompt();
     return;
   }
 
@@ -422,6 +422,16 @@ function renderHomeCategories() {
 }
 
 function renderHomeScreen() {
+  // Update greeting name dynamically
+  const greetingEl = document.getElementById('homeUserGreeting');
+  if (greetingEl) {
+    if (AppState.isAuthenticated) {
+      greetingEl.innerText = "Hi Dnyaneshwari 👋";
+    } else {
+      greetingEl.innerText = "Hi Guest 👋";
+    }
+  }
+
   // 1. Promo banners list
   const promoContainer = document.getElementById('homePromoCarousel');
   const promoDotsContainer = document.getElementById('homePromoDots');
@@ -920,6 +930,8 @@ function getFilteredSalons() {
   // 2. Category Filter (triggered from home or detail views)
   if (AppState.activeCategoryFilter !== "all") {
     list = list.filter(s => s.services.some(serv => serv.category === AppState.activeCategoryFilter));
+    // Sort by rating descending so top-rated salons providing best category services come first
+    list.sort((a, b) => b.rating - a.rating);
   }
 
   // 3. Quick-Filter chips criteria
@@ -1029,7 +1041,19 @@ function renderExploreList() {
       return;
     }
 
-    resultsHeader.innerText = `${list.length} Salon${list.length > 1 ? 's' : ''} near you`;
+    const catObj = SalonHubData.categories.find(c => c.id === AppState.activeCategoryFilter);
+    if (catObj) {
+      resultsHeader.innerHTML = `
+        <div class="active-category-header-row" style="display:flex; align-items:center; justify-content:space-between; width:100%;">
+          <span>Best ${catObj.name} Salons near you</span>
+          <span class="clear-category-tag" onclick="clearCategoryFilter()" style="font-size:11px; background-color:var(--accent-soft); color:var(--accent-color); padding:4px 8px; border-radius:12px; cursor:pointer; font-weight:700;">
+            ${catObj.name} &times;
+          </span>
+        </div>
+      `;
+    } else {
+      resultsHeader.innerText = `${list.length} Salon${list.length > 1 ? 's' : ''} near you`;
+    }
 
     list.forEach(s => {
       const isFav = SalonHubData.favourites.salonIds.includes(s.id);
@@ -1781,6 +1805,10 @@ function updateStickyFooterBar() {
 // TIME SLOT SELECTION & CHECKOUT CONFIRMATION
 // ----------------------------------------------------
 function openSlotPickerDrawer() {
+  if (!AppState.isAuthenticated) {
+    showGuestLoginPrompt();
+    return;
+  }
   // Hide details drawer overlays and open Slot Picker
   closeAllDrawers();
 
@@ -2012,6 +2040,10 @@ function closeSuccessModalAndNavigate() {
 
 // Quick helper to book direct from favourites or suggestions
 function quickBookService(salonId, serviceId) {
+  if (!AppState.isAuthenticated) {
+    showGuestLoginPrompt();
+    return;
+  }
   const salon = SalonHubData.salons.find(s => s.id === salonId);
   const service = salon.services.find(s => s.id === serviceId);
 
@@ -2115,4 +2147,36 @@ function triggerToast(message, actionLabel = "", actionCallback = null) {
       setTimeout(() => toast.remove(), 300);
     }
   }, 3500);
+}
+
+// ----------------------------------------------------
+// GUEST MODE CONTROLLERS & EVENT LISTENERS
+// ----------------------------------------------------
+function continueAsGuest() {
+  AppState.isAuthenticated = false;
+  document.getElementById('navigationBar').style.display = 'flex';
+  navigateToTab('home');
+}
+
+function showGuestLoginPrompt() {
+  document.getElementById('guestLoginPromptOverlay').classList.add('open');
+}
+
+function closeGuestLoginPrompt() {
+  document.getElementById('guestLoginPromptOverlay').classList.remove('open');
+}
+
+function goToAuthFromGuest() {
+  closeGuestLoginPrompt();
+  closeAllDrawers(); // also close any open details drawer
+  
+  // Reset active state for redirection
+  AppState.isAuthenticated = false;
+  document.getElementById('navigationBar').style.display = 'none';
+  showScreen('login');
+}
+
+function clearCategoryFilter() {
+  AppState.activeCategoryFilter = "all";
+  renderExploreList();
 }
