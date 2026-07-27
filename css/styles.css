@@ -2592,32 +2592,54 @@ input:checked+.slider:before {
 
 /* Service Circular Select Button */
 .service-select-btn {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background-color: var(--accent-soft);
-  color: var(--accent-color);
+  padding: 10px 20px;
+  border-radius: 16px;
+  background: var(--accent-gradient);
+  color: #FFFFFF;
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
   border: none;
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 6px;
   cursor: pointer;
-  transition: all 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 14px rgba(156, 84, 242, 0.3);
+}
+
+.service-select-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(156, 84, 242, 0.4);
 }
 
 .service-select-btn:active {
-  transform: scale(0.9);
+  transform: scale(0.95);
+  box-shadow: 0 2px 8px rgba(156, 84, 242, 0.2);
 }
 
 .service-select-btn.selected {
-  background-color: var(--accent-color);
+  background: linear-gradient(135deg, var(--color-success) 0%, #1B5E20 100%);
   color: #FFFFFF;
+  border-color: var(--color-success);
+  box-shadow: 0 4px 14px rgba(46, 125, 50, 0.3);
 }
 
 .service-select-btn svg {
   width: 16px;
   height: 16px;
   stroke-width: 3px;
+}
+
+.time-slot-btn.frozen {
+  background-color: rgba(220, 220, 220, 0.3) !important;
+  color: var(--text-body) !important;
+  opacity: 0.6;
+  cursor: not-allowed !important;
+  text-decoration: line-through;
+  border-color: transparent !important;
+  pointer-events: none;
 }
 
 /* Floating bottom bar for checkouts */

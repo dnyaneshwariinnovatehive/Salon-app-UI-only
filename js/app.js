@@ -264,10 +264,8 @@ function confirmDeleteAccount() {
 }
 
 // ----------------------------------------------------
-// NEW REGISTRATION & ROLE VALIDATION FLOWS
+// NEW REGISTRATION & CUSTOMER SIGNUP FLOWS
 // ----------------------------------------------------
-let selectedRegRole = 'customer';
-
 function showRegisterScreen() {
   showScreen('register');
   
@@ -278,52 +276,8 @@ function showRegisterScreen() {
   document.getElementById('regPassword').value = '';
   document.getElementById('regConfirmPassword').value = '';
   
-  // Set default role
-  selectRole('customer');
-  
   // Re-create icons in case Lucide needs to render inside the new screen
   lucide.createIcons();
-}
-
-function selectRole(role) {
-  selectedRegRole = role;
-  
-  // Update chip active classes
-  const chips = document.querySelectorAll('.role-chip');
-  chips.forEach(chip => {
-    const chipText = chip.textContent.trim().toLowerCase();
-    const roleLower = role.toLowerCase();
-    
-    if (chipText === roleLower || 
-        (role === 'ServiceProvider' && chip.textContent.trim() === 'ServiceProvider') ||
-        (role === 'SuperAdmin' && chip.textContent.trim() === 'SuperAdmin')) {
-      chip.classList.add('active');
-    } else {
-      chip.classList.remove('active');
-    }
-  });
-  
-  // If the user selected any role except customer, immediately show the construction screen
-  if (role !== 'customer') {
-    const displayRole = role === 'ServiceProvider' ? 'Service Provider' : (role === 'SuperAdmin' ? 'Super Admin' : role);
-    document.getElementById('selectedRoleName').textContent = displayRole;
-    showScreen('not_built');
-  }
-}
-
-function goBackToRegistration() {
-  showScreen('register');
-  
-  // Reset active role to customer visually and logically
-  selectedRegRole = 'customer';
-  const chips = document.querySelectorAll('.role-chip');
-  chips.forEach(chip => {
-    if (chip.textContent.trim().toLowerCase() === 'customer') {
-      chip.classList.add('active');
-    } else {
-      chip.classList.remove('active');
-    }
-  });
 }
 
 function performRegister() {
@@ -363,15 +317,7 @@ function performRegister() {
     return;
   }
   
-  // 2. Role Check (backup check)
-  if (selectedRegRole !== 'customer') {
-    const displayRole = selectedRegRole === 'ServiceProvider' ? 'Service Provider' : (selectedRegRole === 'SuperAdmin' ? 'Super Admin' : selectedRegRole);
-    document.getElementById('selectedRoleName').textContent = displayRole;
-    showScreen('not_built');
-    return;
-  }
-  
-  // 3. Complete customer registration & log in
+  // 2. Complete customer registration & log in
   AppState.isAuthenticated = true;
   document.getElementById('navigationBar').style.display = 'flex';
   
@@ -1662,6 +1608,7 @@ function renderDetailServicesList(salon) {
         <span class="service-item-price">₹${s.price}</span>
         <button class="service-select-btn ${isSelected ? 'selected' : ''}" onclick="event.stopPropagation(); toggleServiceSelection('${s.id}')">
           <i data-lucide="${isSelected ? 'check' : 'plus'}"></i>
+          <span>${isSelected ? 'Added' : 'Add'}</span>
         </button>
       </div>
     `;
@@ -1839,22 +1786,21 @@ function renderDateSlots() {
   const container = document.getElementById('slotDatePickerList');
   container.innerHTML = "";
 
-  const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-  // Render next 7 days
+  // Only render Today and Tomorrow
   const today = new Date();
 
   if (!AppState.selectedDateNum) {
     AppState.selectedDateNum = today.getDate();
   }
 
-  for (let i = 0; i < 7; i++) {
+  for (let i = 0; i < 2; i++) {
     const futureDate = new Date(today);
     futureDate.setDate(today.getDate() + i);
 
     const dayNum = futureDate.getDate();
-    const dayName = i === 0 ? 'Today' : i === 1 ? 'Tomorrow' : weekdays[futureDate.getDay()];
+    const dayName = i === 0 ? 'Today' : 'Tomorrow';
     const isActive = AppState.selectedDateNum === dayNum;
 
     const btn = document.createElement('button');
@@ -1875,26 +1821,68 @@ function selectDateSlot(dateNum, formattedDate) {
   updateSlotConfirmDetails();
 }
 
+function timeToMinutes(timeStr) {
+  const [time, modifier] = timeStr.split(' ');
+  let [hours, minutes] = time.split(':').map(Number);
+  if (modifier === 'PM' && hours !== 12) {
+    hours += 12;
+  }
+  if (modifier === 'AM' && hours === 12) {
+    hours = 0;
+  }
+  return hours * 60 + minutes;
+}
+
 function renderTimeSlots() {
   const container = document.getElementById('slotTimePickerList');
   container.innerHTML = "";
 
-  const slots = ["09:30 AM", "10:30 AM", "11:30 AM", "01:00 PM", "02:30 PM", "04:00 PM", "05:30 PM", "07:00 PM"];
+  // Contiguous 30-minute intervals
+  const slots = [
+    "09:00 AM", "09:30 AM", "10:00 AM", "10:30 AM", "11:00 AM", "11:30 AM", 
+    "12:00 PM", "12:30 PM", "01:00 PM", "01:30 PM", "02:00 PM", "02:30 PM", 
+    "03:00 PM", "03:30 PM", "04:00 PM", "04:30 PM", "05:00 PM", "05:30 PM", 
+    "06:00 PM", "06:30 PM", "07:00 PM", "07:30 PM"
+  ];
 
   if (!AppState.selectedTimeSlot) {
-    AppState.selectedTimeSlot = slots[2]; // default 11:30 AM
+    AppState.selectedTimeSlot = "11:30 AM";
+  }
+
+  const totalDuration = AppState.selectedServices.reduce((sum, s) => {
+    const mins = parseInt(s.time) || 30;
+    return sum + mins;
+  }, 0);
+
+  let selectedMins = null;
+  if (AppState.selectedTimeSlot) {
+    selectedMins = timeToMinutes(AppState.selectedTimeSlot);
   }
 
   slots.forEach(time => {
+    const slotMins = timeToMinutes(time);
     const isActive = AppState.selectedTimeSlot === time;
+    
+    // Check overlap
+    let isFrozen = false;
+    if (selectedMins !== null && !isActive) {
+      isFrozen = slotMins > selectedMins && slotMins < (selectedMins + totalDuration);
+    }
+
     const btn = document.createElement('button');
-    btn.className = `time-slot-btn ${isActive ? 'active' : ''}`;
-    btn.onclick = () => {
-      AppState.selectedTimeSlot = time;
-      renderTimeSlots();
-      updateSlotConfirmDetails();
-    };
-    btn.innerText = time;
+    btn.className = `time-slot-btn ${isActive ? 'active' : ''} ${isFrozen ? 'frozen' : ''}`;
+    
+    if (isFrozen) {
+      btn.disabled = true;
+      btn.innerHTML = `${time} <span style="font-size:8px; display:block; opacity:0.7;">Frozen</span>`;
+    } else {
+      btn.onclick = () => {
+        AppState.selectedTimeSlot = time;
+        renderTimeSlots();
+        updateSlotConfirmDetails();
+      };
+      btn.innerText = time;
+    }
     container.appendChild(btn);
   });
 }
