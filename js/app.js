@@ -953,6 +953,52 @@ function renderExploreScreen() {
     favSection.style.display = 'none';
   }
 
+  // Render Top Rated Combos Near You
+  const combosSection = document.getElementById('exploreTopCombosSection');
+  const combosRow = document.getElementById('exploreTopCombosRow');
+  combosRow.innerHTML = "";
+
+  const allCombos = [];
+  SalonHubData.salons.filter(s => s.isOpen).sort((a, b) => b.rating - a.rating).forEach(salon => {
+    salon.services.filter(s => s.category === 'combos').forEach(combo => {
+      allCombos.push({ salon, combo });
+    });
+  });
+
+  if (allCombos.length > 0) {
+    combosSection.style.display = 'block';
+    allCombos.forEach(item => {
+      const el = document.createElement('div');
+      el.className = 'explore-combo-card';
+      el.onclick = () => openSalonDetail(item.salon.id);
+      el.innerHTML = `
+        <div class="explore-combo-img">
+          <img src="${item.salon.image}" alt="${item.combo.name}">
+          <span class="explore-combo-save-badge">SAVE BIG</span>
+        </div>
+        <div class="explore-combo-info">
+          <div class="explore-combo-salon-row">
+            <span class="explore-combo-salon-name">${item.salon.name}</span>
+            <span class="explore-combo-rating"><i data-lucide="star"></i>${item.salon.rating}</span>
+          </div>
+          <h4 class="explore-combo-name">${item.combo.name}</h4>
+          <div class="explore-combo-meta">
+            <span class="explore-combo-price">₹${item.combo.price}</span>
+            <span class="explore-combo-time"><i data-lucide="clock"></i>${item.combo.time}</span>
+          </div>
+          <div class="explore-combo-desc">${item.combo.desc}</div>
+          <button class="btn-primary explore-combo-book-btn" onclick="event.stopPropagation(); quickBookService('${item.salon.id}', '${item.combo.id}')">
+            Book Combo <i data-lucide="arrow-right"></i>
+          </button>
+        </div>
+      `;
+      combosRow.appendChild(el);
+    });
+  } else {
+    combosSection.style.display = 'none';
+  }
+
+  lucide.createIcons();
   renderExploreList();
 }
 

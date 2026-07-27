@@ -3081,3 +3081,141 @@ input:checked+.slider:before {
   color: var(--text-body);
   font-weight: 400;
 }
+
+/* Explore Top Rated Combos Section */
+.explore-combo-card {
+  min-width: 260px;
+  max-width: 260px;
+  background-color: var(--surface-color);
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1.5px solid var(--accent-color);
+  box-shadow: 0 4px 16px rgba(156, 84, 242, 0.1);
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  flex-shrink: 0;
+}
+
+.explore-combo-card:active {
+  transform: scale(0.98);
+}
+
+.explore-combo-img {
+  position: relative;
+  height: 100px;
+  overflow: hidden;
+}
+
+.explore-combo-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.explore-combo-save-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: var(--accent-gradient);
+  color: #FFFFFF;
+  font-size: 8px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(156, 84, 242, 0.3);
+}
+
+.explore-combo-info {
+  padding: 12px;
+}
+
+.explore-combo-salon-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.explore-combo-salon-name {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent-color);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 160px;
+}
+
+.explore-combo-rating {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-heading);
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.explore-combo-rating svg {
+  width: 11px;
+  height: 11px;
+  fill: #FFB300;
+  stroke: none;
+}
+
+.explore-combo-name {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--text-heading);
+  margin-bottom: 6px;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.explore-combo-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.explore-combo-price {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--accent-color);
+}
+
+.explore-combo-time {
+  font-size: 10px;
+  color: var(--text-body);
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.explore-combo-time svg {
+  width: 10px;
+  height: 10px;
+}
+
+.explore-combo-desc {
+  font-size: 10px;
+  color: var(--text-light);
+  line-height: 1.35;
+  margin-bottom: 10px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.explore-combo-book-btn {
+  width: 100%;
+  padding: 8px 14px;
+  font-size: 12px;
+  border-radius: 12px;
+}
