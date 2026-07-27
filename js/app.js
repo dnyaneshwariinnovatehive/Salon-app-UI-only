@@ -1554,10 +1554,12 @@ function toggleDarkModeSetting(checkbox) {
 // ----------------------------------------------------
 // INTERACTIVE DETAILED FLOW: SALON DETAILS OVERLAY
 // ----------------------------------------------------
-function openSalonDetail(salonId) {
+function openSalonDetail(salonId, preserveSelection) {
   AppState.selectedSalonId = salonId;
   AppState.selectedDetailCategory = "all";
-  AppState.selectedServices = []; // reset selection
+  if (!preserveSelection) {
+    AppState.selectedServices = []; // reset selection only if not coming from cart
+  }
 
   const salon = SalonHubData.salons.find(s => s.id === salonId);
   if (!salon) return;
@@ -1836,7 +1838,7 @@ function renderCart() {
         <div class="empty-state-icon"><i data-lucide="shopping-cart"></i></div>
         <h4>Your cart is empty</h4>
         <p>Add services from the salon menu to get started.</p>
-        <button class="btn-primary" style="max-width:220px;" onclick="closeCartDrawer(); openSalonDetail('${AppState.selectedSalonId}');">Browse Services</button>
+        <button class="btn-primary" style="max-width:220px;" onclick="closeCartDrawer(); openSalonDetail('${AppState.selectedSalonId}', true);">Browse Services</button>
       </div>
     `;
     lucide.createIcons();
@@ -1884,7 +1886,7 @@ function renderCart() {
   // Add more services button
   const addMoreBtn = document.createElement('button');
   addMoreBtn.className = 'cart-add-more-btn';
-  addMoreBtn.onclick = () => { closeCartDrawer(); openSalonDetail(AppState.selectedSalonId); };
+  addMoreBtn.onclick = () => { closeCartDrawer(); openSalonDetail(AppState.selectedSalonId, true); };
   addMoreBtn.innerHTML = `<i data-lucide="plus-circle"></i> Add More Services`;
   itemsWrapper.appendChild(addMoreBtn);
 
