@@ -264,6 +264,10 @@ body.dark .app-container {
   padding-right: 20px;
 }
 
+.mt-10 {
+  margin-top: 10px;
+}
+
 .mt-15 {
   margin-top: 15px;
 }
@@ -3360,4 +3364,727 @@ input:checked+.slider:before {
 .cart-add-more-btn svg {
   width: 18px;
   height: 18px;
+}
+
+/* =====================================================
+   SERVICE PROVIDER (SP) APP STYLES
+   ===================================================== */
+
+/* Role Selector on Login Screen */
+.role-selector {
+  display: flex;
+  gap: 8px;
+  padding: 4px;
+  background: var(--border-color);
+  border-radius: 14px;
+  margin-bottom: 20px;
+}
+.role-option {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-body);
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+.role-option.active {
+  background: var(--surface-color);
+  color: var(--accent-color);
+  box-shadow: 0 2px 8px rgba(156, 84, 242, 0.12);
+}
+.role-option svg { transition: color 0.25s ease; }
+.role-option.active svg { color: var(--accent-color); }
+
+/* SP Header */
+.sp-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px 12px;
+}
+.sp-header-info { display: flex; flex-direction: column; gap: 2px; }
+.sp-greeting { font-size: 20px; font-weight: 800; color: var(--text-heading); }
+.sp-salon-name { font-size: 12px; color: var(--text-body); }
+
+/* SP Status Toggle */
+.sp-status-toggle {
+  display: flex;
+  gap: 0;
+  padding: 4px;
+  margin: 0 20px;
+  background: var(--border-color);
+  border-radius: 12px;
+}
+.sp-status-btn {
+  flex: 1;
+  padding: 8px 10px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-body);
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+.sp-status-btn.active-available {
+  background: var(--color-success);
+  color: #fff;
+}
+.sp-status-btn.active-break {
+  background: var(--color-warning);
+  color: #fff;
+}
+.sp-status-btn.active-busy {
+  background: var(--color-danger);
+  color: #fff;
+}
+
+/* SP Next Appointment Card */
+.sp-next-appt-card {
+  background: var(--accent-gradient);
+  border-radius: 18px;
+  padding: 18px 20px;
+  color: #fff;
+  box-shadow: 0 8px 30px rgba(156, 84, 242, 0.25);
+}
+.sp-next-appt-badge {
+  display: inline-block;
+  background: rgba(255,255,255,0.2);
+  backdrop-filter: blur(4px);
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.sp-next-appt-customer { font-size: 17px; font-weight: 800; margin-bottom: 4px; }
+.sp-next-appt-service { font-size: 12px; opacity: 0.85; margin-bottom: 10px; }
+.sp-next-appt-time {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+.sp-next-appt-time svg { width: 14px; height: 14px; }
+
+/* SP Stats Row */
+.sp-stats-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+.sp-stat-card {
+  background: var(--surface-color);
+  border-radius: 14px;
+  padding: 14px;
+  box-shadow: var(--shadow-card);
+  text-align: center;
+}
+.sp-stat-card strong {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text-heading);
+  display: block;
+}
+.sp-stat-card p {
+  font-size: 11px;
+  color: var(--text-body);
+  margin-top: 2px;
+}
+.sp-stat-card.stat-earnings strong { color: var(--accent-color); }
+.sp-stat-card.stat-completed strong { color: var(--color-success); }
+.sp-stat-card.stat-remaining strong { color: var(--color-warning); }
+
+/* SP Hours Strip */
+.sp-hours-strip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: var(--surface-color);
+  border-radius: 12px;
+  box-shadow: var(--shadow-card);
+  font-size: 12px;
+  color: var(--text-body);
+}
+.sp-hours-strip svg { width: 14px; height: 14px; color: var(--accent-color); flex-shrink: 0; }
+
+/* SP Timeline */
+.sp-timeline { position: relative; padding-left: 24px; }
+.sp-timeline::before {
+  content: '';
+  position: absolute;
+  left: 7px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--border-color);
+}
+.sp-timeline-item {
+  position: relative;
+  margin-bottom: 12px;
+  padding: 12px 14px;
+  background: var(--surface-color);
+  border-radius: 14px;
+  box-shadow: var(--shadow-card);
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+.sp-timeline-item:active { transform: scale(0.98); }
+.sp-timeline-dot {
+  position: absolute;
+  left: -20px;
+  top: 16px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid var(--surface-color);
+}
+.sp-timeline-dot.dot-completed { background: var(--color-success); }
+.sp-timeline-dot.dot-in_progress { background: var(--color-warning); }
+.sp-timeline-dot.dot-scheduled { background: var(--accent-color); }
+.sp-timeline-dot.dot-no_show { background: var(--color-danger); }
+.sp-timeline-time {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-body);
+  margin-bottom: 4px;
+}
+.sp-timeline-customer { font-size: 14px; font-weight: 700; color: var(--text-heading); }
+.sp-timeline-service { font-size: 11px; color: var(--text-body); margin-top: 2px; }
+.sp-timeline-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 6px;
+}
+
+/* SP Appointment Badge */
+.sp-appt-badge {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 8px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.sp-appt-badge.badge-completed { background: var(--color-success-bg); color: var(--color-success); }
+.sp-appt-badge.badge-in_progress { background: var(--color-warning-bg); color: var(--color-warning); }
+.sp-appt-badge.badge-scheduled { background: var(--accent-soft); color: var(--accent-color); }
+.sp-appt-badge.badge-no_show { background: var(--color-danger-bg); color: var(--color-danger); }
+
+/* SP Filter Chips */
+.sp-filter-chips {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+.sp-filter-chips::-webkit-scrollbar { display: none; }
+.sp-filter-chip {
+  white-space: nowrap;
+  padding: 7px 14px;
+  border-radius: 20px;
+  border: 1.5px solid var(--border-color);
+  background: var(--surface-color);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-body);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.sp-filter-chip.active {
+  background: var(--accent-color);
+  color: #fff;
+  border-color: var(--accent-color);
+}
+
+/* SP Schedule Day/Week Toggle */
+.sp-toggle-bar {
+  display: flex;
+  gap: 0;
+  padding: 3px;
+  background: var(--border-color);
+  border-radius: 10px;
+}
+.sp-toggle-btn {
+  flex: 1;
+  padding: 7px 12px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-body);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.sp-toggle-btn.active {
+  background: var(--surface-color);
+  color: var(--accent-color);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+
+/* SP Date Navigator */
+.sp-date-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.sp-date-nav-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  border: 1.5px solid var(--border-color);
+  background: var(--surface-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-body);
+}
+.sp-date-nav-btn svg { width: 16px; height: 16px; }
+.sp-date-nav-label { font-size: 14px; font-weight: 700; color: var(--text-heading); }
+
+/* SP Walk-in Form */
+.sp-available-slots {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+}
+.sp-available-slots::-webkit-scrollbar { display: none; }
+.sp-slot-chip {
+  white-space: nowrap;
+  padding: 7px 12px;
+  border-radius: 10px;
+  border: 1.5px solid var(--border-color);
+  background: var(--surface-color);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-body);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.sp-slot-chip.active {
+  background: var(--accent-color);
+  color: #fff;
+  border-color: var(--accent-color);
+}
+.sp-slot-chip.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  text-decoration: line-through;
+}
+.sp-form-group { margin-bottom: 16px; }
+.sp-form-group label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-heading);
+  margin-bottom: 6px;
+}
+.sp-form-group .input-field {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1.5px solid var(--border-color);
+  border-radius: 12px;
+  background: var(--surface-color);
+  font-size: 14px;
+  color: var(--text-heading);
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+.sp-form-group .input-field:focus { border-color: var(--accent-color); }
+.sp-form-group select.input-field {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%237C758D' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 36px;
+}
+
+/* SP Profile Card */
+.sp-profile-card-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 20px;
+  background: var(--surface-color);
+  border-radius: 18px;
+  box-shadow: var(--shadow-card);
+  margin: 16px 20px;
+}
+.sp-profile-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--accent-soft);
+}
+.sp-profile-name { font-size: 18px; font-weight: 800; color: var(--text-heading); }
+.sp-profile-role-tag {
+  display: inline-block;
+  padding: 3px 10px;
+  background: var(--accent-soft);
+  color: var(--accent-color);
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  margin-top: 4px;
+}
+.sp-profile-salon { font-size: 12px; color: var(--text-body); margin-top: 2px; }
+
+/* SP Specialization Chips */
+.sp-spec-section { padding: 0 20px; margin-top: 16px; }
+.sp-spec-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.sp-spec-chip {
+  padding: 6px 14px;
+  border-radius: 20px;
+  background: var(--accent-soft);
+  color: var(--accent-color);
+  font-size: 12px;
+  font-weight: 600;
+  border: none;
+}
+.sp-spec-label { font-size: 11px; color: var(--text-light); font-style: italic; margin-top: 6px; }
+
+/* SP Info Rows */
+.sp-info-section { padding: 0 20px; margin-top: 20px; }
+.sp-section-title {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--text-heading);
+  margin-bottom: 10px;
+}
+.sp-info-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  background: var(--surface-color);
+  border-radius: 12px;
+  margin-bottom: 8px;
+  box-shadow: var(--shadow-card);
+}
+.sp-info-row-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--text-heading);
+}
+.sp-info-row-left svg { width: 16px; height: 16px; color: var(--text-body); }
+.sp-info-row-right {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  color: var(--text-body);
+}
+.sp-lock-icon { color: var(--text-light); cursor: not-allowed; }
+.sp-lock-icon svg { width: 14px; height: 14px; }
+
+/* SP Working Hours Grid */
+.sp-hours-grid { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
+.sp-hours-day {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: var(--surface-color);
+  border-radius: 10px;
+  font-size: 12px;
+}
+.sp-hours-day-name { font-weight: 700; color: var(--text-heading); width: 40px; }
+.sp-hours-day-time { color: var(--text-body); flex: 1; text-align: center; }
+.sp-hours-day-off { color: var(--color-danger); font-weight: 600; font-style: italic; }
+
+/* SP Leave Request Card */
+.sp-leave-card {
+  padding: 14px;
+  background: var(--surface-color);
+  border-radius: 14px;
+  box-shadow: var(--shadow-card);
+  margin-bottom: 10px;
+}
+.sp-leave-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+.sp-leave-date { font-size: 13px; font-weight: 700; color: var(--text-heading); }
+.sp-leave-badge {
+  padding: 3px 8px;
+  border-radius: 8px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.sp-leave-badge.badge-approved { background: var(--color-success-bg); color: var(--color-success); }
+.sp-leave-badge.badge-pending { background: var(--color-warning-bg); color: var(--color-warning); }
+.sp-leave-badge.badge-rejected { background: var(--color-danger-bg); color: var(--color-danger); }
+.sp-leave-type { font-size: 11px; color: var(--text-body); }
+.sp-leave-reason { font-size: 12px; color: var(--text-body); margin-top: 4px; }
+.sp-leave-add-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 12px;
+  border: 2px dashed var(--border-color);
+  border-radius: 14px;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent-color);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 8px;
+}
+.sp-leave-add-btn:hover { border-color: var(--accent-color); background: var(--accent-soft); }
+
+/* SP Earnings Card */
+.sp-earnings-card {
+  padding: 16px;
+  background: var(--surface-color);
+  border-radius: 14px;
+  box-shadow: var(--shadow-card);
+  margin-top: 8px;
+  cursor: pointer;
+}
+.sp-earnings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.sp-earnings-label { font-size: 12px; color: var(--text-body); }
+.sp-earnings-amount { font-size: 18px; font-weight: 800; color: var(--accent-color); }
+.sp-earnings-detail { font-size: 11px; color: var(--accent-color); margin-top: 4px; }
+
+/* SP Earnings Detail Overlay */
+.sp-earnings-period {
+  padding: 14px;
+  background: var(--surface-color);
+  border-radius: 14px;
+  box-shadow: var(--shadow-card);
+  margin-bottom: 12px;
+}
+.sp-earnings-period-title { font-size: 14px; font-weight: 700; color: var(--text-heading); margin-bottom: 10px; }
+.sp-earnings-breakdown { display: flex; flex-direction: column; gap: 6px; }
+.sp-earnings-row-detail {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+}
+.sp-earnings-row-detail span { color: var(--text-body); }
+.sp-earnings-row-detail strong { color: var(--text-heading); }
+.sp-earnings-bar {
+  height: 8px;
+  border-radius: 4px;
+  background: var(--border-color);
+  margin-top: 8px;
+  overflow: hidden;
+}
+.sp-earnings-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  background: var(--accent-gradient);
+  transition: width 0.5s ease;
+}
+
+/* SP Settings Rows */
+.sp-settings-section { padding: 0 20px; margin-top: 20px; }
+.sp-settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  background: var(--surface-color);
+  border-radius: 12px;
+  margin-bottom: 8px;
+  box-shadow: var(--shadow-card);
+}
+.sp-settings-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--text-heading);
+}
+.sp-settings-left svg { width: 16px; height: 16px; color: var(--text-body); }
+
+/* SP QR Scanner */
+.sp-qr-scanner {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 450px;
+  height: 100%;
+  background: #000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+.sp-qr-viewfinder {
+  width: 220px;
+  height: 220px;
+  position: relative;
+  border: 2px solid rgba(255,255,255,0.15);
+  border-radius: 16px;
+}
+.sp-qr-corner {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  border-color: var(--accent-color);
+  border-style: solid;
+  border-width: 0;
+}
+.sp-qr-corner-tl { top: -2px; left: -2px; border-top-width: 4px; border-left-width: 4px; border-radius: 16px 0 0 0; }
+.sp-qr-corner-tr { top: -2px; right: -2px; border-top-width: 4px; border-right-width: 4px; border-radius: 0 16px 0 0; }
+.sp-qr-corner-bl { bottom: -2px; left: -2px; border-bottom-width: 4px; border-left-width: 4px; border-radius: 0 0 0 16px; }
+.sp-qr-corner-br { bottom: -2px; right: -2px; border-bottom-width: 4px; border-right-width: 4px; border-radius: 0 0 16px 0; }
+.sp-qr-line {
+  position: absolute;
+  top: 0;
+  left: 10px;
+  right: 10px;
+  height: 2px;
+  background: var(--accent-color);
+  box-shadow: 0 0 8px var(--accent-color);
+  animation: qrScanLine 2s ease-in-out infinite;
+}
+@keyframes qrScanLine {
+  0%, 100% { top: 10px; }
+  50% { top: calc(100% - 10px); }
+}
+.sp-success-check {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: var(--color-success-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+}
+
+/* SP Appointment Detail Content */
+.sp-appt-detail-customer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.sp-appt-detail-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-color);
+  font-size: 18px;
+  font-weight: 800;
+}
+.sp-appt-detail-name { font-size: 16px; font-weight: 800; color: var(--text-heading); }
+.sp-appt-detail-phone {
+  font-size: 12px;
+  color: var(--accent-color);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 2px;
+}
+.sp-appt-detail-info-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--bg-color);
+  border-radius: 10px;
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+.sp-appt-detail-info-row svg { width: 16px; height: 16px; color: var(--accent-color); flex-shrink: 0; }
+.sp-appt-detail-info-row strong { color: var(--text-heading); }
+.sp-appt-detail-services {
+  margin: 14px 0;
+  padding: 12px;
+  background: var(--bg-color);
+  border-radius: 12px;
+}
+.sp-appt-service-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 0;
+  font-size: 13px;
+}
+.sp-appt-service-row:not(:last-child) { border-bottom: 1px dashed var(--border-color); }
+.sp-appt-payment-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: var(--bg-color);
+  border-radius: 10px;
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+.sp-appt-payment-row span { color: var(--text-body); }
+.sp-appt-payment-row strong { font-size: 15px; }
+.sp-appt-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+}
+.sp-appt-actions .btn-primary,
+.sp-appt-actions .btn-secondary {
+  flex: 1;
+  font-size: 12px;
+  padding: 10px;
+}
+.sp-amount-edit-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+  padding: 10px 14px;
+  background: var(--accent-soft);
+  border-radius: 12px;
+}
+.sp-amount-edit-row input {
+  flex: 1;
+  padding: 8px 10px;
+  border: 1.5px solid var(--accent-color);
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--accent-color);
+  background: var(--surface-color);
+  outline: none;
 }

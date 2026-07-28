@@ -36,7 +36,10 @@ const AppState = {
   // Selected Slots checkout details
   selectedDateNum: null,
   selectedTimeSlot: null,
-  selectedStylistId: null
+  selectedStylistId: null,
+
+  // Service Provider Mode
+  spMode: false,
 };
 
 // Initial Setup on Document Load
@@ -53,9 +56,14 @@ window.addEventListener('DOMContentLoaded', () => {
   setTimeout(() => {
     const splashScreen = document.getElementById('screen_splash');
     if (splashScreen && splashScreen.classList.contains('active')) {
-      document.getElementById('navigationBar').style.display = 'flex';
-      showScreen('home');
-      renderHomeScreen();
+      if (AppState.spMode) {
+        document.getElementById('spNavigationBar').style.display = 'flex';
+        spNavigateToTab('sp_home');
+      } else {
+        document.getElementById('navigationBar').style.display = 'flex';
+        showScreen('home');
+        renderHomeScreen();
+      }
     }
   }, 2500);
 
@@ -226,25 +234,39 @@ function moveOtpFocus(current, nextFieldId) {
 }
 
 function performAuth() {
-  // Validate values briefly and proceed
   AppState.isAuthenticated = true;
-  document.getElementById('navigationBar').style.display = 'flex';
 
-  // Update names in layout based on forms
+  if (AppState.spMode) {
+    // SP Login
+    document.getElementById('navigationBar').style.display = 'none';
+    document.getElementById('spNavigationBar').style.display = 'flex';
+    triggerToast(`Welcome back, Rahul!`);
+    spNavigateToTab('sp_home');
+    return;
+  }
+
+  // Customer Login (existing logic)
+  document.getElementById('navigationBar').style.display = 'flex';
   const nameInput = document.getElementById('signupName').value.trim();
   if (AppState.authMode === 'signup' && nameInput !== "") {
     SalonHubData.user.name = nameInput;
   }
-
-  // Load avatar image into home profile
   document.getElementById('homeUserAvatar').src = SalonHubData.user.avatar;
-
   triggerToast(`Welcome back, ${SalonHubData.user.name}!`);
   navigateToTab('home');
 }
 
 function performSocialAuth(platform) {
   AppState.isAuthenticated = true;
+
+  if (AppState.spMode) {
+    document.getElementById('navigationBar').style.display = 'none';
+    document.getElementById('spNavigationBar').style.display = 'flex';
+    triggerToast(`Signed in as Service Provider using ${platform}`);
+    spNavigateToTab('sp_home');
+    return;
+  }
+
   document.getElementById('navigationBar').style.display = 'flex';
   triggerToast(`Signed in successfully using ${platform}`);
   navigateToTab('home');
@@ -252,10 +274,30 @@ function performSocialAuth(platform) {
 
 function performLogout() {
   AppState.isAuthenticated = false;
+  AppState.spMode = false;
   document.getElementById('navigationBar').style.display = 'none';
+  document.getElementById('spNavigationBar').style.display = 'none';
   showScreen('login');
   toggleAuthTab('login');
+  // Reset role selector
+  document.getElementById('roleBtnCustomer').classList.add('active');
+  document.getElementById('roleBtnSP').classList.remove('active');
   triggerToast("Logged out of account.");
+}
+
+// ----------------------------------------------------
+// ROLE SWITCHING: Customer vs Service Provider
+// ----------------------------------------------------
+function switchAppRole(role) {
+  if (role === 'sp') {
+    AppState.spMode = true;
+    document.getElementById('roleBtnCustomer').classList.remove('active');
+    document.getElementById('roleBtnSP').classList.add('active');
+  } else {
+    AppState.spMode = false;
+    document.getElementById('roleBtnCustomer').classList.add('active');
+    document.getElementById('roleBtnSP').classList.remove('active');
+  }
 }
 
 function confirmDeleteAccount() {

@@ -53,6 +53,18 @@
           <p style="color: var(--text-body); font-size: 14px; margin-top: 5px;">Premium Grooming & Beauty Discovery</p>
         </div>
 
+        <!-- Role Selector -->
+        <div class="role-selector" id="roleSelector">
+          <button class="role-option active" id="roleBtnCustomer" onclick="switchAppRole('customer')">
+            <i data-lucide="user" style="width:16px; height:16px;"></i>
+            <span>Customer</span>
+          </button>
+          <button class="role-option" id="roleBtnSP" onclick="switchAppRole('sp')">
+            <i data-lucide="scissors" style="width:16px; height:16px;"></i>
+            <span>Service Provider</span>
+          </button>
+        </div>
+
         <!-- Auth Tabs Toggle -->
         <div class="login-tabs">
           <button class="login-tab-btn active" id="btnTabLogin" onclick="toggleAuthTab('login')">Login</button>
@@ -706,6 +718,93 @@
         </div>
       </div>
 
+      <!-- ================= SP SCREEN: HOME DASHBOARD ================= -->
+      <div class="screen sp-screen" id="screen_sp_home">
+        <div class="sp-header">
+          <img id="spHomeAvatar" src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&q=80" alt="Avatar" style="width:44px; height:44px; border-radius:50%; object-fit:cover; border:2px solid var(--accent-soft);">
+          <div class="sp-header-info" style="flex:1; margin-left:12px;">
+            <span class="sp-greeting" id="spHomeGreeting">Hi Rahul 👋</span>
+            <span class="sp-salon-name" id="spHomeSalonInfo">Luxe Studio Salon • Koregaon Park, Pune</span>
+          </div>
+          <button class="header-btn" onclick="openNotificationsDrawer()">
+            <i data-lucide="bell"></i>
+            <div class="badge-dot"></div>
+          </button>
+        </div>
+
+        <div id="spStatusPills" class="px-20 mt-10" style="display:flex; gap:8px;"></div>
+        <div id="spNextApptCard" class="px-20 mt-15"></div>
+        <div id="spStatsRow" class="px-20 mt-15" style="display:flex; gap:10px;"></div>
+        <div id="spShiftInfo" class="px-20 mt-15" style="display:flex; align-items:center; gap:8px; padding:10px 14px; background:var(--surface-color); border-radius:12px; box-shadow:var(--shadow-card);"></div>
+        <div class="px-20 mt-15"><h3 style="font-size:16px; font-weight:800;">Today's Timeline</h3></div>
+        <div id="spTimeline" class="px-20 mt-10" style="padding-bottom:24px;"></div>
+      </div>
+
+      <!-- ================= SP SCREEN: SCHEDULE ================= -->
+      <div class="screen sp-screen" id="screen_sp_schedule">
+        <div class="sp-header">
+          <h2 class="screen-title">Schedule</h2>
+        </div>
+        <div class="px-20 mt-10" style="display:flex; align-items:center; gap:10px;">
+          <button id="spScheduleDayBtn" onclick="spToggleScheduleView('day')" style="background:#9C54F2; color:#fff; border:none; padding:8px 20px; border-radius:20px; font-size:12px; font-weight:700; cursor:pointer;">Day</button>
+          <button id="spScheduleWeekBtn" onclick="spToggleScheduleView('week')" style="background:#F3EEFF; color:#9C54F2; border:none; padding:8px 20px; border-radius:20px; font-size:12px; font-weight:700; cursor:pointer;">Week</button>
+          <div style="display:flex; align-items:center; gap:8px; margin-left:auto;">
+            <button onclick="spScheduleNav(-1)" style="background:none; border:none; cursor:pointer; padding:4px;"><i data-lucide="chevron-left" style="width:18px; height:18px; color:#666;"></i></button>
+            <span id="spScheduleDateLabel" style="font-size:13px; font-weight:700; color:#333; white-space:nowrap;"></span>
+            <button onclick="spScheduleNav(1)" style="background:none; border:none; cursor:pointer; padding:4px;"><i data-lucide="chevron-right" style="width:18px; height:18px; color:#666;"></i></button>
+          </div>
+        </div>
+        <div id="spScheduleFilters" class="px-20 mt-10" style="display:flex; gap:6px; overflow-x:auto;"></div>
+        <div id="spScheduleTimeline" class="px-20 mt-15" style="padding-bottom:24px;"></div>
+      </div>
+
+      <!-- ================= SP SCREEN: ADD WALK-IN ================= -->
+      <div class="screen sp-screen" id="screen_sp_walkin">
+        <div class="sp-header">
+          <h2 class="screen-title">Add Walk-in Customer</h2>
+        </div>
+        <div id="spWalkinSlots" class="px-20 mt-10" style="display:flex; gap:6px; overflow-x:auto; padding-bottom:4px;"></div>
+        <div class="px-20 mt-15" style="padding-bottom:24px;">
+          <h3 style="font-size:14px; font-weight:700; color:#333; margin-bottom:10px;">Customer Details</h3>
+          <div style="margin-bottom:12px;">
+            <label style="font-size:12px; font-weight:700; color:#555; display:block; margin-bottom:4px;">Customer Name</label>
+            <input type="text" id="spWalkinName" placeholder="Enter name" oninput="spUpdateWalkinField('name', this.value)" style="width:100%; padding:12px; border:1.5px solid #E0E0E0; border-radius:10px; font-size:14px; box-sizing:border-box;">
+          </div>
+          <div style="margin-bottom:12px;">
+            <label style="font-size:12px; font-weight:700; color:#555; display:block; margin-bottom:4px;">Phone (optional)</label>
+            <input type="tel" id="spWalkinPhone" placeholder="Enter phone" oninput="spUpdateWalkinField('phone', this.value)" style="width:100%; padding:12px; border:1.5px solid #E0E0E0; border-radius:10px; font-size:14px; box-sizing:border-box;">
+          </div>
+          <div style="margin-bottom:16px;">
+            <label style="font-size:12px; font-weight:700; color:#555; display:block; margin-bottom:4px;">Service</label>
+            <select id="spWalkinService" onchange="spUpdateWalkinField('serviceId', this.value)" style="width:100%; padding:12px; border:1.5px solid #E0E0E0; border-radius:10px; font-size:14px; box-sizing:border-box; background:#fff; color:#333;">
+              <option value="">Select service...</option>
+            </select>
+          </div>
+          <button onclick="submitWalkinForm()" style="width:100%; padding:14px; background:#222; color:#fff; border:none; border-radius:12px; font-size:14px; font-weight:700; cursor:pointer;">Add Walk-in</button>
+        </div>
+      </div>
+
+      <!-- ================= SP SCREEN: PROFILE ================= -->
+      <div class="screen sp-screen" id="screen_sp_profile">
+        <div class="sp-header">
+          <h2 class="screen-title">My Profile</h2>
+        </div>
+        <div class="profile-scroll" style="padding-bottom:24px;">
+          <div id="spProfileCard"></div>
+          <div id="spProfileSpecializations" class="px-20 mt-15"></div>
+          <div class="px-20 mt-15"><h3 class="sp-section-title">Personal Information</h3></div>
+          <div id="spProfileInfo"></div>
+          <div class="px-20 mt-15"><h3 class="sp-section-title">Working Hours</h3></div>
+          <div id="spProfileWorkingHours" class="px-20"></div>
+          <div class="px-20 mt-15"><h3 class="sp-section-title">Leave Requests</h3></div>
+          <div id="spProfileLeaveRequests" class="px-20"></div>
+          <div class="px-20 mt-15"><h3 class="sp-section-title">Earnings</h3></div>
+          <div id="spProfileEarningsRow" class="px-20"></div>
+          <div class="px-20 mt-15"><h3 class="sp-section-title">Account Settings</h3></div>
+          <div id="spProfileSettings" class="px-20"></div>
+        </div>
+      </div>
+
     </div>
 
     <!-- ================= FIXED BOTTOM TAB NAVIGATION BAR ================= -->
@@ -727,6 +826,26 @@
         <span>Favourites</span>
       </a>
       <a class="nav-item" data-tab="profile" onclick="navigateToTab('profile')">
+        <i data-lucide="user"></i>
+        <span>Profile</span>
+      </a>
+    </div>
+
+    <!-- SP Bottom Navigation -->
+    <div class="nav-footer sp-nav-footer" id="spNavigationBar" style="display: none;">
+      <a class="nav-item sp-nav-item active" data-tab="sp_home" onclick="spNavigateToTab('sp_home')">
+        <i data-lucide="home"></i>
+        <span>Home</span>
+      </a>
+      <a class="nav-item sp-nav-item" data-tab="sp_schedule" onclick="spNavigateToTab('sp_schedule')">
+        <i data-lucide="calendar"></i>
+        <span>Schedule</span>
+      </a>
+      <a class="nav-item sp-nav-item" data-tab="sp_walkin" onclick="spNavigateToTab('sp_walkin')">
+        <i data-lucide="user-plus"></i>
+        <span>Add Walk-in</span>
+      </a>
+      <a class="nav-item sp-nav-item" data-tab="sp_profile" onclick="spNavigateToTab('sp_profile')">
         <i data-lucide="user"></i>
         <span>Profile</span>
       </a>
@@ -1085,6 +1204,45 @@
     </div>
   </div>
 
+<!-- SP Appointment Detail Overlay -->
+<div class="overlay" id="spDetailOverlay" onclick="closeSPOverlay('spDetailOverlay')">
+  <div class="drawer" id="spDetailDrawer" onclick="event.stopPropagation()">
+    <div class="drawer-drag-bar" onclick="closeSPOverlay('spDetailOverlay')"></div>
+    <div class="drawer-header">
+      <h3 style="font-size:18px; font-weight:800;">Appointment Details</h3>
+      <button class="drawer-close-btn" onclick="closeSPOverlay('spDetailOverlay')"><i data-lucide="x" style="width:16px; height:16px;"></i></button>
+    </div>
+    <div class="drawer-content" id="spDetailContent"></div>
+  </div>
+</div>
+
+<!-- SP QR Scan Overlay -->
+<div class="overlay" id="spScanOverlay"></div>
+
+  <!-- SP Earnings Detail Overlay -->
+  <div class="overlay" id="spEarningsOverlay" onclick="closeSPOverlay('spEarningsOverlay')">
+    <div class="drawer" id="spEarningsDrawer" onclick="event.stopPropagation()" style="max-height:70%;">
+      <div class="drawer-drag-bar" onclick="closeSPOverlay('spEarningsOverlay')"></div>
+      <div class="drawer-header">
+        <h3 style="font-size:18px; font-weight:800;">My Earnings</h3>
+        <button class="drawer-close-btn" onclick="closeSPOverlay('spEarningsOverlay')"><i data-lucide="x" style="width:16px; height:16px;"></i></button>
+      </div>
+      <div class="drawer-content" id="spEarningsContent"></div>
+    </div>
+  </div>
+
+  <!-- SP Leave Request Overlay -->
+  <div class="overlay" id="spLeaveOverlay" onclick="closeSPOverlay('spLeaveOverlay')">
+    <div class="drawer" id="spLeaveDrawer" onclick="event.stopPropagation()" style="max-height:70%;">
+      <div class="drawer-drag-bar" onclick="closeSPOverlay('spLeaveOverlay')"></div>
+      <div class="drawer-header">
+        <h3 style="font-size:18px; font-weight:800;">Request Leave</h3>
+        <button class="drawer-close-btn" onclick="closeSPOverlay('spLeaveOverlay')"><i data-lucide="x" style="width:16px; height:16px;"></i></button>
+      </div>
+      <div class="drawer-content" id="spLeaveContent"></div>
+    </div>
+  </div>
+
 
   <!-- ================= EXTERNAL SCRIPTS ================= -->
   <!-- Lucide icons CDN -->
@@ -1093,6 +1251,9 @@
   <script src="js/mockData.js"></script>
   <!-- Main Application Logic Script -->
   <script src="js/app.js"></script>
+  <!-- Service Provider Data & Logic -->
+  <script src="js/spData.js"></script>
+  <script src="js/spApp.js"></script>
 
 </body>
 
