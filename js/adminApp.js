@@ -144,12 +144,12 @@ function renderAdminHomeScreen() {
   document.getElementById('adminStatOnDuty').innerText = activeProviders.length - onLeaveToday.length;
   document.getElementById('adminStatOnLeave').innerText = onLeaveToday.length;
 
-  // Pending leave requests (top 2)
+  // Pending leave requests (all)
   const pendingLeaves = AdminData.providerLeaves.filter(l => l.status === 'pending');
   document.getElementById('adminPendingLeaveCount').innerText = pendingLeaves.length;
   const pendingContainer = document.getElementById('adminPendingLeaveList');
   pendingContainer.innerHTML = '';
-  pendingLeaves.slice(0, 2).forEach(lv => {
+  pendingLeaves.forEach(lv => {
     const pName = getProviderName(lv.provider_id);
     const card = document.createElement('div');
     card.style.cssText = 'display:flex; align-items:center; justify-content:space-between; padding:12px; background:var(--color-warning-bg); border-radius:12px; margin-bottom:8px;';
@@ -167,20 +167,22 @@ function renderAdminHomeScreen() {
     pendingContainer.appendChild(card);
   });
 
-  // Daily load per provider
+  // Daily load per provider (grid 2 per row)
   const loadContainer = document.getElementById('adminProviderLoad');
   loadContainer.innerHTML = '';
   activeProviders.forEach(p => {
     const count = todayAppts.filter(a => a.provider_id === p.id).length;
     const card = document.createElement('div');
-    card.style.cssText = 'min-width:120px; background:var(--surface-color); border-radius:14px; padding:12px; border:1px solid var(--border-color); flex-shrink:0;';
+    card.style.cssText = 'background:var(--surface-color); border-radius:14px; padding:12px; border:1px solid var(--border-color); display:flex; align-items:center; gap:10px;';
     card.innerHTML = `
-      <img src="${p.avatar}" style="width:36px; height:36px; border-radius:50%; object-fit:cover; margin-bottom:6px;">
-      <div style="font-size:12px; font-weight:700; color:var(--text-heading);">${p.name}</div>
-      <div style="font-size:11px; color:var(--text-light);">${p.role}</div>
-      <div style="margin-top:6px; display:flex; align-items:center; gap:4px;">
-        <span style="font-size:18px; font-weight:800; color:var(--accent-color);">${count}</span>
-        <span style="font-size:11px; color:var(--text-body);">appts</span>
+      <img src="${p.avatar}" style="width:40px; height:40px; border-radius:50%; object-fit:cover;">
+      <div style="flex:1; min-width:0;">
+        <div style="font-size:12px; font-weight:700; color:var(--text-heading);">${p.name}</div>
+        <div style="font-size:10px; color:var(--text-light);">${p.role}</div>
+      </div>
+      <div style="text-align:center;">
+        <div style="font-size:18px; font-weight:800; color:var(--accent-color);">${count}</div>
+        <div style="font-size:9px; color:var(--text-body);">appts</div>
       </div>
     `;
     loadContainer.appendChild(card);
@@ -219,6 +221,15 @@ function adminRejectLeave(leaveId) {
 // ----------------------------------------------------
 function adminOpenAddProvider() {
   AdminState.editingProvider = null;
+  openAdminDrawer('adminProviderFormDrawer');
+  renderAdminProviderForm();
+}
+
+function adminEditProvider(providerId) {
+  const p = getProvider(providerId);
+  if (!p) return;
+  AdminState.editingProvider = p;
+  closeAdminDrawer('adminProviderProfileDrawer');
   openAdminDrawer('adminProviderFormDrawer');
   renderAdminProviderForm();
 }
@@ -284,12 +295,40 @@ function renderAdminAppointmentsScreen() {
 }
 
 function applyAdminApptFilter() {
-  AdminState.appointmentsFilter.date = document.getElementById('adminApptDateFilter').value;
+  const dateVal = document.getElementById('adminApptDateFilter').value;
+  const customDateInput = document.getElementById('adminApptCustomDate');
+  if (dateVal === 'custom') {
+    customDateInput.style.display = 'block';
+    if (customDateInput.value) {
+      AdminState.appointmentsFilter.date = 'custom_' + customDateInput.value;
+    } else {
+      AdminState.appointmentsFilter.date = 'custom';
+    }
+  } else {
+    customDateInput.style.display = 'none';
+    AdminState.appointmentsFilter.date = dateVal;
+  }
   AdminState.appointmentsFilter.provider = document.getElementById('adminApptProviderFilter').value;
   AdminState.appointmentsFilter.service = document.getElementById('adminApptServiceFilter').value;
   AdminState.appointmentsFilter.status = document.getElementById('adminApptStatusFilter').value;
   AdminState.appointmentsFilter.source = document.getElementById('adminApptSourceFilter').value;
   renderAdminAppointmentList();
+}
+
+function getFilterDateStr(filterDate) {
+  const today = new Date();
+  if (filterDate === 'today') return formatDateShort(today);
+  if (filterDate === 'yesterday') {
+    const d = new Date(today); d.setDate(d.getDate() - 1); return formatDateShort(d);
+  }
+  if (filterDate === 'tomorrow') {
+    const d = new Date(today); d.setDate(d.getDate() + 1); return formatDateShort(d);
+  }
+  if (filterDate && filterDate.startsWith('custom_')) {
+    const parts = filterDate.replace('custom_', '').split('-');
+    if (parts.length === 3) return formatDateShort(new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2])));
+  }
+  return null;
 }
 
 function renderAdminAppointmentList() {
@@ -299,16 +338,11 @@ function renderAdminAppointmentList() {
   let list = [...AdminData.appointments];
 
   const f = AdminState.appointmentsFilter;
-  if (f.date && f.date !== 'today') {
-    const months = { Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5, Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11 };
-    const parts = f.date.split('-');
-    if (parts.length === 3) {
-      const filterDate = formatDateShort(new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2])));
-      list = list.filter(a => a.date === filterDate);
-    }
-  } else if (f.date === 'today') {
-    const todayStr = getTodayDateStr();
-    list = list.filter(a => a.date === todayStr);
+
+  // Date filter
+  if (f.date && f.date !== 'all') {
+    const filterDateStr = getFilterDateStr(f.date);
+    if (filterDateStr) list = list.filter(a => a.date === filterDateStr);
   }
 
   if (f.provider !== 'all') list = list.filter(a => a.provider_id === f.provider);
@@ -316,7 +350,10 @@ function renderAdminAppointmentList() {
   if (f.status !== 'all') list = list.filter(a => a.status === f.status);
   if (f.source !== 'all') list = list.filter(a => a.booking_source.toLowerCase() === f.source);
 
+  // Sort by time, completed to bottom
   list.sort((a, b) => {
+    if (a.status === 'completed' && b.status !== 'completed') return 1;
+    if (a.status !== 'completed' && b.status === 'completed') return -1;
     const timeA = a.time.split(' ')[0];
     const timeB = b.time.split(' ')[0];
     return timeA.localeCompare(timeB);
@@ -339,17 +376,21 @@ function renderAdminAppointmentList() {
     const svcNames = appt.service_ids.map(id => getServiceName(id)).join(', ');
     const sc = getStatusColor(appt.status);
     const card = document.createElement('div');
-    card.style.cssText = 'background:var(--surface-color); border-radius:14px; padding:14px; margin-bottom:10px; border:1px solid var(--border-color); box-shadow:var(--shadow-card); cursor:pointer;';
-    card.onclick = () => openAdminAppointmentDetail(appt.id);
+    card.style.cssText = 'background:var(--surface-color); border-radius:14px; padding:14px; margin-bottom:10px; border:1px solid var(--border-color); box-shadow:var(--shadow-card);';
     card.innerHTML = `
       <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
-        <div style="display:flex; align-items:center; gap:8px;">
-          <span style="font-size:14px; font-weight:700; color:var(--text-heading);">${appt.customer_name}</span>
-          ${appt.customer_gender === 'Female' ? '<i data-lucide="venus" style="width:14px; height:14px; color:#C2185B;"></i>' : '<i data-lucide="mars" style="width:14px; height:14px; color:#1565C0;"></i>'}
+        <div style="display:flex; align-items:center; gap:8px; cursor:pointer;" onclick="event.stopPropagation(); openAdminCustomerInfo('${appt.id}')">
+          <div style="width:32px; height:32px; border-radius:50%; background:var(--accent-soft); display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; color:var(--accent-color);">
+            ${appt.customer_name.charAt(0).toUpperCase()}
+          </div>
+          <div>
+            <div style="font-size:14px; font-weight:700; color:var(--text-heading);">${appt.customer_name}</div>
+            <div style="font-size:10px; color:var(--text-light);">${appt.customer_phone}</div>
+          </div>
         </div>
         ${getStatusBadge(appt.status)}
       </div>
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; font-size:12px; color:var(--text-body); margin-bottom:8px;">
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; font-size:12px; color:var(--text-body); margin-bottom:8px; cursor:pointer;" onclick="openAdminAppointmentDetail(appt.id)">
         <div><span style="color:var(--text-light);">Provider:</span> <strong style="color:var(--text-heading);">${pName}</strong></div>
         <div><span style="color:var(--text-light);">Time:</span> <strong style="color:var(--text-heading);">${appt.time} (${appt.duration}m)</strong></div>
         <div style="grid-column:1/-1;"><span style="color:var(--text-light);">Service:</span> <strong style="color:var(--text-heading);">${svcNames}</strong></div>
@@ -422,6 +463,62 @@ function openAdminAppointmentDetail(apptId) {
     </div>
   `;
   openAdminDrawer('adminApptDetailDrawer');
+  lucide.createIcons();
+}
+
+// ----------------------------------------------------
+// CUSTOMER INFO POPUP
+// ----------------------------------------------------
+function openAdminCustomerInfo(apptId) {
+  const appt = AdminData.appointments.find(a => a.id === apptId);
+  if (!appt) return;
+
+  // Compute customer stats
+  const allCustomerAppts = AdminData.appointments.filter(a => a.customer_phone === appt.customer_phone);
+  const totalAppts = allCustomerAppts.length;
+  const totalSpent = allCustomerAppts.reduce((s, a) => s + a.total_amount, 0);
+  const completedAppts = allCustomerAppts.filter(a => a.status === 'completed').length;
+
+  const content = document.getElementById('adminCustomerInfoContent');
+  content.innerHTML = `
+    <div style="padding:20px;">
+      <div style="text-align:center; margin-bottom:16px;">
+        <div style="width:64px; height:64px; border-radius:50%; background:var(--accent-soft); display:flex; align-items:center; justify-content:center; margin:0 auto 10px; font-size:28px; font-weight:800; color:var(--accent-color);">
+          ${appt.customer_name.charAt(0).toUpperCase()}
+        </div>
+        <div style="font-size:18px; font-weight:800; color:var(--text-heading);">${appt.customer_name}</div>
+        <div style="font-size:12px; color:var(--text-body);">${appt.customer_phone}</div>
+        <div style="margin-top:4px; font-size:11px; color:var(--text-body);">
+          ${appt.customer_gender === 'Female' ? '<i data-lucide="venus" style="width:12px; height:12px; display:inline; color:#C2185B;"></i> Female' : '<i data-lucide="mars" style="width:12px; height:12px; display:inline; color:#1565C0;"></i> Male'}
+        </div>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-bottom:14px;">
+        <div style="background:var(--surface-color); border-radius:12px; padding:10px; text-align:center; border:1px solid var(--border-color);">
+          <div style="font-size:18px; font-weight:800; color:var(--accent-color);">${totalAppts}</div>
+          <div style="font-size:10px; color:var(--text-light);">Total Appts</div>
+        </div>
+        <div style="background:var(--surface-color); border-radius:12px; padding:10px; text-align:center; border:1px solid var(--border-color);">
+          <div style="font-size:18px; font-weight:800; color:#2E7D32;">${completedAppts}</div>
+          <div style="font-size:10px; color:var(--text-light);">Completed</div>
+        </div>
+        <div style="background:var(--surface-color); border-radius:12px; padding:10px; text-align:center; border:1px solid var(--border-color);">
+          <div style="font-size:18px; font-weight:800; color:var(--text-heading);">₹${totalSpent.toLocaleString()}</div>
+          <div style="font-size:10px; color:var(--text-light);">Total Spent</div>
+        </div>
+      </div>
+      <div style="padding:12px; background:var(--surface-color); border-radius:12px; border:1px solid var(--border-color);">
+        <div style="font-size:11px; color:var(--text-light); text-transform:uppercase; margin-bottom:8px;">Recent Appointments</div>
+        ${allCustomerAppts.slice(0, 3).map(a => {
+          const pName = getProviderName(a.provider_id);
+          return `<div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid var(--border-color); font-size:12px;">
+            <span style="color:var(--text-heading);">${a.date} • ${a.time}</span>
+            <span style="color:var(--text-body);">${pName}</span>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+  `;
+  openAdminDrawer('adminCustomerInfoDrawer');
   lucide.createIcons();
 }
 
@@ -620,13 +717,18 @@ function openAdminProviderProfile(providerId) {
         <div style="font-size:11px; color:var(--text-light); text-transform:uppercase; margin-bottom:6px;">Working Hours</div>
         ${hoursHtml}
       </div>
-      ${p.is_active ? `
-      <button onclick="adminDeactivateProvider('${p.id}')" style="width:100%; padding:12px; background:var(--color-danger-bg); color:#C62828; border:none; border-radius:12px; font-size:13px; font-weight:700; cursor:pointer;">
-        Deactivate Provider
-      </button>` : `
-      <button onclick="adminActivateProvider('${p.id}')" style="width:100%; padding:12px; background:var(--color-success-bg); color:#2E7D32; border:none; border-radius:12px; font-size:13px; font-weight:700; cursor:pointer;">
-        Activate Provider
-      </button>`}
+      <div style="display:flex; gap:8px;">
+        <button onclick="adminEditProvider('${p.id}')" style="flex:1; padding:12px; background:var(--accent-color); color:#fff; border:none; border-radius:12px; font-size:13px; font-weight:700; cursor:pointer;">
+          <i data-lucide="edit" style="width:14px; height:14px; display:inline; vertical-align:middle; margin-right:4px;"></i> Edit Profile
+        </button>
+        ${p.is_active ? `
+        <button onclick="adminDeactivateProvider('${p.id}')" style="padding:12px; background:var(--color-danger-bg); color:#C62828; border:none; border-radius:12px; font-size:13px; font-weight:700; cursor:pointer;">
+          Deactivate
+        </button>` : `
+        <button onclick="adminActivateProvider('${p.id}')" style="padding:12px; background:var(--color-success-bg); color:#2E7D32; border:none; border-radius:12px; font-size:13px; font-weight:700; cursor:pointer;">
+          Activate
+        </button>`}
+      </div>
     </div>
   `;
   openAdminDrawer('adminProviderProfileDrawer');
@@ -662,6 +764,13 @@ function adminActivateProvider(providerId) {
 function renderAdminProviderForm() {
   const p = AdminState.editingProvider;
   const isEdit = !!p;
+
+  // Initialize selected specs
+  _selectedSpecs.clear();
+  if (isEdit && p.specialization_ids) {
+    p.specialization_ids.forEach(id => _selectedSpecs.add(id));
+  }
+
   const form = document.getElementById('adminProviderFormContent');
   form.innerHTML = `
     <div style="padding:20px;">
@@ -685,9 +794,10 @@ function renderAdminProviderForm() {
       <div style="margin-bottom:12px;">
         <label style="font-size:12px; font-weight:700; color:var(--text-body); display:block; margin-bottom:4px;">Specializations</label>
         <div style="display:flex; flex-wrap:wrap; gap:6px;" id="admProviderSpecs">
-          ${AdminData.serviceCategories.map(cat => `
-            <button onclick="toggleSpec(this, '${cat.id}')" style="padding:6px 12px; border-radius:12px; font-size:11px; font-weight:600; cursor:pointer; background:${isEdit && p.specialization_ids.includes(cat.id) ? 'var(--accent-color)' : 'var(--accent-soft)'}; color:${isEdit && p.specialization_ids.includes(cat.id) ? '#fff' : 'var(--accent-color)'}; border:1px solid var(--accent-color);">${cat.name}</button>
-          `).join('')}
+          ${AdminData.serviceCategories.map(cat => {
+            const selected = _selectedSpecs.has(cat.id);
+            return `<button onclick="toggleSpec(this, '${cat.id}')" style="padding:6px 12px; border-radius:12px; font-size:11px; font-weight:600; cursor:pointer; background:${selected ? 'var(--accent-color)' : 'var(--accent-soft)'}; color:${selected ? '#fff' : 'var(--accent-color)'}; border:1px solid var(--accent-color);">${cat.name}</button>`;
+          }).join('')}
         </div>
       </div>
       <div style="margin-bottom:12px;">

@@ -861,26 +861,26 @@
           <div id="adminPendingLeaveList"></div>
         </div>
 
-        <!-- Daily Provider Load -->
-        <div class="px-20 mt-15">
-          <h3 style="font-size:14px; font-weight:800; margin-bottom:10px;">Today's Provider Load</h3>
-          <div style="display:flex; gap:10px; overflow-x:auto; padding-bottom:8px;" id="adminProviderLoad"></div>
-        </div>
-
         <!-- Quick Actions -->
-        <div class="px-20 mt-15" style="padding-bottom:24px;">
+        <div class="px-20 mt-15">
           <h3 style="font-size:14px; font-weight:800; margin-bottom:10px;">Quick Actions</h3>
-          <div style="display:flex; gap:8px; flex-wrap:wrap;">
-            <button onclick="adminOpenAddProvider()" style="display:flex; align-items:center; gap:6px; padding:10px 16px; background:var(--accent-soft); color:var(--accent-color); border:none; border-radius:12px; font-size:12px; font-weight:700; cursor:pointer;">
-              <i data-lucide="user-plus" style="width:14px; height:14px;"></i> Add Provider
+          <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px;">
+            <button onclick="adminOpenAddProvider()" style="display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; padding:14px 8px; background:var(--accent-soft); color:var(--accent-color); border:none; border-radius:12px; font-size:11px; font-weight:700; cursor:pointer; min-height:70px;">
+              <i data-lucide="user-plus" style="width:20px; height:20px;"></i> Add Provider
             </button>
-            <button onclick="adminOpenAddService()" style="display:flex; align-items:center; gap:6px; padding:10px 16px; background:var(--accent-soft); color:var(--accent-color); border:none; border-radius:12px; font-size:12px; font-weight:700; cursor:pointer;">
-              <i data-lucide="plus-circle" style="width:14px; height:14px;"></i> Add Service
+            <button onclick="adminOpenAddService()" style="display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; padding:14px 8px; background:var(--accent-soft); color:var(--accent-color); border:none; border-radius:12px; font-size:11px; font-weight:700; cursor:pointer; min-height:70px;">
+              <i data-lucide="plus-circle" style="width:20px; height:20px;"></i> Add Service
             </button>
-            <button onclick="adminOpenMarkClosed()" style="display:flex; align-items:center; gap:6px; padding:10px 16px; background:var(--color-warning-bg); color:#EF6C00; border:none; border-radius:12px; font-size:12px; font-weight:700; cursor:pointer;">
-              <i data-lucide="calendar-x" style="width:14px; height:14px;"></i> Mark Closed
+            <button onclick="adminOpenMarkClosed()" style="display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; padding:14px 8px; background:var(--color-warning-bg); color:#EF6C00; border:none; border-radius:12px; font-size:11px; font-weight:700; cursor:pointer; min-height:70px;">
+              <i data-lucide="calendar-x" style="width:20px; height:20px;"></i> Mark Closed
             </button>
           </div>
+        </div>
+
+        <!-- Daily Provider Load -->
+        <div class="px-20 mt-15" style="padding-bottom:24px;">
+          <h3 style="font-size:14px; font-weight:800; margin-bottom:10px;">Today's Provider Load</h3>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;" id="adminProviderLoad"></div>
         </div>
       </div>
 
@@ -895,8 +895,12 @@
         <div class="px-20" style="display:flex; flex-wrap:wrap; gap:6px; padding-bottom:10px;">
           <select id="adminApptDateFilter" onchange="applyAdminApptFilter()" style="flex:1; min-width:80px; padding:8px 10px; border:1px solid var(--border-color); border-radius:10px; font-size:11px; background:var(--surface-color); color:var(--text-heading);">
             <option value="today">Today</option>
+            <option value="yesterday">Yesterday</option>
+            <option value="tomorrow">Tomorrow</option>
+            <option value="custom">Custom Date...</option>
             <option value="all">All Dates</option>
           </select>
+          <input type="date" id="adminApptCustomDate" onchange="applyAdminApptFilter()" style="display:none; flex:1; min-width:80px; padding:8px 10px; border:1px solid var(--border-color); border-radius:10px; font-size:11px; background:var(--surface-color); color:var(--text-heading);">
           <select id="adminApptProviderFilter" onchange="applyAdminApptFilter()" style="flex:1; min-width:80px; padding:8px 10px; border:1px solid var(--border-color); border-radius:10px; font-size:11px; background:var(--surface-color); color:var(--text-heading);">
             <option value="all">All Providers</option>
           </select>
@@ -1509,6 +1513,18 @@
     <div class="drawer" id="adminApptDetailDrawer" onclick="event.stopPropagation()" style="max-height:80%;">
       <div class="drawer-drag-bar" onclick="closeAdminDrawer('adminApptDetailDrawer')"></div>
       <div class="drawer-content" id="adminApptDetailContent"></div>
+    </div>
+  </div>
+
+  <!-- 2a. Customer Info -->
+  <div class="overlay" id="adminCustomerInfoOverlay" onclick="closeAdminDrawer('adminCustomerInfoDrawer')" style="z-index:100;">
+    <div class="drawer" id="adminCustomerInfoDrawer" onclick="event.stopPropagation()" style="max-height:60%;">
+      <div class="drawer-drag-bar" onclick="closeAdminDrawer('adminCustomerInfoDrawer')"></div>
+      <div class="drawer-header">
+        <h3 style="font-size:18px; font-weight:800;">Customer Info</h3>
+        <button class="drawer-close-btn" onclick="closeAdminDrawer('adminCustomerInfoDrawer')"><i data-lucide="x" style="width:16px; height:16px;"></i></button>
+      </div>
+      <div class="drawer-content" id="adminCustomerInfoContent"></div>
     </div>
   </div>
 
