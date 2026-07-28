@@ -248,6 +248,7 @@ function performAuth() {
     AppState.spMode = true;
     document.getElementById('navigationBar').style.display = 'none';
     document.getElementById('spNavigationBar').style.display = 'flex';
+    showScreen('sp_home');
     triggerToast('Welcome back, Rahul!');
     spNavigateToTab('sp_home');
     return;
