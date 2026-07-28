@@ -720,7 +720,7 @@
           </button>
         </div>
 
-        <div id="spStatusPills" class="px-20 mt-10" style="display:flex; gap:6px;"></div>
+        <div id="spStatusPills" class="px-20 mt-10" style="display:flex; gap:10px;"></div>
         <div id="spNextApptCard" class="px-20 mt-10"></div>
         <div id="spStatsRow" class="px-20 mt-10" style="display:flex; gap:8px;"></div>
 
@@ -742,8 +742,8 @@
           <h2 class="screen-title">Schedule</h2>
         </div>
         <div class="px-20 mt-10" style="display:flex; align-items:center; gap:10px;">
-          <button id="spScheduleDayBtn" onclick="spToggleScheduleView('day')" style="background:#9C54F2; color:#fff; border:none; padding:8px 20px; border-radius:20px; font-size:12px; font-weight:700; cursor:pointer;">Day</button>
-          <button id="spScheduleWeekBtn" onclick="spToggleScheduleView('week')" style="background:var(--accent-soft); color:var(--accent-color); border:none; padding:8px 20px; border-radius:20px; font-size:12px; font-weight:700; cursor:pointer;">Week</button>
+          <button id="spScheduleDayBtn" onclick="spToggleScheduleView('day')" style="background:#9C54F2; color:#fff; border:none; padding:8px 20px; border-radius:20px; font-size:12px; font-weight:700; cursor:pointer;">Today</button>
+          <button id="spScheduleTomorrowBtn" onclick="spToggleScheduleView('tomorrow')" style="background:var(--accent-soft); color:var(--accent-color); border:none; padding:8px 20px; border-radius:20px; font-size:12px; font-weight:700; cursor:pointer;">Tomorrow</button>
           <div style="display:flex; align-items:center; gap:8px; margin-left:auto;">
             <button onclick="spScheduleNav(-1)" style="background:none; border:none; cursor:pointer; padding:4px;"><i data-lucide="chevron-left" style="width:18px; height:18px; color:var(--text-body);"></i></button>
             <span id="spScheduleDateLabel" style="font-size:13px; font-weight:700; color:var(--text-heading); white-space:nowrap;"></span>

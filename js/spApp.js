@@ -98,20 +98,21 @@ function renderSPHomeScreen() {
 
   const statusContainer = document.getElementById('spStatusPills');
   if (statusContainer) {
+    autoFetchProviderStatus();
     const statuses = [
-      { key: 'available', label: 'Available', icon: 'check-circle' },
-      { key: 'on_break', label: 'On Break', icon: 'coffee' },
-      { key: 'busy', label: 'Busy', icon: 'minus-circle' }
+      { key: 'available', label: 'Available', icon: 'check-circle', color: '#16A34A' },
+      { key: 'on_break', label: 'On Break', icon: 'coffee', color: '#F59E0B' },
+      { key: 'busy', label: 'Busy', icon: 'minus-circle', color: '#DC2626' }
     ];
     statusContainer.innerHTML = "";
     statuses.forEach(s => {
       const btn = document.createElement('button');
       const isActive = SPData.status === s.key;
-      btn.style.cssText = `display:flex; align-items:center; gap:4px; padding:5px 12px; border-radius:16px; border:none; font-size:11px; font-weight:700; cursor:pointer; transition:all 0.2s; ${
-        isActive ? 'background:#9C54F2; color:#fff; box-shadow:0 2px 6px rgba(156,84,242,0.3);' : 'background:var(--accent-soft); color:#9C54F2;'
+      btn.style.cssText = `flex:1; display:flex; align-items:center; justify-content:center; gap:6px; padding:14px 8px; border-radius:16px; border:none; font-size:13px; font-weight:700; cursor:pointer; transition:all 0.2s; ${
+        isActive ? `background:${s.color}; color:#fff; box-shadow:0 3px 12px ${s.color}44;` : 'background:var(--accent-soft); color:var(--accent-color);'
       }`;
       btn.onclick = () => setProviderStatus(s.key);
-      btn.innerHTML = `<i data-lucide="${s.icon}" style="width:12px; height:12px;"></i>${s.label}`;
+      btn.innerHTML = `<i data-lucide="${s.icon}" style="width:16px; height:16px;"></i>${s.label}`;
       statusContainer.appendChild(btn);
     });
   }
@@ -224,14 +225,15 @@ function renderSPHomeScreen() {
 // ----------------------------------------------------
 function renderSPScheduleScreen() {
   const dayBtn = document.getElementById('spScheduleDayBtn');
-  const weekBtn = document.getElementById('spScheduleWeekBtn');
-  if (dayBtn && weekBtn) {
-    dayBtn.style.cssText = SPState.scheduleView === 'day'
-      ? 'background:#9C54F2; color:#fff; border:none; padding:8px 20px; border-radius:20px; font-size:12px; font-weight:700; cursor:pointer;'
-      : 'background:var(--accent-soft); color:#9C54F2; border:none; padding:8px 20px; border-radius:20px; font-size:12px; font-weight:700; cursor:pointer;';
-    weekBtn.style.cssText = SPState.scheduleView === 'week'
-      ? 'background:#9C54F2; color:#fff; border:none; padding:8px 20px; border-radius:20px; font-size:12px; font-weight:700; cursor:pointer;'
-      : 'background:var(--accent-soft); color:#9C54F2; border:none; padding:8px 20px; border-radius:20px; font-size:12px; font-weight:700; cursor:pointer;';
+  const tomorrowBtn = document.getElementById('spScheduleTomorrowBtn');
+  if (dayBtn && tomorrowBtn) {
+    const isDay = SPState.scheduleView === 'day';
+    dayBtn.style.cssText = isDay
+      ? 'background:var(--accent-color); color:#fff; border:none; padding:8px 20px; border-radius:20px; font-size:12px; font-weight:700; cursor:pointer;'
+      : 'background:var(--accent-soft); color:var(--accent-color); border:none; padding:8px 20px; border-radius:20px; font-size:12px; font-weight:700; cursor:pointer;';
+    tomorrowBtn.style.cssText = !isDay
+      ? 'background:var(--accent-color); color:#fff; border:none; padding:8px 20px; border-radius:20px; font-size:12px; font-weight:700; cursor:pointer;'
+      : 'background:var(--accent-soft); color:var(--accent-color); border:none; padding:8px 20px; border-radius:20px; font-size:12px; font-weight:700; cursor:pointer;';
   }
 
   const dateLabel = document.getElementById('spScheduleDateLabel');
@@ -284,16 +286,6 @@ function renderSPScheduleScreen() {
       filtered = filtered.filter(a => a.date === 'tomorrow');
     } else {
       filtered = [];
-    }
-
-    if (SPState.scheduleView === 'week') {
-      const weekEnd = new Date(navDate);
-      weekEnd.setDate(weekEnd.getDate() + 6);
-      filtered = filtered.filter(a => {
-        if (a.date === 'today') return true;
-        if (a.date === 'tomorrow') return tomorrow <= weekEnd;
-        return false;
-      });
     }
 
     if (SPState.scheduleFilter === 'scheduled') filtered = filtered.filter(a => a.status === 'scheduled' || a.status === 'in_progress');
@@ -358,11 +350,24 @@ function spScheduleNav(dir) {
   const d = SPState.scheduleDate;
   d.setDate(d.getDate() + dir);
   SPState.scheduleDate = d;
+  const today = new Date();
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  if (d.toDateString() === today.toDateString()) SPState.scheduleView = 'day';
+  else if (d.toDateString() === tomorrow.toDateString()) SPState.scheduleView = 'tomorrow';
   renderSPScheduleScreen();
 }
 
 function spToggleScheduleView(view) {
   SPState.scheduleView = view;
+  const today = new Date();
+  if (view === 'day') {
+    SPState.scheduleDate = today;
+  } else if (view === 'tomorrow') {
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    SPState.scheduleDate = tomorrow;
+  }
   renderSPScheduleScreen();
 }
 
@@ -1005,6 +1010,49 @@ function submitLeaveRequest() {
   closeSPOverlay('spLeaveOverlay');
   triggerToast("Leave request submitted!");
   renderSPProfileScreen();
+}
+
+// ----------------------------------------------------
+// 9b. AUTO-FETCH PROVIDER STATUS FROM APPOINTMENTS
+// ----------------------------------------------------
+function autoFetchProviderStatus() {
+  const now = new Date();
+  const currentHour = now.getHours();
+  const currentMin = now.getMinutes();
+  const currentTimeMin = currentHour * 60 + currentMin;
+
+  const todayAppts = SPData.appointments.filter(a => a.date === 'today');
+  const inProgress = todayAppts.find(a => a.status === 'in_progress');
+  if (inProgress) {
+    SPData.status = 'busy';
+    return;
+  }
+
+  let nextStart = Infinity;
+  let prevEnd = 0;
+  todayAppts.forEach(a => {
+    if (a.status === 'scheduled' || a.status === 'in_progress') {
+      const parts = a.time.match(/(\d+):(\d+)/);
+      if (parts) {
+        let hrs = parseInt(parts[1]);
+        const mins = parseInt(parts[2]);
+        if (a.time.includes('PM') && hrs !== 12) hrs += 12;
+        if (a.time.includes('AM') && hrs === 12) hrs = 0;
+        const start = hrs * 60 + mins;
+        const end = start + a.duration;
+        if (start > currentTimeMin && start < nextStart) nextStart = start;
+        if (end <= currentTimeMin && end > prevEnd) prevEnd = end;
+      }
+    }
+  });
+
+  const breakBuffer = 15;
+  if (nextStart < Infinity && nextStart - currentTimeMin <= breakBuffer && nextStart > currentTimeMin) {
+    SPData.status = 'busy';
+    return;
+  }
+
+  SPData.status = 'available';
 }
 
 // ----------------------------------------------------
