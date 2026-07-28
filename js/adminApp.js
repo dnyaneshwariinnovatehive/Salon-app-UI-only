@@ -376,7 +376,8 @@ function renderAdminAppointmentList() {
     const svcNames = appt.service_ids.map(id => getServiceName(id)).join(', ');
     const sc = getStatusColor(appt.status);
     const card = document.createElement('div');
-    card.style.cssText = 'background:var(--surface-color); border-radius:14px; padding:14px; margin-bottom:10px; border:1px solid var(--border-color); box-shadow:var(--shadow-card);';
+    card.style.cssText = 'background:var(--surface-color); border-radius:14px; padding:14px; margin-bottom:10px; border:1px solid var(--border-color); box-shadow:var(--shadow-card); cursor:pointer;';
+    card.onclick = () => openAdminAppointmentDetail(appt.id);
     card.innerHTML = `
       <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
         <div style="display:flex; align-items:center; gap:8px; cursor:pointer;" onclick="event.stopPropagation(); openAdminCustomerInfo('${appt.id}')">
@@ -390,7 +391,7 @@ function renderAdminAppointmentList() {
         </div>
         ${getStatusBadge(appt.status)}
       </div>
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; font-size:12px; color:var(--text-body); margin-bottom:8px; cursor:pointer;" onclick="openAdminAppointmentDetail(appt.id)">
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; font-size:12px; color:var(--text-body); margin-bottom:8px;">
         <div><span style="color:var(--text-light);">Provider:</span> <strong style="color:var(--text-heading);">${pName}</strong></div>
         <div><span style="color:var(--text-light);">Time:</span> <strong style="color:var(--text-heading);">${appt.time} (${appt.duration}m)</strong></div>
         <div style="grid-column:1/-1;"><span style="color:var(--text-light);">Service:</span> <strong style="color:var(--text-heading);">${svcNames}</strong></div>
