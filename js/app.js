@@ -236,16 +236,25 @@ function moveOtpFocus(current, nextFieldId) {
 function performAuth() {
   AppState.isAuthenticated = true;
 
-  if (AppState.spMode) {
-    // SP Login
+  const loginEmail = (document.getElementById('loginEmail')?.value || '').trim().toLowerCase();
+  const loginPass = (document.getElementById('loginPassword')?.value || '').trim();
+  const regEmail = (document.getElementById('signupEmail')?.value || '').trim().toLowerCase();
+  const regPass = (document.getElementById('signupPassword')?.value || '').trim();
+
+  const isSPLogin = (loginEmail === 'serviceprovider@gmail.com' && loginPass === '123456') ||
+                    (AppState.authMode === 'signup' && regEmail === 'serviceprovider@gmail.com' && regPass === '123456');
+
+  if (isSPLogin) {
+    AppState.spMode = true;
     document.getElementById('navigationBar').style.display = 'none';
     document.getElementById('spNavigationBar').style.display = 'flex';
-    triggerToast(`Welcome back, Rahul!`);
+    triggerToast('Welcome back, Rahul!');
     spNavigateToTab('sp_home');
     return;
   }
 
   // Customer Login (existing logic)
+  AppState.spMode = false;
   document.getElementById('navigationBar').style.display = 'flex';
   const nameInput = document.getElementById('signupName').value.trim();
   if (AppState.authMode === 'signup' && nameInput !== "") {
@@ -259,14 +268,6 @@ function performAuth() {
 function performSocialAuth(platform) {
   AppState.isAuthenticated = true;
 
-  if (AppState.spMode) {
-    document.getElementById('navigationBar').style.display = 'none';
-    document.getElementById('spNavigationBar').style.display = 'flex';
-    triggerToast(`Signed in as Service Provider using ${platform}`);
-    spNavigateToTab('sp_home');
-    return;
-  }
-
   document.getElementById('navigationBar').style.display = 'flex';
   triggerToast(`Signed in successfully using ${platform}`);
   navigateToTab('home');
@@ -279,25 +280,7 @@ function performLogout() {
   document.getElementById('spNavigationBar').style.display = 'none';
   showScreen('login');
   toggleAuthTab('login');
-  // Reset role selector
-  document.getElementById('roleBtnCustomer').classList.add('active');
-  document.getElementById('roleBtnSP').classList.remove('active');
   triggerToast("Logged out of account.");
-}
-
-// ----------------------------------------------------
-// ROLE SWITCHING: Customer vs Service Provider
-// ----------------------------------------------------
-function switchAppRole(role) {
-  if (role === 'sp') {
-    AppState.spMode = true;
-    document.getElementById('roleBtnCustomer').classList.remove('active');
-    document.getElementById('roleBtnSP').classList.add('active');
-  } else {
-    AppState.spMode = false;
-    document.getElementById('roleBtnCustomer').classList.add('active');
-    document.getElementById('roleBtnSP').classList.remove('active');
-  }
 }
 
 function confirmDeleteAccount() {

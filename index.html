@@ -53,18 +53,6 @@
           <p style="color: var(--text-body); font-size: 14px; margin-top: 5px;">Premium Grooming & Beauty Discovery</p>
         </div>
 
-        <!-- Role Selector -->
-        <div class="role-selector" id="roleSelector">
-          <button class="role-option active" id="roleBtnCustomer" onclick="switchAppRole('customer')">
-            <i data-lucide="user" style="width:16px; height:16px;"></i>
-            <span>Customer</span>
-          </button>
-          <button class="role-option" id="roleBtnSP" onclick="switchAppRole('sp')">
-            <i data-lucide="scissors" style="width:16px; height:16px;"></i>
-            <span>Service Provider</span>
-          </button>
-        </div>
-
         <!-- Auth Tabs Toggle -->
         <div class="login-tabs">
           <button class="login-tab-btn active" id="btnTabLogin" onclick="toggleAuthTab('login')">Login</button>
@@ -733,11 +721,20 @@
         </div>
 
         <div id="spStatusPills" class="px-20 mt-10" style="display:flex; gap:8px;"></div>
-        <div id="spNextApptCard" class="px-20 mt-15"></div>
+
+        <div class="section-header px-20 mt-15">
+          <h3>Next Appointment</h3>
+        </div>
+        <div id="spNextApptCard" class="px-20 mt-10"></div>
+
         <div id="spStatsRow" class="px-20 mt-15" style="display:flex; gap:10px;"></div>
+
         <div id="spShiftInfo" class="px-20 mt-15" style="display:flex; align-items:center; gap:8px; padding:10px 14px; background:var(--surface-color); border-radius:12px; box-shadow:var(--shadow-card);"></div>
-        <div class="px-20 mt-15"><h3 style="font-size:16px; font-weight:800;">Today's Timeline</h3></div>
-        <div id="spTimeline" class="px-20 mt-10" style="padding-bottom:24px;"></div>
+
+        <div class="section-header px-20 mt-15">
+          <h3>Today's Appointments</h3>
+        </div>
+        <div id="spTimeline" class="horizontal-scroll" style="padding-top:8px;"></div>
       </div>
 
       <!-- ================= SP SCREEN: SCHEDULE ================= -->
@@ -755,7 +752,9 @@
           </div>
         </div>
         <div id="spScheduleFilters" class="px-20 mt-10" style="display:flex; gap:6px; overflow-x:auto;"></div>
-        <div id="spScheduleTimeline" class="px-20 mt-15" style="padding-bottom:24px;"></div>
+        <div class="px-20 mt-10" style="padding-bottom:24px;">
+          <div id="spScheduleList"></div>
+        </div>
       </div>
 
       <!-- ================= SP SCREEN: ADD WALK-IN ================= -->
@@ -773,6 +772,13 @@
           <div style="margin-bottom:12px;">
             <label style="font-size:12px; font-weight:700; color:#555; display:block; margin-bottom:4px;">Phone (optional)</label>
             <input type="tel" id="spWalkinPhone" placeholder="Enter phone" oninput="spUpdateWalkinField('phone', this.value)" style="width:100%; padding:12px; border:1.5px solid #E0E0E0; border-radius:10px; font-size:14px; box-sizing:border-box;">
+          </div>
+          <div style="margin-bottom:12px;">
+            <label style="font-size:12px; font-weight:700; color:#555; display:block; margin-bottom:4px;">Gender</label>
+            <div style="display:flex; gap:8px;">
+              <button onclick="spUpdateWalkinField('gender', 'Male'); spUpdateWalkinGenderBtn(this);" class="sp-walkin-gender-btn active" style="flex:1; padding:10px; border:1.5px solid #9C54F2; border-radius:10px; background:#9C54F2; color:#fff; font-size:12px; font-weight:700; cursor:pointer;">Male</button>
+              <button onclick="spUpdateWalkinField('gender', 'Female'); spUpdateWalkinGenderBtn(this);" class="sp-walkin-gender-btn" style="flex:1; padding:10px; border:1.5px solid #E0E0E0; border-radius:10px; background:#fff; color:#666; font-size:12px; font-weight:700; cursor:pointer;">Female</button>
+            </div>
           </div>
           <div style="margin-bottom:16px;">
             <label style="font-size:12px; font-weight:700; color:#555; display:block; margin-bottom:4px;">Service</label>
