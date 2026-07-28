@@ -246,11 +246,14 @@ function performAuth() {
 
   if (isSPLogin) {
     AppState.spMode = true;
+    AppState.currentTab = 'sp_home';
     document.getElementById('navigationBar').style.display = 'none';
     document.getElementById('spNavigationBar').style.display = 'flex';
-    showScreen('sp_home');
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('screen_sp_home').classList.add('active');
     triggerToast('Welcome back, Rahul!');
-    spNavigateToTab('sp_home');
+    renderSPHomeScreen();
+    lucide.createIcons();
     return;
   }
 
