@@ -708,33 +708,32 @@
 
       <!-- ================= SP SCREEN: HOME DASHBOARD ================= -->
       <div class="screen sp-screen" id="screen_sp_home">
-        <div class="sp-header">
-          <img id="spHomeAvatar" src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&q=80" alt="Avatar" style="width:44px; height:44px; border-radius:50%; object-fit:cover; border:2px solid var(--accent-soft);">
-          <div class="sp-header-info" style="flex:1; margin-left:12px;">
-            <span class="sp-greeting" id="spHomeGreeting">Hi Rahul 👋</span>
+        <div class="sp-header" style="padding-bottom:0;">
+          <img id="spHomeAvatar" src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&q=80" alt="Avatar" style="width:40px; height:40px; border-radius:50%; object-fit:cover; border:2px solid var(--accent-soft);">
+          <div class="sp-header-info" style="flex:1; margin-left:10px;">
+            <span class="sp-greeting" id="spHomeGreeting" style="font-size:17px;">Hi Rahul 👋</span>
             <span class="sp-salon-name" id="spHomeSalonInfo">Luxe Studio Salon • Koregaon Park, Pune</span>
           </div>
-          <button class="header-btn" onclick="openNotificationsDrawer()">
-            <i data-lucide="bell"></i>
+          <button class="header-btn" onclick="openNotificationsDrawer()" style="width:36px; height:36px;">
+            <i data-lucide="bell" style="width:18px; height:18px;"></i>
             <div class="badge-dot"></div>
           </button>
         </div>
 
-        <div id="spStatusPills" class="px-20 mt-10" style="display:flex; gap:8px;"></div>
-
-        <div class="section-header px-20 mt-15">
-          <h3>Next Appointment</h3>
-        </div>
+        <div id="spStatusPills" class="px-20 mt-10" style="display:flex; gap:6px;"></div>
         <div id="spNextApptCard" class="px-20 mt-10"></div>
+        <div id="spStatsRow" class="px-20 mt-10" style="display:flex; gap:8px;"></div>
 
-        <div id="spStatsRow" class="px-20 mt-15" style="display:flex; gap:10px;"></div>
-
-        <div id="spShiftInfo" class="px-20 mt-15" style="display:flex; align-items:center; gap:8px; padding:10px 14px; background:var(--surface-color); border-radius:12px; box-shadow:var(--shadow-card);"></div>
-
-        <div class="section-header px-20 mt-15">
-          <h3>Today's Appointments</h3>
+        <div class="px-20 mt-10" style="display:flex; align-items:center; gap:6px;">
+          <i data-lucide="briefcase" style="width:13px; height:13px; color:#9C54F2;"></i>
+          <span id="spShiftInfoText" style="font-size:11px; color:#666;">Shift: 09:00 AM - 07:00 PM</span>
         </div>
-        <div id="spTimeline" class="horizontal-scroll" style="padding-top:8px;"></div>
+
+        <div style="display:flex; align-items:center; justify-content:space-between; padding:10px 20px 0;">
+          <h3 style="font-size:14px; font-weight:800;">Today's Appointments</h3>
+          <span id="spApptCount" style="font-size:11px; color:#999; font-weight:600;"></span>
+        </div>
+        <div id="spTimeline" class="horizontal-scroll" style="padding-top:6px; padding-bottom:4px;"></div>
       </div>
 
       <!-- ================= SP SCREEN: SCHEDULE ================= -->
@@ -804,8 +803,6 @@
           <div id="spProfileWorkingHours" class="px-20"></div>
           <div class="px-20 mt-15"><h3 class="sp-section-title">Leave Requests</h3></div>
           <div id="spProfileLeaveRequests" class="px-20"></div>
-          <div class="px-20 mt-15"><h3 class="sp-section-title">Earnings</h3></div>
-          <div id="spProfileEarningsRow" class="px-20"></div>
           <div class="px-20 mt-15"><h3 class="sp-section-title">Account Settings</h3></div>
           <div id="spProfileSettings" class="px-20"></div>
         </div>

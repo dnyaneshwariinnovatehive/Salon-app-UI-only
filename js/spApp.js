@@ -81,7 +81,7 @@ function spGenderColor(g) {
 }
 
 // ----------------------------------------------------
-// 1. RENDER SP HOME SCREEN
+// 1. RENDER SP HOME SCREEN (Compact - fits viewport)
 // ----------------------------------------------------
 function renderSPHomeScreen() {
   const salon = SalonHubData.salons.find(s => s.id === SPData.salonId);
@@ -107,11 +107,11 @@ function renderSPHomeScreen() {
     statuses.forEach(s => {
       const btn = document.createElement('button');
       const isActive = SPData.status === s.key;
-      btn.style.cssText = `display:flex; align-items:center; gap:5px; padding:7px 14px; border-radius:20px; border:none; font-size:12px; font-weight:700; cursor:pointer; transition:all 0.2s; ${
-        isActive ? 'background:#9C54F2; color:#fff; box-shadow:0 2px 8px rgba(156,84,242,0.3);' : 'background:#F3EEFF; color:#9C54F2;'
+      btn.style.cssText = `display:flex; align-items:center; gap:4px; padding:5px 12px; border-radius:16px; border:none; font-size:11px; font-weight:700; cursor:pointer; transition:all 0.2s; ${
+        isActive ? 'background:#9C54F2; color:#fff; box-shadow:0 2px 6px rgba(156,84,242,0.3);' : 'background:#F3EEFF; color:#9C54F2;'
       }`;
       btn.onclick = () => setProviderStatus(s.key);
-      btn.innerHTML = `<i data-lucide="${s.icon}" style="width:14px; height:14px;"></i>${s.label}`;
+      btn.innerHTML = `<i data-lucide="${s.icon}" style="width:12px; height:12px;"></i>${s.label}`;
       statusContainer.appendChild(btn);
     });
   }
@@ -122,32 +122,32 @@ function renderSPHomeScreen() {
     if (nextAppt) {
       const servicesText = nextAppt.services.map(s => s.name).join(', ');
       nextApptContainer.innerHTML = `
-        <div style="background:linear-gradient(135deg, #9C54F2 0%, #7B3FD4 100%); border-radius:16px; padding:18px; color:#fff; cursor:pointer;" onclick="openSPAppointmentDetail('${nextAppt.id}')">
-          <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px;">
-            <i data-lucide="clock" style="width:14px; height:14px; opacity:0.8;"></i>
-            <span style="font-size:10px; opacity:0.8; text-transform:uppercase; letter-spacing:0.5px;">Next Appointment</span>
-          </div>
-          <div style="font-size:17px; font-weight:800; margin-bottom:2px;">${nextAppt.customerName}</div>
-          <div style="font-size:12px; opacity:0.85; margin-bottom:2px;">${servicesText}</div>
-          <div style="display:flex; align-items:center; gap:14px; margin-top:10px;">
-            <span style="font-size:12px; font-weight:600; display:flex; align-items:center; gap:4px;">
-              <i data-lucide="clock" style="width:12px; height:12px;"></i>${nextAppt.time}
-            </span>
-            <span style="font-size:12px; display:flex; align-items:center; gap:4px;">
-              <i data-lucide="timer" style="width:12px; height:12px;"></i>${nextAppt.duration}m
-            </span>
-            <span style="font-size:12px; display:flex; align-items:center; gap:4px;">
-              <i data-lucide="indian-rupee" style="width:12px; height:12px;"></i>₹${nextAppt.totalAmount}
-            </span>
+        <div style="background:linear-gradient(135deg, #9C54F2 0%, #7B3FD4 100%); border-radius:14px; padding:14px 16px; color:#fff; cursor:pointer;" onclick="openSPAppointmentDetail('${nextAppt.id}')">
+          <div style="display:flex; align-items:center; justify-content:space-between;">
+            <div>
+              <div style="display:flex; align-items:center; gap:6px; margin-bottom:4px;">
+                <i data-lucide="clock" style="width:12px; height:12px; opacity:0.8;"></i>
+                <span style="font-size:9px; opacity:0.8; text-transform:uppercase; letter-spacing:0.5px;">Next</span>
+              </div>
+              <div style="font-size:15px; font-weight:800;">${nextAppt.customerName}</div>
+              <div style="font-size:11px; opacity:0.85; margin-top:1px;">${servicesText}</div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:15px; font-weight:800;">${nextAppt.time}</div>
+              <div style="font-size:11px; opacity:0.8;">${nextAppt.duration}m • ₹${nextAppt.totalAmount}</div>
+              <div style="margin-top:6px; display:flex; align-items:center; gap:4px; justify-content:flex-end;">
+                <i data-lucide="${nextAppt.type === 'online' ? 'wifi' : 'store'}" style="width:10px; height:10px;"></i>
+                <span style="font-size:10px; text-transform:capitalize;">${nextAppt.type}</span>
+              </div>
+            </div>
           </div>
         </div>
       `;
     } else {
       nextApptContainer.innerHTML = `
-        <div style="background:#F3EEFF; border-radius:16px; padding:24px; text-align:center;">
-          <i data-lucide="calendar-check" style="width:36px; height:36px; color:#9C54F2; margin-bottom:8px;"></i>
-          <div style="font-size:14px; font-weight:700; color:#333;">No upcoming appointments</div>
-          <div style="font-size:12px; color:#777; margin-top:4px;">You're free for the rest of the day!</div>
+        <div style="background:#F3EEFF; border-radius:14px; padding:16px; text-align:center;">
+          <i data-lucide="calendar-check" style="width:30px; height:30px; color:#9C54F2; margin-bottom:4px;"></i>
+          <div style="font-size:13px; font-weight:700; color:#333;">No upcoming appointments</div>
         </div>
       `;
     }
@@ -163,53 +163,53 @@ function renderSPHomeScreen() {
       { label: 'Total', value: todayAppts.length, icon: 'calendar', bg: '#F3EEFF', color: '#9C54F2' },
       { label: 'Done', value: completedCount, icon: 'check-circle', bg: '#E8F5E9', color: '#2E7D32' },
       { label: 'Left', value: remainingCount, icon: 'clock', bg: '#FFF3E0', color: '#EF6C00' },
-      { label: "Earned", value: `₹${totalToday.toLocaleString()}`, icon: 'indian-rupee', bg: '#E3F2FD', color: '#1565C0' }
+      { label: 'Earned', value: `₹${totalToday.toLocaleString()}`, icon: 'indian-rupee', bg: '#E3F2FD', color: '#1565C0' }
     ];
     statsContainer.innerHTML = "";
     stats.forEach(s => {
       const el = document.createElement('div');
-      el.style.cssText = `background:${s.bg}; border-radius:12px; padding:10px 8px; flex:1; min-width:0; text-align:center;`;
+      el.style.cssText = `background:${s.bg}; border-radius:10px; padding:8px 4px; flex:1; min-width:0; text-align:center;`;
       el.innerHTML = `
-        <i data-lucide="${s.icon}" style="width:18px; height:18px; color:${s.color}; margin-bottom:2px;"></i>
-        <div style="font-size:15px; font-weight:800; color:${s.color};">${s.value}</div>
-        <div style="font-size:9px; color:#666; margin-top:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${s.label}</div>
+        <i data-lucide="${s.icon}" style="width:16px; height:16px; color:${s.color};"></i>
+        <div style="font-size:14px; font-weight:800; color:${s.color}; margin-top:1px;">${s.value}</div>
+        <div style="font-size:8px; color:#666; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${s.label}</div>
       `;
       statsContainer.appendChild(el);
     });
   }
 
-  const shiftEl = document.getElementById('spShiftInfo');
-  if (shiftEl) {
-    shiftEl.innerHTML = `
-      <i data-lucide="briefcase" style="width:14px; height:14px; color:#9C54F2;"></i>
-      <span style="font-size:12px; color:#555;">Shift: 09:00 AM - 07:00 PM • Break: 01:00 PM - 02:00 PM</span>
-    `;
-  }
+  const shiftText = document.getElementById('spShiftInfoText');
+  if (shiftText) shiftText.innerText = 'Shift: 09:00 AM - 07:00 PM • Break: 01:00 - 02:00 PM';
+
+  const apptCount = document.getElementById('spApptCount');
+  const sorted = [...SPData.appointments].sort((a, b) => spTimeToMinutes(a.time) - spTimeToMinutes(b.time));
+  if (apptCount) apptCount.textContent = `${sorted.length} appointments`;
 
   const timelineContainer = document.getElementById('spTimeline');
   if (timelineContainer) {
-    const sorted = [...SPData.appointments].sort((a, b) => spTimeToMinutes(a.time) - spTimeToMinutes(b.time));
     timelineContainer.innerHTML = "";
     sorted.forEach((appt) => {
       const sc = spGetStatusColor(appt.status);
       const servicesText = appt.services.map(s => s.name).join(', ');
       const gc = spGenderColor(appt.customerGender);
+      const balance = appt.finalBilledAmount - appt.advancePaid;
       const card = document.createElement('div');
-      card.style.cssText = `min-width:200px; max-width:200px; background:${sc.bg}; border-radius:14px; padding:14px; cursor:pointer; border-left:4px solid ${sc.color};`;
+      card.style.cssText = `min-width:170px; max-width:170px; background:#fff; border-radius:12px; padding:12px; cursor:pointer; border-left:3px solid ${sc.color}; box-shadow:0 1px 4px rgba(0,0,0,0.06);`;
       card.onclick = () => openSPAppointmentDetail(appt.id);
       card.innerHTML = `
-        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
-          <span style="font-size:13px; font-weight:700; color:${sc.color};">${appt.time}</span>
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:4px;">
+          <span style="font-size:12px; font-weight:700; color:${sc.color};">${appt.time}</span>
           ${spGetStatusBadge(appt.status)}
         </div>
-        <div style="font-size:14px; font-weight:700; color:#222; margin-bottom:2px;">${appt.customerName}</div>
-        <div style="display:inline-flex; align-items:center; gap:3px; background:${gc.bg}; color:${gc.color}; padding:2px 8px; border-radius:8px; font-size:10px; font-weight:600; margin-bottom:6px;">
-          <i data-lucide="${spGenderIcon(appt.customerGender)}" style="width:10px; height:10px;"></i>${appt.customerGender}
+        <div style="font-size:13px; font-weight:700; color:#222; margin-bottom:2px;">${appt.customerName}</div>
+        <div style="display:inline-flex; align-items:center; gap:2px; background:${gc.bg}; color:${gc.color}; padding:1px 6px; border-radius:6px; font-size:9px; font-weight:600; margin-bottom:4px;">
+          <i data-lucide="${spGenderIcon(appt.customerGender)}" style="width:8px; height:8px;"></i>${appt.customerGender}
         </div>
-        <div style="font-size:11px; color:#555; margin-bottom:6px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${servicesText}</div>
-        <div style="display:flex; align-items:center; gap:10px; font-size:11px; color:#888;">
-          <span style="display:flex; align-items:center; gap:3px;"><i data-lucide="timer" style="width:10px; height:10px;"></i>${appt.duration}m</span>
-          <span style="display:flex; align-items:center; gap:3px;"><i data-lucide="indian-rupee" style="width:10px; height:10px;"></i>₹${appt.totalAmount}</span>
+        <div style="font-size:10px; color:#666; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${servicesText}</div>
+        <div style="display:flex; align-items:center; gap:8px; margin-top:4px; font-size:10px; color:#888;">
+          <span>${appt.duration}m</span>
+          <span>₹${appt.totalAmount}</span>
+          ${balance > 0 ? `<span style="color:#C62828;">Due ₹${balance}</span>` : ''}
         </div>
       `;
       timelineContainer.appendChild(card);
@@ -271,7 +271,33 @@ function renderSPScheduleScreen() {
 
   const listContainer = document.getElementById('spScheduleList');
   if (listContainer) {
+    const today = new Date();
+    const navDate = SPState.scheduleDate;
+    const isToday = navDate.toDateString() === today.toDateString();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const isTomorrow = navDate.toDateString() === tomorrow.toDateString();
+
     let filtered = [...SPData.appointments];
+
+    if (isToday) {
+      filtered = filtered.filter(a => a.date === 'today');
+    } else if (isTomorrow) {
+      filtered = filtered.filter(a => a.date === 'tomorrow');
+    } else {
+      filtered = [];
+    }
+
+    if (SPState.scheduleView === 'week') {
+      const weekEnd = new Date(navDate);
+      weekEnd.setDate(weekEnd.getDate() + 6);
+      filtered = filtered.filter(a => {
+        if (a.date === 'today') return true;
+        if (a.date === 'tomorrow') return tomorrow <= weekEnd;
+        return false;
+      });
+    }
+
     if (SPState.scheduleFilter === 'online') filtered = filtered.filter(a => a.type === 'online');
     else if (SPState.scheduleFilter === 'offline') filtered = filtered.filter(a => a.type === 'offline');
     else if (SPState.scheduleFilter === 'completed') filtered = filtered.filter(a => a.status === 'completed');
@@ -286,6 +312,7 @@ function renderSPScheduleScreen() {
         <div style="text-align:center; padding:40px 20px;">
           <i data-lucide="calendar-x" style="width:40px; height:40px; color:#CCC; margin-bottom:8px;"></i>
           <div style="font-size:14px; font-weight:600; color:#999;">No appointments found</div>
+          <div style="font-size:12px; color:#BBB; margin-top:4px;">Try changing the date or filter</div>
         </div>
       `;
       lucide.createIcons();
@@ -590,22 +617,6 @@ function renderSPProfileScreen() {
       <i data-lucide="plus-circle" style="width:16px; height:16px;"></i> Request Leave
     </button>`;
     leaveContainer.appendChild(btnRow);
-  }
-
-  const earningsRow = document.getElementById('spProfileEarningsRow');
-  if (earningsRow) {
-    earningsRow.innerHTML = `<div style="display:flex; align-items:center; justify-content:space-between; padding:14px 0; cursor:pointer;" onclick="openSPEarningsDetail()">
-      <div style="display:flex; align-items:center; gap:10px;">
-        <div style="width:36px; height:36px; border-radius:10px; background:#E8F5E9; display:flex; align-items:center; justify-content:center;">
-          <i data-lucide="indian-rupee" style="width:18px; height:18px; color:#2E7D32;"></i>
-        </div>
-        <div>
-          <div style="font-size:11px; color:#999;">Today's Earnings</div>
-          <div style="font-size:16px; font-weight:800; color:#2E7D32;">₹${SPData.earnings.today.total.toLocaleString()}</div>
-        </div>
-      </div>
-      <i data-lucide="chevron-right" style="width:20px; height:20px; color:#CCC;"></i>
-    </div>`;
   }
 
   const settingsContainer = document.getElementById('spProfileSettings');
