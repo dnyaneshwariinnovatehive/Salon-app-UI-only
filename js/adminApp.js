@@ -741,7 +741,6 @@ function adminDeactivateProvider(providerId) {
   const p = getProvider(providerId);
   if (p) {
     p.is_active = false;
-    triggerToast(`${p.name} deactivated.`);
     closeAdminDrawer('adminProviderProfileDrawer');
     renderAdminStaffScreen();
     if (AdminState.currentTab === 'admin_home') renderAdminHomeScreen();
@@ -752,7 +751,6 @@ function adminActivateProvider(providerId) {
   const p = getProvider(providerId);
   if (p) {
     p.is_active = true;
-    triggerToast(`${p.name} activated.`);
     closeAdminDrawer('adminProviderProfileDrawer');
     renderAdminStaffScreen();
     if (AdminState.currentTab === 'admin_home') renderAdminHomeScreen();
@@ -850,7 +848,6 @@ function saveAdminProvider() {
     p.role = role || p.role;
     p.specialization_ids = specs;
     p.weekly_off = weeklyOff;
-    triggerToast(`${name} updated.`);
   } else {
     const newProvider = {
       id: `st_${Date.now()}`,
@@ -873,7 +870,6 @@ function saveAdminProvider() {
       weekly_off: weeklyOff
     };
     AdminData.serviceProviders.push(newProvider);
-    triggerToast(`${name} added as provider! They can now login.`);
   }
 
   closeAdminDrawer('adminProviderFormDrawer');
@@ -979,14 +975,13 @@ function adminToggleProviderMapping(serviceId, providerId, checked) {
   } else {
     s.provider_ids = s.provider_ids.filter(id => id !== providerId);
   }
-  triggerToast(`Provider mapping updated for ${s.name}`);
+
 }
 
 function adminToggleServiceActive(serviceId) {
   const s = getService(serviceId);
   if (!s) return;
   s.active = !s.active;
-  triggerToast(`${s.name} ${s.active ? 'activated' : 'deactivated'}.`);
   closeAdminDrawer('adminServiceDetailDrawer');
   renderAdminServicesScreen();
 }
@@ -1086,7 +1081,6 @@ function saveAdminService() {
     s.category = category;
     s.gender_focus = gender;
     s.will_refund_advance = refund;
-    triggerToast(`${name} updated.`);
   } else {
     const newId = `adm_svc_${Date.now()}`;
     AdminData.services.push({
@@ -1094,7 +1088,6 @@ function saveAdminService() {
       duration_minutes: _adminSvcDuration || 30, min_advance_percentage: advPct,
       will_refund_advance: refund, gender_focus: gender, active: true, provider_ids: []
     });
-    triggerToast(`${name} added and visible in Customer app immediately.`);
   }
 
   _adminSvcDuration = 30;
@@ -1209,7 +1202,6 @@ function saveAdminCombo(isEdit) {
     c.combined_price = price;
     c.advance_percentage = advPct;
     c.service_ids = Array.from(_comboSelectedSvcs).length > 0 ? Array.from(_comboSelectedSvcs) : c.service_ids;
-    triggerToast(`${name} updated.`);
   } else {
     const svcs = Array.from(_comboSelectedSvcs);
     if (svcs.length < 2) { triggerToast("Select at least 2 services for a combo."); return; }
@@ -1221,7 +1213,6 @@ function saveAdminCombo(isEdit) {
       advance_percentage: advPct,
       active: true
     });
-    triggerToast(`${name} combo created and visible in Customer app.`);
   }
 
   _comboSelectedSvcs.clear();
@@ -1234,7 +1225,6 @@ function adminToggleComboActive(comboId) {
   const c = AdminData.combos.find(co => co.id === comboId);
   if (!c) return;
   c.active = !c.active;
-  triggerToast(`${c.name} ${c.active ? 'activated' : 'deactivated'}.`);
   closeAdminDrawer('adminComboFormDrawer');
   renderAdminCombosList();
 }
@@ -1359,10 +1349,8 @@ function adminToggleClosureDate(dateStr, btn) {
   const idx = AdminData.closureDates.indexOf(dateStr);
   if (idx !== -1) {
     AdminData.closureDates.splice(idx, 1);
-    triggerToast(`${dateStr} removed from closures.`);
   } else {
     AdminData.closureDates.push(dateStr);
-    triggerToast(`${dateStr} marked as closed. New bookings blocked.`);
     const affected = AdminData.appointments.filter(a => a.date === dateStr && a.status !== 'cancelled' && a.status !== 'completed');
     if (affected.length > 0) {
       triggerToast(`${affected.length} appointments exist. Use "Cancel This Day" from Appointments tab.`);
@@ -1407,7 +1395,6 @@ function saveAdminSalonProfile() {
   salon.name = document.getElementById('admSalonName')?.value.trim() || salon.name;
   salon.address = document.getElementById('admSalonAddress')?.value.trim() || salon.address;
   salon.phone = document.getElementById('admSalonPhone')?.value.trim() || salon.phone;
-  triggerToast("Salon profile updated.");
   closeAdminDrawer('adminEditSalonDrawer');
   renderAdminProfileScreen();
 }

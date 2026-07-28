@@ -98,7 +98,8 @@ function renderSPHomeScreen() {
 
   const statusContainer = document.getElementById('spStatusPills');
   if (statusContainer) {
-    autoFetchProviderStatus();
+    if (!SPData._manualStatus) autoFetchProviderStatus();
+    SPData._manualStatus = false;
     const statuses = [
       { key: 'available', label: 'Available', icon: 'check-circle', color: '#16A34A' },
       { key: 'on_break', label: 'On Break', icon: 'coffee', color: '#F59E0B' },
@@ -492,7 +493,7 @@ function submitWalkinForm() {
 
   SPData.appointments.push(newAppt);
   SPState.walkinForm = { name: '', phone: '', gender: 'Male', serviceId: '', timeSlot: '' };
-  triggerToast(`Walk-in added for ${name} at ${timeSlot}!`);
+
 
   if (SPState.currentTab === 'sp_walkin') renderSPWalkinScreen();
   else if (SPState.currentTab === 'sp_home') renderSPHomeScreen();
@@ -629,7 +630,7 @@ function renderSPProfileScreen() {
           <span style="font-size:13px; font-weight:600; color:var(--text-heading);">Notifications</span>
         </div>
         <label style="position:relative; display:inline-block; width:44px; height:24px;">
-          <input type="checkbox" checked onchange="triggerToast(this.checked ? 'Notifications enabled' : 'Notifications disabled')" style="opacity:0; width:0; height:0;">
+          <input type="checkbox" checked style="opacity:0; width:0; height:0;">
           <span style="position:absolute; cursor:pointer; top:0; left:0; right:0; bottom:0; background-color:#9C54F2; border-radius:24px; transition:.3s;">
             <span style="position:absolute; content:''; height:18px; width:18px; left:22px; bottom:3px; background-color:white; border-radius:50%; transition:.3s;"></span>
           </span>
@@ -1060,8 +1061,7 @@ function autoFetchProviderStatus() {
 // ----------------------------------------------------
 function setProviderStatus(status) {
   SPData.status = status;
-  const label = status === 'on_break' ? 'On Break' : status.charAt(0).toUpperCase() + status.slice(1);
-  triggerToast(`Status updated to ${label}`);
+  SPData._manualStatus = true;
   renderSPHomeScreen();
 }
 
@@ -1069,7 +1069,7 @@ function setProviderStatus(status) {
 // 11. SP CALL CUSTOMER
 // ----------------------------------------------------
 function spCallCustomer(phone) {
-  triggerToast("Calling " + phone + "...");
+  // Call functionality
 }
 
 // ----------------------------------------------------
@@ -1084,7 +1084,6 @@ function spEditFinalAmount(apptId) {
   if (isNaN(parsed) || parsed < 0) { triggerToast("Please enter a valid amount."); return; }
   appt.finalBilledAmount = parsed;
   appt.balanceDue = parsed - appt.advancePaid;
-  triggerToast(`Final amount updated to ₹${parsed}`);
   closeSPOverlay('spDetailOverlay');
   openSPAppointmentDetail(apptId);
 }

@@ -255,7 +255,6 @@ function performAuth() {
     document.getElementById('adminNavigationBar').style.display = 'flex';
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById('screen_admin_home').classList.add('active');
-    triggerToast('Welcome back, Admin!');
     renderAdminHomeScreen();
     lucide.createIcons();
     return;
@@ -271,7 +270,6 @@ function performAuth() {
     document.getElementById('spNavigationBar').style.display = 'flex';
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById('screen_sp_home').classList.add('active');
-    triggerToast('Welcome back, Rahul!');
     renderSPHomeScreen();
     lucide.createIcons();
     return;
@@ -286,7 +284,6 @@ function performAuth() {
     SalonHubData.user.name = nameInput;
   }
   document.getElementById('homeUserAvatar').src = SalonHubData.user.avatar;
-  triggerToast(`Welcome back, ${SalonHubData.user.name}!`);
   navigateToTab('home');
 }
 
@@ -294,7 +291,6 @@ function performSocialAuth(platform) {
   AppState.isAuthenticated = true;
 
   document.getElementById('navigationBar').style.display = 'flex';
-  triggerToast(`Signed in successfully using ${platform}`);
   navigateToTab('home');
 }
 
@@ -307,13 +303,11 @@ function performLogout() {
   document.getElementById('adminNavigationBar').style.display = 'none';
   showScreen('login');
   toggleAuthTab('login');
-  triggerToast("Logged out of account.");
 }
 
 function confirmDeleteAccount() {
   if (confirm("Are you sure you want to delete your account permanently? This action is irreversible.")) {
     performLogout();
-    triggerToast("Account deleted successfully.");
   }
 }
 
@@ -387,7 +381,6 @@ function performRegister() {
     document.getElementById('adminNavigationBar').style.display = 'flex';
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById('screen_admin_home').classList.add('active');
-    triggerToast(`Welcome to SalonHub Admin, ${name}!`);
     renderAdminHomeScreen();
     lucide.createIcons();
     return;
@@ -400,7 +393,6 @@ function performRegister() {
     document.getElementById('spNavigationBar').style.display = 'flex';
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById('screen_sp_home').classList.add('active');
-    triggerToast(`Welcome to SalonHub, ${name}!`);
     renderSPHomeScreen();
     lucide.createIcons();
     return;
@@ -424,7 +416,6 @@ function performRegister() {
     greetingEl.textContent = `Hi ${name} 👋`;
   }
 
-  triggerToast(`Welcome to SalonHub, ${name}!`);
   navigateToTab('home');
 }
 
@@ -874,7 +865,7 @@ function setupPullToRefresh() {
     if (indicator.classList.contains('active')) {
       setTimeout(() => {
         indicator.classList.remove('active');
-        triggerToast("Salon list updated successfully!");
+        
         renderHomeScreen();
       }, 1200);
     }
@@ -883,7 +874,7 @@ function setupPullToRefresh() {
 }
 
 function copyPromoCode(code) {
-  triggerToast(`Coupon code "${code}" copied!`);
+
 }
 
 // ----------------------------------------------------
@@ -1411,7 +1402,7 @@ function submitPastReview(bookingId, stars) {
     booking.reviewed = true;
     booking.rating = stars;
     renderBookingsScreen();
-    triggerToast(`Thank you for rating Luxe with ${stars} stars!`);
+
   }
 }
 
@@ -1519,13 +1510,10 @@ function toggleFavSalon(salonId) {
   const index = SalonHubData.favourites.salonIds.indexOf(salonId);
   if (index !== -1) {
     SalonHubData.favourites.salonIds.splice(index, 1);
-    triggerToast("Removed salon from favourites.");
   } else {
     SalonHubData.favourites.salonIds.push(salonId);
-    triggerToast("Added salon to favourites!");
   }
 
-  // Re-render relevant active tab screen views
   if (AppState.currentTab === 'home') renderHomeScreen();
   if (AppState.currentTab === 'explore') renderExploreScreen();
   if (AppState.currentTab === 'favourites') renderFavouritesScreen();
@@ -1535,10 +1523,8 @@ function toggleFavService(serviceId) {
   const index = SalonHubData.favourites.serviceIds.indexOf(serviceId);
   if (index !== -1) {
     SalonHubData.favourites.serviceIds.splice(index, 1);
-    triggerToast("Removed service from favourites.");
   } else {
     SalonHubData.favourites.serviceIds.push(serviceId);
-    triggerToast("Added service to favourites!");
   }
   if (AppState.currentTab === 'favourites') renderFavouritesScreen();
 }
@@ -1613,7 +1599,7 @@ function submitNewPaymentCard() {
   SalonHubData.user.savedCards.push(newCard);
   closeAddCardDrawer();
   renderProfileScreen();
-  triggerToast("Card saved successfully!");
+
 }
 
 function removeSavedCard(cardId) {
@@ -1622,7 +1608,7 @@ function removeSavedCard(cardId) {
     if (idx !== -1) {
       SalonHubData.user.savedCards.splice(idx, 1);
       renderProfileScreen();
-      triggerToast("Card details removed.");
+      
     }
   }
 }
@@ -1631,10 +1617,8 @@ function toggleDarkModeSetting(checkbox) {
   const body = document.body;
   if (checkbox.checked) {
     body.classList.add('dark');
-    triggerToast("Dark mode activated");
   } else {
     body.classList.remove('dark');
-    triggerToast("Light mode activated");
   }
 }
 
@@ -1758,10 +1742,8 @@ function toggleDetailServiceFav(serviceId) {
   const index = SalonHubData.favourites.serviceIds.indexOf(serviceId);
   if (index !== -1) {
     SalonHubData.favourites.serviceIds.splice(index, 1);
-    triggerToast("Removed service from favourites.");
   } else {
     SalonHubData.favourites.serviceIds.push(serviceId);
-    triggerToast("Added service to favourites!");
   }
 
   const salon = SalonHubData.salons.find(s => s.id === AppState.selectedSalonId);
@@ -1860,7 +1842,6 @@ function addComboToCart(comboId) {
   });
   AppState.selectedServices.push(service);
 
-  triggerToast(`Upgraded to ${service.name}!`);
   renderDetailServicesList(salon);
   renderRecommendedCombos();
   updateStickyFooterBar();
@@ -1993,7 +1974,6 @@ function removeFromCart(serviceId) {
   if (AppState.selectedServices.length === 0) {
     closeCartDrawer();
     updateStickyFooterBar();
-    triggerToast("Cart is now empty.");
     return;
   }
   renderCart();
@@ -2300,7 +2280,7 @@ function selectNewLocation(locName) {
   AppState.selectedLocation = locName;
   document.getElementById('currentLocationText').innerText = locName;
   closeLocationDrawer();
-  triggerToast(`Location updated to ${locName}`);
+  
 
   // Filter or reload lists matching distance if necessary
   renderHomeScreen();
