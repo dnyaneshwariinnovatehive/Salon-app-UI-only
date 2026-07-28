@@ -4,7 +4,7 @@ const SPState = {
   currentTab: 'sp_home',
   scheduleView: 'day',
   scheduleDate: new Date(),
-  scheduleFilter: 'all',
+  scheduleFilter: 'scheduled',
   activeApptDetailId: null,
   walkinForm: { name: '', phone: '', gender: 'Male', serviceId: '', timeSlot: '' }
 };
@@ -250,10 +250,8 @@ function renderSPScheduleScreen() {
   if (filterContainer) {
     const filters = [
       { key: 'all', label: 'All' },
-      { key: 'online', label: 'Online' },
-      { key: 'offline', label: 'Walk-in' },
-      { key: 'completed', label: 'Completed' },
-      { key: 'no_show', label: 'No Show' }
+      { key: 'scheduled', label: 'Scheduled' },
+      { key: 'completed', label: 'Completed' }
     ];
     filterContainer.innerHTML = "";
     filters.forEach(f => {
@@ -298,10 +296,8 @@ function renderSPScheduleScreen() {
       });
     }
 
-    if (SPState.scheduleFilter === 'online') filtered = filtered.filter(a => a.type === 'online');
-    else if (SPState.scheduleFilter === 'offline') filtered = filtered.filter(a => a.type === 'offline');
-    else if (SPState.scheduleFilter === 'completed') filtered = filtered.filter(a => a.status === 'completed');
-    else if (SPState.scheduleFilter === 'no_show') filtered = filtered.filter(a => a.status === 'no_show');
+    if (SPState.scheduleFilter === 'scheduled') filtered = filtered.filter(a => a.status === 'scheduled' || a.status === 'in_progress');
+    else if (SPState.scheduleFilter === 'completed') filtered = filtered.filter(a => a.status === 'completed' || a.status === 'no_show');
 
     filtered.sort((a, b) => spTimeToMinutes(a.time) - spTimeToMinutes(b.time));
 
@@ -781,15 +777,8 @@ function openSPAppointmentDetail(apptId) {
 
         ${appt.status === 'in_progress' || appt.status === 'completed' ? `
         <div style="margin-top:14px; padding:14px; background:var(--accent-soft); border-radius:12px;">
-          <div style="display:flex; align-items:center; justify-content:space-between;">
-            <div>
-              <div style="font-size:11px; color:var(--text-light); text-transform:uppercase; letter-spacing:0.5px;">Final Billed Amount</div>
-              <div style="font-size:20px; font-weight:800; color:var(--text-heading); margin-top:2px;">₹${appt.finalBilledAmount}</div>
-            </div>
-            <button onclick="spEditFinalAmount('${appt.id}')" style="background:var(--surface-color); border:none; color:#9C54F2; padding:8px 14px; border-radius:10px; font-size:12px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:4px; box-shadow:0 1px 4px rgba(0,0,0,0.08);">
-              <i data-lucide="pencil" style="width:14px; height:14px;"></i> Edit
-            </button>
-          </div>
+          <div style="font-size:11px; color:var(--text-light); text-transform:uppercase; letter-spacing:0.5px;">Final Billed Amount</div>
+          <div style="font-size:20px; font-weight:800; color:var(--text-heading); margin-top:2px;">₹${appt.finalBilledAmount}</div>
         </div>
         ` : ''}
 
