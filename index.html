@@ -228,6 +228,16 @@
               </button>
             </div>
           </div>
+
+          <div class="form-group">
+            <label>Register as</label>
+            <div class="role-selector-container">
+              <button class="role-chip active" data-role="customer" onclick="selectRegisterRole(this, 'customer')">Customer</button>
+              <button class="role-chip" data-role="provider" onclick="selectRegisterRole(this, 'provider')">Service Provider</button>
+              <button class="role-chip" data-role="admin" onclick="selectRegisterRole(this, 'admin')">Admin</button>
+              <button class="role-chip" data-role="superadmin" onclick="selectRegisterRole(this, 'superadmin')">Super Admin</button>
+            </div>
+          </div>
         </div>
 
         <button class="btn-primary" onclick="performRegister()" style="margin-top: 10px;">
@@ -808,6 +818,228 @@
         </div>
       </div>
 
+      <!-- ================= ADMIN SCREEN: HOME DASHBOARD ================= -->
+      <div class="screen admin-screen" id="screen_admin_home">
+        <div class="sp-header" style="padding-bottom:0;">
+          <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80" alt="Admin" style="width:40px; height:40px; border-radius:50%; object-fit:cover; border:2px solid var(--accent-soft);">
+          <div class="sp-header-info" style="flex:1; margin-left:10px;">
+            <span class="sp-greeting" id="adminHomeGreeting" style="font-size:17px;">Hi Admin 👋</span>
+            <span class="sp-salon-name" id="adminHomeSalonName" style="font-size:12px;">Luxe Studio Salon • Koregaon Park, Pune</span>
+          </div>
+          <button class="header-btn" onclick="openNotificationsDrawer()" style="width:36px; height:36px;">
+            <i data-lucide="bell" style="width:18px; height:18px;"></i>
+            <div class="badge-dot"></div>
+          </button>
+        </div>
+
+        <!-- Today's Stats Cards -->
+        <div class="px-20 mt-10" style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+          <div style="background:var(--surface-color); border-radius:14px; padding:14px; border:1px solid var(--border-color); box-shadow:var(--shadow-card);">
+            <div style="font-size:11px; color:var(--text-light);">Today's Appointments</div>
+            <div style="font-size:26px; font-weight:800; color:var(--accent-color);" id="adminStatAppts">0</div>
+          </div>
+          <div style="background:var(--surface-color); border-radius:14px; padding:14px; border:1px solid var(--border-color); box-shadow:var(--shadow-card);">
+            <div style="font-size:11px; color:var(--text-light);">Today's Revenue</div>
+            <div style="font-size:26px; font-weight:800; color:#2E7D32;" id="adminStatRevenue">₹0</div>
+          </div>
+          <div style="background:var(--surface-color); border-radius:14px; padding:14px; border:1px solid var(--border-color); box-shadow:var(--shadow-card);">
+            <div style="font-size:11px; color:var(--text-light);">Staff on Duty</div>
+            <div style="font-size:26px; font-weight:800; color:var(--text-heading);" id="adminStatOnDuty">0</div>
+          </div>
+          <div style="background:var(--surface-color); border-radius:14px; padding:14px; border:1px solid var(--border-color); box-shadow:var(--shadow-card);">
+            <div style="font-size:11px; color:var(--text-light);">On Leave Today</div>
+            <div style="font-size:26px; font-weight:800; color:#C62828;" id="adminStatOnLeave">0</div>
+          </div>
+        </div>
+
+        <!-- Pending Leave Requests -->
+        <div class="px-20 mt-15">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
+            <h3 style="font-size:14px; font-weight:800;">Pending Leave Requests</h3>
+            <span style="font-size:12px; color:var(--accent-color); font-weight:700;" id="adminPendingLeaveCount">0</span>
+          </div>
+          <div id="adminPendingLeaveList"></div>
+        </div>
+
+        <!-- Daily Provider Load -->
+        <div class="px-20 mt-15">
+          <h3 style="font-size:14px; font-weight:800; margin-bottom:10px;">Today's Provider Load</h3>
+          <div style="display:flex; gap:10px; overflow-x:auto; padding-bottom:8px;" id="adminProviderLoad"></div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="px-20 mt-15" style="padding-bottom:24px;">
+          <h3 style="font-size:14px; font-weight:800; margin-bottom:10px;">Quick Actions</h3>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button onclick="adminOpenAddProvider()" style="display:flex; align-items:center; gap:6px; padding:10px 16px; background:var(--accent-soft); color:var(--accent-color); border:none; border-radius:12px; font-size:12px; font-weight:700; cursor:pointer;">
+              <i data-lucide="user-plus" style="width:14px; height:14px;"></i> Add Provider
+            </button>
+            <button onclick="adminOpenAddService()" style="display:flex; align-items:center; gap:6px; padding:10px 16px; background:var(--accent-soft); color:var(--accent-color); border:none; border-radius:12px; font-size:12px; font-weight:700; cursor:pointer;">
+              <i data-lucide="plus-circle" style="width:14px; height:14px;"></i> Add Service
+            </button>
+            <button onclick="adminOpenMarkClosed()" style="display:flex; align-items:center; gap:6px; padding:10px 16px; background:var(--color-warning-bg); color:#EF6C00; border:none; border-radius:12px; font-size:12px; font-weight:700; cursor:pointer;">
+              <i data-lucide="calendar-x" style="width:14px; height:14px;"></i> Mark Closed
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= ADMIN SCREEN: APPOINTMENTS ================= -->
+      <div class="screen admin-screen" id="screen_admin_appointments">
+        <div class="sp-header">
+          <h2 class="screen-title">Appointments</h2>
+          <button onclick="adminCancelThisDay()" style="padding:8px 14px; background:var(--color-danger-bg); color:#C62828; border:none; border-radius:10px; font-size:11px; font-weight:700; cursor:pointer;">Cancel This Day</button>
+        </div>
+
+        <!-- Filters -->
+        <div class="px-20" style="display:flex; flex-wrap:wrap; gap:6px; padding-bottom:10px;">
+          <select id="adminApptDateFilter" onchange="applyAdminApptFilter()" style="flex:1; min-width:80px; padding:8px 10px; border:1px solid var(--border-color); border-radius:10px; font-size:11px; background:var(--surface-color); color:var(--text-heading);">
+            <option value="today">Today</option>
+            <option value="all">All Dates</option>
+          </select>
+          <select id="adminApptProviderFilter" onchange="applyAdminApptFilter()" style="flex:1; min-width:80px; padding:8px 10px; border:1px solid var(--border-color); border-radius:10px; font-size:11px; background:var(--surface-color); color:var(--text-heading);">
+            <option value="all">All Providers</option>
+          </select>
+          <select id="adminApptServiceFilter" onchange="applyAdminApptFilter()" style="flex:1; min-width:80px; padding:8px 10px; border:1px solid var(--border-color); border-radius:10px; font-size:11px; background:var(--surface-color); color:var(--text-heading);">
+            <option value="all">All Services</option>
+          </select>
+          <select id="adminApptStatusFilter" onchange="applyAdminApptFilter()" style="flex:1; min-width:80px; padding:8px 10px; border:1px solid var(--border-color); border-radius:10px; font-size:11px; background:var(--surface-color); color:var(--text-heading);">
+            <option value="all">All Status</option>
+            <option value="scheduled">Scheduled</option>
+            <option value="in_progress">In Progress</option>
+            <option value="completed">Completed</option>
+            <option value="cancelled">Cancelled</option>
+            <option value="no_show">No Show</option>
+          </select>
+          <select id="adminApptSourceFilter" onchange="applyAdminApptFilter()" style="flex:1; min-width:80px; padding:8px 10px; border:1px solid var(--border-color); border-radius:10px; font-size:11px; background:var(--surface-color); color:var(--text-heading);">
+            <option value="all">All Sources</option>
+            <option value="app">App</option>
+            <option value="walk-in">Walk-in</option>
+            <option value="phone">Phone</option>
+          </select>
+        </div>
+
+        <div class="px-20" id="adminApptList" style="padding-bottom:24px;"></div>
+      </div>
+
+      <!-- ================= ADMIN SCREEN: STAFF ================= -->
+      <div class="screen admin-screen" id="screen_admin_staff">
+        <div class="sp-header">
+          <h2 class="screen-title">Staff</h2>
+          <button onclick="adminOpenAddProvider()" style="display:flex; align-items:center; gap:4px; padding:8px 14px; background:var(--accent-color); color:#fff; border:none; border-radius:10px; font-size:12px; font-weight:700; cursor:pointer;">
+            <i data-lucide="user-plus" style="width:14px; height:14px;"></i> Add
+          </button>
+        </div>
+
+        <div class="tab-switcher-header">
+          <div class="tab-switcher">
+            <button class="tab-switch-btn active" id="adminStaffAllBtn" onclick="adminSetStaffSegment('all')">All Staff</button>
+            <button class="tab-switch-btn" id="adminStaffLeavesBtn" onclick="adminSetStaffSegment('leaves')">Leave Requests</button>
+          </div>
+        </div>
+
+        <div id="adminStaffAllView">
+          <div class="px-20" id="adminStaffList" style="padding-bottom:24px;"></div>
+        </div>
+        <div id="adminStaffLeavesView" style="display:none;">
+          <!-- Mini Leave Calendar -->
+          <div class="px-20 mt-10" id="adminLeaveCalendar"></div>
+          <div class="px-20 mt-10" id="adminLeaveList" style="padding-bottom:24px;"></div>
+        </div>
+      </div>
+
+      <!-- ================= ADMIN SCREEN: SERVICES ================= -->
+      <div class="screen admin-screen" id="screen_admin_services">
+        <div class="sp-header">
+          <h2 class="screen-title">Services</h2>
+          <button onclick="adminOpenAddService()" style="display:flex; align-items:center; gap:4px; padding:8px 14px; background:var(--accent-color); color:#fff; border:none; border-radius:10px; font-size:12px; font-weight:700; cursor:pointer;">
+            <i data-lucide="plus-circle" style="width:14px; height:14px;"></i> Add
+          </button>
+        </div>
+
+        <div class="tab-switcher-header">
+          <div class="tab-switcher">
+            <button class="tab-switch-btn active" id="adminSvcServicesBtn" onclick="adminSetServicesSegment('services')">Services</button>
+            <button class="tab-switch-btn" id="adminSvcCombosBtn" onclick="adminSetServicesSegment('combos')">Combos</button>
+          </div>
+        </div>
+
+        <div id="adminServicesView">
+          <div class="px-20" id="adminServicesList" style="padding-bottom:24px;"></div>
+        </div>
+        <div id="adminCombosView" style="display:none;">
+          <div class="px-20 mt-10" style="text-align:right;">
+            <button onclick="adminOpenCreateCombo()" style="padding:8px 14px; background:var(--accent-soft); color:var(--accent-color); border:none; border-radius:10px; font-size:12px; font-weight:700; cursor:pointer;">
+              <i data-lucide="wand" style="width:14px; height:14px;"></i> Create Combo
+            </button>
+          </div>
+          <div class="px-20 mt-10" id="adminCombosList" style="padding-bottom:24px;"></div>
+        </div>
+      </div>
+
+      <!-- ================= ADMIN SCREEN: PROFILE ================= -->
+      <div class="screen admin-screen" id="screen_admin_profile">
+        <div class="sp-header">
+          <h2 class="screen-title">More</h2>
+        </div>
+
+        <div style="margin:0 20px; background:var(--surface-color); border-radius:16px; overflow:hidden; border:1px solid var(--border-color); box-shadow:var(--shadow-card);">
+          <img id="adminProfileCover" src="https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=600&q=80" style="width:100%; height:120px; object-fit:cover;">
+          <div style="padding:16px;">
+            <div style="display:flex; align-items:center; justify-content:space-between;">
+              <div>
+                <div style="font-size:18px; font-weight:800; color:var(--text-heading);" id="adminProfileName">Luxe Studio Salon</div>
+                <div style="font-size:12px; color:var(--text-body); margin-top:2px;" id="adminProfileAddress">Shop 4, Royal Avenue, Koregaon Park, Pune - 411001</div>
+              </div>
+              <button onclick="adminOpenEditSalon()" style="padding:8px 12px; background:var(--accent-soft); color:var(--accent-color); border:none; border-radius:10px; font-size:11px; font-weight:700; cursor:pointer;">Edit</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Financial Oversight -->
+        <div class="px-20 mt-15">
+          <h3 style="font-size:14px; font-weight:800; margin-bottom:10px;">Financial Overview</h3>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px;">
+            <div style="background:var(--surface-color); border-radius:12px; padding:12px; border:1px solid var(--border-color);">
+              <div style="font-size:10px; color:var(--text-light); text-transform:uppercase;">Total Advance</div>
+              <div style="font-size:18px; font-weight:800; color:var(--accent-color);" id="adminFinAdvance">₹0</div>
+            </div>
+            <div style="background:var(--surface-color); border-radius:12px; padding:12px; border:1px solid var(--border-color);">
+              <div style="font-size:10px; color:var(--text-light); text-transform:uppercase;">Total Balance</div>
+              <div style="font-size:18px; font-weight:800; color:#1565C0;" id="adminFinBalance">₹0</div>
+            </div>
+            <div style="background:var(--surface-color); border-radius:12px; padding:12px; border:1px solid var(--border-color);">
+              <div style="font-size:10px; color:var(--text-light); text-transform:uppercase;">Total Revenue</div>
+              <div style="font-size:18px; font-weight:800; color:#2E7D32;" id="adminFinTotal">₹0</div>
+            </div>
+            <div style="background:var(--surface-color); border-radius:12px; padding:12px; border:1px solid var(--border-color);">
+              <div style="font-size:10px; color:var(--text-light); text-transform:uppercase;">Forfeited</div>
+              <div style="font-size:18px; font-weight:800; color:#C62828;" id="adminFinForfeited">₹0</div>
+            </div>
+          </div>
+          <h3 style="font-size:12px; font-weight:700; color:var(--text-body); margin-bottom:8px;">Per-Service Revenue (Top 6)</h3>
+          <div id="adminFinPerService" style="background:var(--surface-color); border-radius:12px; padding:12px; border:1px solid var(--border-color);"></div>
+        </div>
+
+        <!-- Closure Calendar -->
+        <div class="px-20 mt-15">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
+            <h3 style="font-size:14px; font-weight:800;">Closure Calendar</h3>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <button onclick="adminClosureNav(-1)" style="background:none; border:none; cursor:pointer; padding:4px;"><i data-lucide="chevron-left" style="width:16px; height:16px; color:var(--text-body);"></i></button>
+              <span id="adminClosureMonthLabel" style="font-size:13px; font-weight:700; min-width:100px; text-align:center;"></span>
+              <button onclick="adminClosureNav(1)" style="background:none; border:none; cursor:pointer; padding:4px;"><i data-lucide="chevron-right" style="width:16px; height:16px; color:var(--text-body);"></i></button>
+            </div>
+          </div>
+          <div id="adminClosureCalendar" style="padding-bottom:24px;"></div>
+        </div>
+
+        <!-- Logout -->
+        <div class="px-20" style="padding-bottom:40px;">
+          <button onclick="adminLogout()" style="width:100%; padding:14px; background:var(--color-danger-bg); color:#C62828; border:none; border-radius:14px; font-size:14px; font-weight:700; cursor:pointer;">Logout</button>
+        </div>
+      </div>
+
     </div>
 
     <!-- ================= FIXED BOTTOM TAB NAVIGATION BAR ================= -->
@@ -851,6 +1083,30 @@
       <a class="nav-item sp-nav-item" data-tab="sp_profile" onclick="spNavigateToTab('sp_profile')">
         <i data-lucide="user"></i>
         <span>Profile</span>
+      </a>
+    </div>
+
+    <!-- Admin Bottom Navigation -->
+    <div class="nav-footer admin-nav-footer" id="adminNavigationBar" style="display: none;">
+      <a class="nav-item admin-nav-item active" data-tab="admin_home" onclick="adminNavigateToTab('admin_home')">
+        <i data-lucide="home"></i>
+        <span>Home</span>
+      </a>
+      <a class="nav-item admin-nav-item" data-tab="admin_appointments" onclick="adminNavigateToTab('admin_appointments')">
+        <i data-lucide="calendar"></i>
+        <span>Appointments</span>
+      </a>
+      <a class="nav-item admin-nav-item" data-tab="admin_staff" onclick="adminNavigateToTab('admin_staff')">
+        <i data-lucide="users"></i>
+        <span>Staff</span>
+      </a>
+      <a class="nav-item admin-nav-item" data-tab="admin_services" onclick="adminNavigateToTab('admin_services')">
+        <i data-lucide="scissors"></i>
+        <span>Services</span>
+      </a>
+      <a class="nav-item admin-nav-item" data-tab="admin_profile" onclick="adminNavigateToTab('admin_profile')">
+        <i data-lucide="settings"></i>
+        <span>More</span>
       </a>
     </div>
 
@@ -1247,6 +1503,75 @@
   </div>
 
 
+  <!-- ================= ADMIN DRAWER OVERLAYS ================= -->
+  <!-- 1. Appointment Detail -->
+  <div class="overlay" id="adminApptDetailOverlay" onclick="closeAdminDrawer('adminApptDetailDrawer')">
+    <div class="drawer" id="adminApptDetailDrawer" onclick="event.stopPropagation()" style="max-height:80%;">
+      <div class="drawer-drag-bar" onclick="closeAdminDrawer('adminApptDetailDrawer')"></div>
+      <div class="drawer-content" id="adminApptDetailContent"></div>
+    </div>
+  </div>
+
+  <!-- 2. Provider Profile -->
+  <div class="overlay" id="adminProviderProfileOverlay" onclick="closeAdminDrawer('adminProviderProfileDrawer')">
+    <div class="drawer" id="adminProviderProfileDrawer" onclick="event.stopPropagation()" style="max-height:85%;">
+      <div class="drawer-drag-bar" onclick="closeAdminDrawer('adminProviderProfileDrawer')"></div>
+      <div class="drawer-header">
+        <h3 style="font-size:18px; font-weight:800;">Provider Profile</h3>
+        <button class="drawer-close-btn" onclick="closeAdminDrawer('adminProviderProfileDrawer')"><i data-lucide="x" style="width:16px; height:16px;"></i></button>
+      </div>
+      <div class="drawer-content" id="adminProviderProfileContent"></div>
+    </div>
+  </div>
+
+  <!-- 3. Provider Form -->
+  <div class="overlay" id="adminProviderFormOverlay" onclick="closeAdminDrawer('adminProviderFormDrawer')">
+    <div class="drawer" id="adminProviderFormDrawer" onclick="event.stopPropagation()" style="max-height:85%;">
+      <div class="drawer-drag-bar" onclick="closeAdminDrawer('adminProviderFormDrawer')"></div>
+      <div class="drawer-content" id="adminProviderFormContent"></div>
+    </div>
+  </div>
+
+  <!-- 4. Service Detail -->
+  <div class="overlay" id="adminServiceDetailOverlay" onclick="closeAdminDrawer('adminServiceDetailDrawer')">
+    <div class="drawer" id="adminServiceDetailDrawer" onclick="event.stopPropagation()" style="max-height:80%;">
+      <div class="drawer-drag-bar" onclick="closeAdminDrawer('adminServiceDetailDrawer')"></div>
+      <div class="drawer-header">
+        <h3 style="font-size:18px; font-weight:800;">Service Details</h3>
+        <button class="drawer-close-btn" onclick="closeAdminDrawer('adminServiceDetailDrawer')"><i data-lucide="x" style="width:16px; height:16px;"></i></button>
+      </div>
+      <div class="drawer-content" id="adminServiceDetailContent"></div>
+    </div>
+  </div>
+
+  <!-- 5. Service Form -->
+  <div class="overlay" id="adminServiceFormOverlay" onclick="closeAdminDrawer('adminServiceFormDrawer')">
+    <div class="drawer" id="adminServiceFormDrawer" onclick="event.stopPropagation()" style="max-height:85%;">
+      <div class="drawer-drag-bar" onclick="closeAdminDrawer('adminServiceFormDrawer')"></div>
+      <div class="drawer-content" id="adminServiceFormContent"></div>
+    </div>
+  </div>
+
+  <!-- 6. Combo Form -->
+  <div class="overlay" id="adminComboFormOverlay" onclick="closeAdminDrawer('adminComboFormDrawer')">
+    <div class="drawer" id="adminComboFormDrawer" onclick="event.stopPropagation()" style="max-height:85%;">
+      <div class="drawer-drag-bar" onclick="closeAdminDrawer('adminComboFormDrawer')"></div>
+      <div class="drawer-content" id="adminComboFormContent"></div>
+    </div>
+  </div>
+
+  <!-- 7. Edit Salon -->
+  <div class="overlay" id="adminEditSalonOverlay" onclick="closeAdminDrawer('adminEditSalonDrawer')">
+    <div class="drawer" id="adminEditSalonDrawer" onclick="event.stopPropagation()" style="max-height:60%;">
+      <div class="drawer-drag-bar" onclick="closeAdminDrawer('adminEditSalonDrawer')"></div>
+      <div class="drawer-header">
+        <h3 style="font-size:18px; font-weight:800;">Edit Salon Profile</h3>
+        <button class="drawer-close-btn" onclick="closeAdminDrawer('adminEditSalonDrawer')"><i data-lucide="x" style="width:16px; height:16px;"></i></button>
+      </div>
+      <div class="drawer-content" id="adminEditSalonContent"></div>
+    </div>
+  </div>
+
   <!-- ================= EXTERNAL SCRIPTS ================= -->
   <!-- Lucide icons CDN -->
   <script src="https://unpkg.com/lucide@latest"></script>
@@ -1257,6 +1582,9 @@
   <!-- Service Provider Data & Logic -->
   <script src="js/spData.js"></script>
   <script src="js/spApp.js"></script>
+  <!-- Admin Data & Logic -->
+  <script src="js/adminData.js"></script>
+  <script src="js/adminApp.js"></script>
 
 </body>
 

@@ -5,6 +5,7 @@ const AppState = {
   isAuthenticated: false,
   authMode: 'login', // 'login', 'signup', 'otp'
   currentTab: 'home',
+  selectedRegisterRole: 'customer',
   selectedLocation: "Koregaon Park, Pune",
   homeGender: 'unisex', // 'unisex', 'male', 'female'
 
@@ -40,6 +41,8 @@ const AppState = {
 
   // Service Provider Mode
   spMode: false,
+  // Admin Mode
+  adminMode: false,
 };
 
 // Initial Setup on Document Load
@@ -241,6 +244,23 @@ function performAuth() {
   const regEmail = (document.getElementById('signupEmail')?.value || '').trim().toLowerCase();
   const regPass = (document.getElementById('signupPassword')?.value || '').trim();
 
+  const isAdminLogin = (loginEmail === 'admin@gmail.com' && loginPass === '123456') ||
+                        (AppState.authMode === 'signup' && regEmail === 'admin@gmail.com' && regPass === '123456');
+
+  if (isAdminLogin) {
+    AppState.adminMode = true;
+    AppState.currentTab = 'admin_home';
+    document.getElementById('navigationBar').style.display = 'none';
+    document.getElementById('spNavigationBar').style.display = 'none';
+    document.getElementById('adminNavigationBar').style.display = 'flex';
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('screen_admin_home').classList.add('active');
+    triggerToast('Welcome back, Admin!');
+    renderAdminHomeScreen();
+    lucide.createIcons();
+    return;
+  }
+
   const isSPLogin = (loginEmail === 'serviceprovider@gmail.com' && loginPass === '123456') ||
                     (AppState.authMode === 'signup' && regEmail === 'serviceprovider@gmail.com' && regPass === '123456');
 
@@ -259,6 +279,7 @@ function performAuth() {
 
   // Customer Login (existing logic)
   AppState.spMode = false;
+  AppState.adminMode = false;
   document.getElementById('navigationBar').style.display = 'flex';
   const nameInput = document.getElementById('signupName').value.trim();
   if (AppState.authMode === 'signup' && nameInput !== "") {
@@ -280,8 +301,10 @@ function performSocialAuth(platform) {
 function performLogout() {
   AppState.isAuthenticated = false;
   AppState.spMode = false;
+  AppState.adminMode = false;
   document.getElementById('navigationBar').style.display = 'none';
   document.getElementById('spNavigationBar').style.display = 'none';
+  document.getElementById('adminNavigationBar').style.display = 'none';
   showScreen('login');
   toggleAuthTab('login');
   triggerToast("Logged out of account.");
@@ -311,13 +334,20 @@ function showRegisterScreen() {
   lucide.createIcons();
 }
 
+function selectRegisterRole(btn, role) {
+  AppState.selectedRegisterRole = role;
+  document.querySelectorAll('.role-chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+}
+
 function performRegister() {
   const name = document.getElementById('regName').value.trim();
   const phone = document.getElementById('regPhone').value.trim();
   const email = document.getElementById('regEmail').value.trim();
   const password = document.getElementById('regPassword').value;
   const confirmPassword = document.getElementById('regConfirmPassword').value;
-  
+  const role = AppState.selectedRegisterRole || 'customer';
+
   // 1. Validation
   if (!name) {
     triggerToast("Please enter your Full Name.");
@@ -347,25 +377,53 @@ function performRegister() {
     triggerToast("Passwords do not match.");
     return;
   }
-  
-  // 2. Complete customer registration & log in
+
+  // 2. Route based on selected role
+  if (role === 'admin' || role === 'superadmin') {
+    AppState.isAuthenticated = true;
+    AppState.adminMode = true;
+    document.getElementById('navigationBar').style.display = 'none';
+    document.getElementById('spNavigationBar').style.display = 'none';
+    document.getElementById('adminNavigationBar').style.display = 'flex';
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('screen_admin_home').classList.add('active');
+    triggerToast(`Welcome to SalonHub Admin, ${name}!`);
+    renderAdminHomeScreen();
+    lucide.createIcons();
+    return;
+  }
+
+  if (role === 'provider') {
+    AppState.isAuthenticated = true;
+    AppState.spMode = true;
+    document.getElementById('navigationBar').style.display = 'none';
+    document.getElementById('spNavigationBar').style.display = 'flex';
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('screen_sp_home').classList.add('active');
+    triggerToast(`Welcome to SalonHub, ${name}!`);
+    renderSPHomeScreen();
+    lucide.createIcons();
+    return;
+  }
+
+  // 3. Complete customer registration & log in
   AppState.isAuthenticated = true;
   document.getElementById('navigationBar').style.display = 'flex';
-  
+
   // Save credentials to mock state
   SalonHubData.user.name = name;
   SalonHubData.user.phone = phone;
   SalonHubData.user.email = email;
-  
+
   // Load avatar image into home profile
   document.getElementById('homeUserAvatar').src = SalonHubData.user.avatar;
-  
+
   // Reset the home screen profile names
   const greetingEl = document.querySelector('.location-picker .greeting');
   if (greetingEl) {
     greetingEl.textContent = `Hi ${name} 👋`;
   }
-  
+
   triggerToast(`Welcome to SalonHub, ${name}!`);
   navigateToTab('home');
 }

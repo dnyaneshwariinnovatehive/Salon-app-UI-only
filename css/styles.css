@@ -4098,3 +4098,21 @@ input:checked+.slider:before {
   background: var(--surface-color);
   outline: none;
 }
+
+/* --- ADMIN SCREENS --- */
+.admin-screen {
+  /* Inherits .screen display behavior */
+}
+
+.admin-screen .sp-header {
+  /* Reuse SP header pattern for consistency */
+}
+
+.admin-nav-footer .nav-item.active {
+  color: var(--accent-color);
+}
+
+.admin-nav-footer .nav-item.active svg {
+  stroke: var(--accent-color);
+  fill: rgba(156, 84, 242, 0.1);
+}
