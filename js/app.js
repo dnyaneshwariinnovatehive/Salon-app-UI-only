@@ -110,6 +110,8 @@ function setupBrowserHistory() {
       else if (openOverlay.id === 'successModalOverlay') closeSuccessModal();
       else if (openOverlay.id === 'homeFilterOverlay') closeHomeFilterSheet();
       else if (openOverlay.id === 'salonRegOverlay') closeSalonRegistration();
+      else if (openOverlay.id === 'adminFinancialDrawerOverlay') closeAdminDrawer('adminFinancialDrawer');
+      else if (openOverlay.id === 'adminClosureDrawerOverlay') closeAdminDrawer('adminClosureDrawer');
       else if (AppState.saMode && openOverlay.id.endsWith('Overlay')) {
         const drawerName = openOverlay.id.replace('Overlay', '');
         if (typeof saCloseDrawer === 'function') saCloseDrawer(drawerName);

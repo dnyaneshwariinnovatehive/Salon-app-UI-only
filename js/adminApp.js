@@ -1410,3 +1410,38 @@ function adminLogout() {
     performLogout();
   }
 }
+
+// ----------------------------------------------------
+// ADMIN FINANCIAL OVERVIEW
+// ----------------------------------------------------
+function adminOpenFinancial() {
+  openAdminDrawer('adminFinancialDrawer');
+  renderAdminFinancials();
+}
+
+// ----------------------------------------------------
+// ADMIN SALON CLOSURE
+// ----------------------------------------------------
+function adminOpenClosure() {
+  openAdminDrawer('adminClosureDrawer');
+  AdminState.closureCalendarMonth = new Date();
+  renderAdminClosureCalendar();
+  renderAdminClosurePastRecords();
+}
+
+function renderAdminClosurePastRecords() {
+  const container = document.getElementById('adminClosurePastRecords');
+  if (!container) return;
+  const dates = AdminData.closureDates || [];
+  if (!dates.length) {
+    container.innerHTML = '<div style="font-size:12px; color:var(--text-light); padding:8px 0;">No past closures recorded.</div>';
+    return;
+  }
+  container.innerHTML = '';
+  dates.sort().forEach(d => {
+    const div = document.createElement('div');
+    div.style.cssText = 'display:flex; align-items:center; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border-color); font-size:12px;';
+    div.innerHTML = `<span style="color:var(--text-heading);">${d}</span><span style="color:#C62828; font-weight:600;">Closed</span>`;
+    container.appendChild(div);
+  });
+}

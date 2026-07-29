@@ -175,6 +175,12 @@
             <i data-lucide="eye" style="width: 14px; height: 14px;"></i> Explore as Guest
           </a>
         </div>
+
+        <div style="padding:20px 20px 40px; text-align:center;">
+          <button onclick="openSalonRegistration()" style="padding:10px 20px; background:transparent; color:var(--accent-color); border:1.5px solid var(--accent-color); border-radius:30px; font-size:13px; font-weight:700; cursor:pointer; width:80%;">
+            <i data-lucide="store" style="width:15px; height:15px; display:inline; vertical-align:middle; margin-right:6px;"></i> Register Your Salon
+          </button>
+        </div>
       </div>
 
       <!-- ================= SCREEN: REGISTER SCREEN ================= -->
@@ -186,7 +192,6 @@
 
         <div class="register-header">
           <h2>Create your SalonHub account</h2>
-          <p>Register as a SuperAdmin, Admin, ServiceProvider, or customer.</p>
         </div>
 
         <div class="register-form-fields">
@@ -238,15 +243,6 @@
             </div>
           </div>
 
-          <div class="form-group">
-            <label>Register as</label>
-            <div class="role-selector-container">
-              <button class="role-chip active" data-role="customer" onclick="selectRegisterRole(this, 'customer')">Customer</button>
-              <button class="role-chip" data-role="provider" onclick="selectRegisterRole(this, 'provider')">Service Provider</button>
-              <button class="role-chip" data-role="admin" onclick="selectRegisterRole(this, 'admin')">Admin</button>
-              <button class="role-chip" data-role="superadmin" onclick="selectRegisterRole(this, 'superadmin')">Super Admin</button>
-            </div>
-          </div>
         </div>
 
         <button class="btn-primary" onclick="performRegister()" style="margin-top: 10px;">
@@ -937,6 +933,27 @@
               </div>
               <button onclick="adminOpenEditSalon()" style="padding:8px 12px; background:var(--accent-soft); color:var(--accent-color); border:none; border-radius:10px; font-size:11px; font-weight:700; cursor:pointer;">Edit</button>
             </div>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="px-20 mt-15">
+          <div style="background:var(--surface-color); border-radius:14px; border:1px solid var(--border-color); overflow:hidden; box-shadow:var(--shadow-card);">
+            <button onclick="adminOpenFinancial()" style="display:flex; align-items:center; gap:12px; width:100%; padding:14px 16px; background:none; border:none; border-bottom:1px solid var(--border-color); cursor:pointer; font-size:14px; font-weight:600; color:var(--text-heading); text-align:left;">
+              <i data-lucide="bar-chart-3" style="width:20px; height:20px; color:var(--accent-color);"></i>
+              <span>Financial Overview</span>
+              <i data-lucide="chevron-right" style="width:16px; height:16px; margin-left:auto; color:var(--text-light);"></i>
+            </button>
+            <button onclick="adminOpenClosure()" style="display:flex; align-items:center; gap:12px; width:100%; padding:14px 16px; background:none; border:none; border-bottom:1px solid var(--border-color); cursor:pointer; font-size:14px; font-weight:600; color:var(--text-heading); text-align:left;">
+              <i data-lucide="calendar-x" style="width:20px; height:20px; color:#EF6C00;"></i>
+              <span>Salon Closure</span>
+              <i data-lucide="chevron-right" style="width:16px; height:16px; margin-left:auto; color:var(--text-light);"></i>
+            </button>
+            <button onclick="adminNavigateToTab('admin_staff')" style="display:flex; align-items:center; gap:12px; width:100%; padding:14px 16px; background:none; border:none; cursor:pointer; font-size:14px; font-weight:600; color:var(--text-heading); text-align:left;">
+              <i data-lucide="users" style="width:20px; height:20px; color:#1565C0;"></i>
+              <span>Staff</span>
+              <i data-lucide="chevron-right" style="width:16px; height:16px; margin-left:auto; color:var(--text-light);"></i>
+            </button>
           </div>
         </div>
 
@@ -1773,6 +1790,68 @@
     <div class="drawer" id="saConfirmDrawer" onclick="event.stopPropagation()" style="max-height:40%;">
       <div class="drawer-drag-bar" onclick="saCloseDrawer('saConfirmDrawer')"></div>
       <div class="drawer-content" id="saConfirmContent"></div>
+    </div>
+  </div>
+
+  <!-- ================= ADMIN FINANCIAL OVERVIEW DRAWER ================= -->
+  <div class="overlay" id="adminFinancialDrawerOverlay" onclick="closeAdminDrawer('adminFinancialDrawer')">
+    <div class="drawer" id="adminFinancialDrawer" onclick="event.stopPropagation()" style="max-height:80%;">
+      <div class="drawer-drag-bar" onclick="closeAdminDrawer('adminFinancialDrawer')"></div>
+      <div class="drawer-header">
+        <h3 style="font-size:18px; font-weight:800;">Financial Overview</h3>
+        <button class="drawer-close-btn" onclick="closeAdminDrawer('adminFinancialDrawer')"><i data-lucide="x" style="width:16px; height:16px;"></i></button>
+      </div>
+      <div class="drawer-content" id="adminFinancialContent">
+        <div style="padding:20px;">
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px;">
+            <div style="background:var(--accent-soft); border-radius:12px; padding:14px; text-align:center;">
+              <div style="font-size:10px; font-weight:700; color:var(--text-body);">Total Revenue</div>
+              <div style="font-size:22px; font-weight:800; color:var(--accent-color); margin-top:4px;" id="adminFinTotal">₹0</div>
+            </div>
+            <div style="background:var(--color-success-bg); border-radius:12px; padding:14px; text-align:center;">
+              <div style="font-size:10px; font-weight:700; color:var(--text-body);">Advance Collected</div>
+              <div style="font-size:22px; font-weight:800; color:#2E7D32; margin-top:4px;" id="adminFinAdvance">₹0</div>
+            </div>
+            <div style="background:var(--color-info-bg); border-radius:12px; padding:14px; text-align:center;">
+              <div style="font-size:10px; font-weight:700; color:var(--text-body);">Balance Collected</div>
+              <div style="font-size:22px; font-weight:800; color:#1565C0; margin-top:4px;" id="adminFinBalance">₹0</div>
+            </div>
+            <div style="background:var(--color-danger-bg); border-radius:12px; padding:14px; text-align:center;">
+              <div style="font-size:10px; font-weight:700; color:var(--text-body);">Forfeited</div>
+              <div style="font-size:22px; font-weight:800; color:#C62828; margin-top:4px;" id="adminFinForfeited">₹0</div>
+            </div>
+          </div>
+
+          <h4 style="font-size:13px; font-weight:800; margin-bottom:8px;">Revenue by Service</h4>
+          <div id="adminFinPerService"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= ADMIN CLOSURE CALENDAR DRAWER ================= -->
+  <div class="overlay" id="adminClosureDrawerOverlay" onclick="closeAdminDrawer('adminClosureDrawer')">
+    <div class="drawer" id="adminClosureDrawer" onclick="event.stopPropagation()" style="max-height:70%;">
+      <div class="drawer-drag-bar" onclick="closeAdminDrawer('adminClosureDrawer')"></div>
+      <div class="drawer-header">
+        <h3 style="font-size:18px; font-weight:800;">Salon Closure Dates</h3>
+        <button class="drawer-close-btn" onclick="closeAdminDrawer('adminClosureDrawer')"><i data-lucide="x" style="width:16px; height:16px;"></i></button>
+      </div>
+      <div class="drawer-content" id="adminClosureContent">
+        <div style="padding:20px;">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
+            <button onclick="adminClosureNav(-1)" style="background:none; border:none; cursor:pointer; padding:8px;"><i data-lucide="chevron-left" style="width:18px; height:18px;"></i></button>
+            <span id="adminClosureMonthLabel" style="font-size:14px; font-weight:700;">January 2026</span>
+            <button onclick="adminClosureNav(1)" style="background:none; border:none; cursor:pointer; padding:8px;"><i data-lucide="chevron-right" style="width:18px; height:18px;"></i></button>
+          </div>
+          <div id="adminClosureCalendar"></div>
+
+          <h4 style="font-size:12px; font-weight:800; margin-top:16px; margin-bottom:8px;">Past Closure Records</h4>
+          <div id="adminClosurePastRecords">
+            <div style="font-size:12px; color:var(--text-light); padding:8px 0;">No past closures.</div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
