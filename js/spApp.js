@@ -164,21 +164,19 @@ function renderSPHomeScreen() {
     const todayAppts = SPData.appointments.filter(a => a.date === 'today');
     const completedCount = todayAppts.filter(a => a.status === 'completed').length;
     const remainingCount = todayAppts.filter(a => a.status === 'scheduled' || a.status === 'in_progress').length;
-    const totalToday = SPData.earnings.today.total;
     const stats = [
       { label: 'Total', value: todayAppts.length, icon: 'calendar', bg: 'var(--accent-soft)', color: '#9C54F2' },
       { label: 'Done', value: completedCount, icon: 'check-circle', bg: 'var(--color-success-bg)', color: '#2E7D32' },
-      { label: 'Left', value: remainingCount, icon: 'clock', bg: 'var(--color-warning-bg)', color: '#EF6C00' },
-      { label: 'Earned', value: `₹${totalToday.toLocaleString()}`, icon: 'indian-rupee', bg: 'var(--color-info-bg)', color: '#1565C0' }
+      { label: 'Left', value: remainingCount, icon: 'clock', bg: 'var(--color-warning-bg)', color: '#EF6C00' }
     ];
     statsContainer.innerHTML = "";
     stats.forEach(s => {
       const el = document.createElement('div');
-      el.style.cssText = `background:${s.bg}; border-radius:10px; padding:8px 4px; flex:1; min-width:0; text-align:center;`;
+      el.style.cssText = `background:${s.bg}; border-radius:12px; padding:10px 4px; flex:1; min-width:0; text-align:center;`;
       el.innerHTML = `
-        <i data-lucide="${s.icon}" style="width:16px; height:16px; color:${s.color};"></i>
-        <div style="font-size:14px; font-weight:800; color:${s.color}; margin-top:1px;">${s.value}</div>
-        <div style="font-size:8px; color:var(--text-body); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${s.label}</div>
+        <i data-lucide="${s.icon}" style="width:18px; height:18px; color:${s.color};"></i>
+        <div style="font-size:16px; font-weight:800; color:${s.color}; margin-top:2px;">${s.value}</div>
+        <div style="font-size:10px; font-weight:700; color:var(--text-body); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${s.label}</div>
       `;
       statsContainer.appendChild(el);
     });
@@ -188,7 +186,22 @@ function renderSPHomeScreen() {
   if (shiftText) shiftText.innerText = 'Shift: 09:00 AM - 07:00 PM • Break: 01:00 - 02:00 PM';
 
   const apptCount = document.getElementById('spApptCount');
-  const sorted = [...SPData.appointments].sort((a, b) => spTimeToMinutes(a.time) - spTimeToMinutes(b.time));
+  
+  // Sort sequence: in_progress -> scheduled -> completed -> no_show
+  const statusPriority = {
+    'in_progress': 1,
+    'scheduled': 2,
+    'completed': 3,
+    'no_show': 4
+  };
+
+  const sorted = [...SPData.appointments].sort((a, b) => {
+    const pA = statusPriority[a.status] || 99;
+    const pB = statusPriority[b.status] || 99;
+    if (pA !== pB) return pA - pB;
+    return spTimeToMinutes(a.time) - spTimeToMinutes(b.time);
+  });
+
   if (apptCount) apptCount.textContent = `${sorted.length} appointments`;
 
   const timelineContainer = document.getElementById('spTimeline');
@@ -200,22 +213,24 @@ function renderSPHomeScreen() {
       const gc = spGenderColor(appt.customerGender);
       const balance = appt.finalBilledAmount - appt.advancePaid;
       const card = document.createElement('div');
-      card.style.cssText = `background:var(--surface-color); border-radius:12px; padding:12px; cursor:pointer; border-left:3px solid ${sc.color}; box-shadow:var(--shadow-card);`;
+      card.style.cssText = `background:var(--surface-color); border-radius:14px; padding:14px 16px; cursor:pointer; border-left:4px solid ${sc.color}; box-shadow:var(--shadow-card); display:flex; align-items:center; justify-content:space-between;`;
       card.onclick = () => openSPAppointmentDetail(appt.id);
       card.innerHTML = `
-        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:4px;">
-          <span style="font-size:12px; font-weight:700; color:${sc.color};">${appt.time}</span>
-          ${spGetStatusBadge(appt.status)}
+        <div style="flex:1; min-width:0; padding-right:12px;">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px; flex-wrap:wrap;">
+            <span style="font-size:13px; font-weight:800; color:${sc.color};">${appt.time}</span>
+            ${spGetStatusBadge(appt.status)}
+            <span style="display:inline-flex; align-items:center; gap:3px; background:${gc.bg}; color:${gc.color}; padding:2px 8px; border-radius:8px; font-size:10px; font-weight:700;">
+              <i data-lucide="${spGenderIcon(appt.customerGender)}" style="width:10px; height:10px;"></i>${appt.customerGender}
+            </span>
+          </div>
+          <div style="font-size:14px; font-weight:800; color:var(--text-heading); margin-bottom:2px;">${appt.customerName}</div>
+          <div style="font-size:11px; color:var(--text-body); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${servicesText}</div>
         </div>
-        <div style="font-size:13px; font-weight:700; color:var(--text-heading); margin-bottom:2px;">${appt.customerName}</div>
-        <div style="display:inline-flex; align-items:center; gap:2px; background:${gc.bg}; color:${gc.color}; padding:1px 6px; border-radius:6px; font-size:9px; font-weight:600; margin-bottom:4px;">
-          <i data-lucide="${spGenderIcon(appt.customerGender)}" style="width:8px; height:8px;"></i>${appt.customerGender}
-        </div>
-        <div style="font-size:10px; color:var(--text-body); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${servicesText}</div>
-        <div style="display:flex; align-items:center; gap:6px; margin-top:4px; font-size:10px; color:var(--text-light);">
-          <span>${appt.duration}m</span>
-          <span>₹${appt.totalAmount}</span>
-          ${balance > 0 ? `<span style="color:var(--color-danger);">Due ₹${balance}</span>` : ''}
+        <div style="text-align:right; flex-shrink:0;">
+          <div style="font-size:14px; font-weight:800; color:var(--text-heading);">₹${appt.totalAmount}</div>
+          <div style="font-size:11px; color:var(--text-light); margin-top:2px;">${appt.duration} mins</div>
+          ${balance > 0 ? `<div style="font-size:10px; color:var(--color-danger); font-weight:700; margin-top:2px;">Due ₹${balance}</div>` : ''}
         </div>
       `;
       timelineContainer.appendChild(card);
@@ -264,7 +279,7 @@ function renderSPScheduleScreen() {
     filters.forEach(f => {
       const btn = document.createElement('button');
       const isActive = SPState.scheduleFilter === f.key;
-      btn.style.cssText = `padding:6px 14px; border-radius:16px; border:1px solid ${isActive ? 'var(--accent-color)' : 'var(--border-color)'}; background:${isActive ? 'var(--accent-color)' : 'var(--surface-color)'}; color:${isActive ? '#fff' : 'var(--text-body)'}; font-size:11px; font-weight:600; cursor:pointer; white-space:nowrap;`;
+      btn.style.cssText = `flex:1; padding:10px 4px; text-align:center; border-radius:14px; border:1.5px solid ${isActive ? 'var(--accent-color)' : 'var(--border-color)'}; background:${isActive ? 'var(--accent-color)' : 'var(--surface-color)'}; color:${isActive ? '#fff' : 'var(--text-body)'}; font-size:12px; font-weight:700; cursor:pointer; min-width:0;`;
       btn.onclick = () => {
         SPState.scheduleFilter = f.key;
         renderSPScheduleScreen();
