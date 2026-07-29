@@ -2193,6 +2193,7 @@ function selectDateSlot(dateNum, formattedDate) {
 }
 
 function timeToMinutes(timeStr) {
+  if (!timeStr) return 0;
   const [time, modifier] = timeStr.split(' ');
   let [hours, minutes] = time.split(':').map(Number);
   if (modifier === 'PM' && hours !== 12) {
@@ -2204,8 +2205,23 @@ function timeToMinutes(timeStr) {
   return hours * 60 + minutes;
 }
 
+function minutesToTime(mins) {
+  let hours = Math.floor(mins / 60);
+  let minutes = mins % 60;
+  let modifier = 'AM';
+  if (hours >= 12) {
+    modifier = 'PM';
+    if (hours > 12) hours -= 12;
+  }
+  if (hours === 0) hours = 12;
+  const minsStr = minutes < 10 ? `0${minutes}` : `${minutes}`;
+  const hoursStr = hours < 10 ? `0${hours}` : `${hours}`;
+  return `${hoursStr}:${minsStr} ${modifier}`;
+}
+
 function renderTimeSlots() {
   const container = document.getElementById('slotTimePickerList');
+  if (!container) return;
   container.innerHTML = "";
 
   // Contiguous 30-minute intervals
@@ -2216,37 +2232,67 @@ function renderTimeSlots() {
     "06:00 PM", "06:30 PM", "07:00 PM", "07:30 PM"
   ];
 
-  if (!AppState.selectedTimeSlot) {
-    AppState.selectedTimeSlot = "11:30 AM";
-  }
-
   const totalDuration = AppState.selectedServices.reduce((sum, s) => {
     const mins = parseInt(s.time) || 30;
     return sum + mins;
   }, 0);
+
+  // Calculate required 30-min slots
+  const requiredSlots = Math.max(1, Math.ceil(totalDuration / 30));
+
+  // Update visual requirement badge and notice in drawer
+  const reqBadge = document.getElementById('slotRequirementBadge');
+  const reqInfo = document.getElementById('slotRequirementInfo');
+  if (reqBadge) {
+    reqBadge.innerText = `${requiredSlots} Slot${requiredSlots > 1 ? 's' : ''} (${totalDuration}m)`;
+  }
+  if (reqInfo) {
+    if (requiredSlots > 1) {
+      reqInfo.innerHTML = `<i data-lucide="clock" style="width:12px; height:12px; display:inline-block; vertical-align:middle; margin-right:4px;"></i> Service requires <strong>${requiredSlots} consecutive slots</strong> (${totalDuration} mins).`;
+    } else {
+      reqInfo.innerHTML = `<i data-lucide="clock" style="width:12px; height:12px; display:inline-block; vertical-align:middle; margin-right:4px;"></i> Service duration: <strong>${totalDuration} mins</strong> (1 slot).`;
+    }
+    if (window.lucide) lucide.createIcons();
+  }
+
+  // A slot is valid if there are enough remaining consecutive slots before closing time
+  const isSlotValid = (idx) => (slots.length - idx) >= requiredSlots;
+
+  // If current selectedTimeSlot is invalid or missing, pick the first valid slot
+  const currentIdx = slots.indexOf(AppState.selectedTimeSlot);
+  if (!AppState.selectedTimeSlot || currentIdx === -1 || !isSlotValid(currentIdx)) {
+    const firstValid = slots.find((_, idx) => isSlotValid(idx));
+    AppState.selectedTimeSlot = firstValid || slots[0];
+  }
 
   let selectedMins = null;
   if (AppState.selectedTimeSlot) {
     selectedMins = timeToMinutes(AppState.selectedTimeSlot);
   }
 
-  slots.forEach(time => {
+  slots.forEach((time, index) => {
     const slotMins = timeToMinutes(time);
     const isActive = AppState.selectedTimeSlot === time;
+    const hasEnoughSlots = isSlotValid(index);
     
-    // Check overlap
+    // Check overlap with active selection block
     let isFrozen = false;
     if (selectedMins !== null && !isActive) {
-      isFrozen = slotMins > selectedMins && slotMins < (selectedMins + totalDuration);
+      isFrozen = slotMins > selectedMins && slotMins < (selectedMins + (requiredSlots * 30));
     }
 
     const btn = document.createElement('button');
-    btn.className = `time-slot-btn ${isActive ? 'active' : ''} ${isFrozen ? 'frozen' : ''}`;
     
-    if (isFrozen) {
+    if (!hasEnoughSlots) {
+      btn.className = 'time-slot-btn unavailable';
       btn.disabled = true;
-      btn.innerHTML = `${time} <span style="font-size:8px; display:block; opacity:0.7;">Frozen</span>`;
+      btn.innerHTML = `${time} <span style="font-size:8px; display:block; opacity:0.75; color:#e11d48; font-weight:700;">N/A (${requiredSlots} slots req)</span>`;
+    } else if (isFrozen) {
+      btn.className = 'time-slot-btn frozen';
+      btn.disabled = true;
+      btn.innerHTML = `${time} <span style="font-size:8px; display:block; opacity:0.7;">Reserved</span>`;
     } else {
+      btn.className = `time-slot-btn ${isActive ? 'active' : ''}`;
       btn.onclick = () => {
         AppState.selectedTimeSlot = time;
         renderTimeSlots();
@@ -2314,12 +2360,29 @@ function renderStylistsPicker() {
 function updateSlotConfirmDetails() {
   const dateText = AppState.formattedBookingDate || "Tomorrow, 25 July";
   const timeText = AppState.selectedTimeSlot || "11:30 AM";
-  const labelText = `${dateText} • ${timeText}`;
 
-  document.getElementById('slotConfirmTimeDetails').innerText = labelText;
+  const totalDuration = AppState.selectedServices.reduce((sum, s) => {
+    const mins = parseInt(s.time) || 30;
+    return sum + mins;
+  }, 0);
+  const requiredSlots = Math.max(1, Math.ceil(totalDuration / 30));
+
+  let timeRangeText = timeText;
+  if (AppState.selectedTimeSlot) {
+    const startMins = timeToMinutes(AppState.selectedTimeSlot);
+    const endMins = startMins + (requiredSlots * 30);
+    const endTimeText = minutesToTime(endMins);
+    timeRangeText = `${timeText} - ${endTimeText}`;
+  }
+
+  const labelText = `${dateText} • ${timeRangeText} (${requiredSlots} slot${requiredSlots > 1 ? 's' : ''})`;
+
+  const detailsEl = document.getElementById('slotConfirmTimeDetails');
+  if (detailsEl) detailsEl.innerText = labelText;
 
   const totalPrice = AppState.selectedServices.reduce((sum, s) => sum + s.price, 0);
-  document.getElementById('slotConfirmPrice').innerText = `₹${totalPrice}`;
+  const priceEl = document.getElementById('slotConfirmPrice');
+  if (priceEl) priceEl.innerText = `₹${totalPrice}`;
 }
 
 function confirmAppointmentCheckout() {

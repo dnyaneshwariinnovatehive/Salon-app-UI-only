@@ -2693,14 +2693,18 @@ input:checked+.slider:before {
   stroke-width: 3px;
 }
 
-.time-slot-btn.frozen {
+.time-slot-btn.frozen,
+.time-slot-btn.unavailable {
   background-color: rgba(220, 220, 220, 0.3) !important;
   color: var(--text-body) !important;
   opacity: 0.6;
   cursor: not-allowed !important;
-  text-decoration: line-through;
   border-color: transparent !important;
   pointer-events: none;
+}
+
+.time-slot-btn.frozen {
+  text-decoration: line-through;
 }
 
 /* Floating bottom bar for checkouts */

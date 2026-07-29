@@ -336,8 +336,8 @@
             <button class="gender-btn" id="btnGenderFemale" onclick="setGenderFilter('female')" title="Female Services">
               <i data-lucide="venus"></i>
             </button>
-            <button class="gender-btn active" id="btnGenderUnisex" onclick="setGenderFilter('unisex')" title="Both Services">
-              <span>Both</span>
+            <button class="gender-btn active" id="btnGenderUnisex" onclick="setGenderFilter('unisex')" title="All Services">
+              <span>All</span>
             </button>
             <button class="gender-btn" id="btnGenderMale" onclick="setGenderFilter('male')" title="Male Services">
               <i data-lucide="mars"></i>
@@ -1139,7 +1139,11 @@
         </div>
 
         <!-- Time Grid select slots selector -->
-        <div class="slot-section-title" style="margin-top: 14px;">Select Time</div>
+        <div class="slot-section-title" style="margin-top: 14px; display:flex; justify-content:space-between; align-items:center;">
+          <span>Select Time</span>
+          <span id="slotRequirementBadge" style="font-size:11px; font-weight:700; color:var(--accent-color); background:var(--accent-soft); padding:3px 8px; border-radius:6px;"></span>
+        </div>
+        <div id="slotRequirementInfo" style="font-size:11px; color:var(--text-body); margin-bottom:10px; opacity:0.85;"></div>
         <div class="time-grid" id="slotTimePickerList">
           <!-- Dynamic slots list -->
         </div>
