@@ -91,12 +91,12 @@ const SalonHubData = {
       slotsLeft: 3,
       about: "Luxe Studio Salon is Koregaon Park's premier destination for high-end styling and body care. Offering state-of-the-art treatments with certified international products.",
       services: [
-        { id: "s1_1", name: "Signature Haircut & Wash", category: "haircut", price: 499, time: "45 mins", desc: "Consultation, custom shampooing, cut, styling and product advice." },
-        { id: "s1_2", name: "Global Hair Colouring (L'Oreal)", category: "colour", price: 2499, time: "120 mins", desc: "All-over permanent colour matching your preference, includes conditioning." },
-        { id: "s1_3", name: "Detox Face Glow Treatment", category: "facial", price: 999, time: "60 mins", desc: "Hydrating deep cleanse exfoliation and face massage with active serums." },
-        { id: "s1_4", name: "Luxury Pedicure & Foot Massage", category: "nails", price: 799, time: "50 mins", desc: "Relaxing warm water herbal soak, nail shaping, scrubbing, mask and massage." },
-        { id: "s1_5", name: "Bridal HD Makeup Trial", category: "bridal", price: 3999, time: "90 mins", desc: "HD makeup consultation and setup by senior artists for your special day." },
-        { id: "s1_6", name: "Haircut + Face Glow Combo", category: "combos", price: 1299, time: "90 mins", desc: "Premium haircut, wash, and detox facial combo." }
+        { id: "s1_1", name: "Signature Haircut & Wash", category: "haircut", price: 499, time: "45 mins", desc: "Consultation, custom shampooing, cut, styling and product advice.", image: "https://images.unsplash.com/photo-1621605815971-fbc98d665033?auto=format&fit=crop&w=300&q=80" },
+        { id: "s1_2", name: "Global Hair Colouring (L'Oreal)", category: "colour", price: 2499, time: "120 mins", desc: "All-over permanent colour matching your preference, includes conditioning.", image: "https://images.unsplash.com/photo-1562322140-8baeececf3df?auto=format&fit=crop&w=300&q=80" },
+        { id: "s1_3", name: "Detox Face Glow Treatment", category: "facial", price: 999, time: "60 mins", desc: "Hydrating deep cleanse exfoliation and face massage with active serums.", image: "https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?auto=format&fit=crop&w=300&q=80" },
+        { id: "s1_4", name: "Luxury Pedicure & Foot Massage", category: "nails", price: 799, time: "50 mins", desc: "Relaxing warm water herbal soak, nail shaping, scrubbing, mask and massage.", image: "https://images.unsplash.com/photo-1604654894610-df63bc536371?auto=format&fit=crop&w=300&q=80" },
+        { id: "s1_5", name: "Bridal HD Makeup Trial", category: "bridal", price: 3999, time: "90 mins", desc: "HD makeup consultation and setup by senior artists for your special day.", image: "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=300&q=80" },
+        { id: "s1_6", name: "Haircut + Face Glow Combo", category: "combos", price: 1299, time: "90 mins", desc: "Premium haircut, wash, and detox facial combo.", image: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=300&q=80" }
       ],
       stylistIds: ["st_1", "st_2", "st_4"]
     },
@@ -118,11 +118,11 @@ const SalonHubData = {
       slotsLeft: 5,
       about: "The Hair Loft offers trendy and affordable styling options in a warm, relaxed space. Perfect for regular grooming and modern haircuts.",
       services: [
-        { id: "s2_1", name: "Classic Haircut & Beard Grooming", category: "haircut", price: 350, time: "40 mins", desc: "Standard haircut with personalized beard trim, hot towel massage." },
-        { id: "s2_2", name: "Beard Spa & Steam", category: "haircut", price: 200, time: "20 mins", desc: "Organic oils massage, hot steam, line trim and conditioning balm application." },
-        { id: "s2_3", name: "Deep Conditioning Hair Spa", category: "haircut", price: 899, time: "60 mins", desc: "Nourishing cream mask application, steam, massage and serum spray." },
-        { id: "s2_4", name: "Root Touch-up (No Ammonia)", category: "colour", price: 799, time: "60 mins", desc: "Precision grey coverage roots coloring for natural looking shine." },
-        { id: "s2_5", name: "Trend Haircut + Beard Spa Combo", category: "combos", price: 499, time: "60 mins", desc: "Trendy haircut, wash, and organic beard spa combo package." }
+        { id: "s2_1", name: "Classic Haircut & Beard Grooming", category: "haircut", price: 350, time: "40 mins", desc: "Standard haircut with personalized beard trim, hot towel massage.", image: "https://images.unsplash.com/photo-1621605815971-fbc98d665033?auto=format&fit=crop&w=300&q=80" },
+        { id: "s2_2", name: "Beard Spa & Steam", category: "haircut", price: 200, time: "20 mins", desc: "Organic oils massage, hot steam, line trim and conditioning balm application.", image: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=300&q=80" },
+        { id: "s2_3", name: "Deep Conditioning Hair Spa", category: "haircut", price: 899, time: "60 mins", desc: "Nourishing cream mask application, steam, massage and serum spray.", image: "https://images.unsplash.com/photo-1562322140-8baeececf3df?auto=format&fit=crop&w=300&q=80" },
+        { id: "s2_4", name: "Root Touch-up (No Ammonia)", category: "colour", price: 799, time: "60 mins", desc: "Precision grey coverage roots coloring for natural looking shine.", image: "https://images.unsplash.com/photo-1562322140-8baeececf3df?auto=format&fit=crop&w=300&q=80" },
+        { id: "s2_5", name: "Trend Haircut + Beard Spa Combo", category: "combos", price: 499, time: "60 mins", desc: "Trendy haircut, wash, and organic beard spa combo package.", image: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=300&q=80" }
       ],
       stylistIds: ["st_1", "st_3"]
     },
@@ -144,10 +144,10 @@ const SalonHubData = {
       slotsLeft: 2,
       about: "Glow Beauty Bar specialize in premium skin therapies, nail extensions and customized makeup, created specifically for modern women.",
       services: [
-        { id: "s3_1", name: "Gel Nail Extensions & Art", category: "nails", price: 1499, time: "80 mins", desc: "Full-set gel extensions with custom nail paint art, stones and top coat." },
-        { id: "s3_2", name: "O3+ Radiance D-Tan Facial", category: "facial", price: 1800, time: "75 mins", desc: "Multi-step premium facial for instant glow, tan removal and skin hydration." },
-        { id: "s3_3", name: "Classic Party Makeup", category: "makeup", price: 2499, time: "60 mins", desc: "Glamorous party look including eyelashes, contour and high-definition products." },
-        { id: "s3_4", name: "Full Arms & Legs Fruit Waxing", category: "spa", price: 599, time: "45 mins", desc: "Gentle organic fruit wax application, standard soothing lotion massage." }
+        { id: "s3_1", name: "Gel Nail Extensions & Art", category: "nails", price: 1499, time: "80 mins", desc: "Full-set gel extensions with custom nail paint art, stones and top coat.", image: "https://images.unsplash.com/photo-1604654894610-df63bc536371?auto=format&fit=crop&w=300&q=80" },
+        { id: "s3_2", name: "O3+ Radiance D-Tan Facial", category: "facial", price: 1800, time: "75 mins", desc: "Multi-step premium facial for instant glow, tan removal and skin hydration.", image: "https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?auto=format&fit=crop&w=300&q=80" },
+        { id: "s3_3", name: "Classic Party Makeup", category: "makeup", price: 2499, time: "60 mins", desc: "Glamorous party look including eyelashes, contour and high-definition products.", image: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=300&q=80" },
+        { id: "s3_4", name: "Full Arms & Legs Fruit Waxing", category: "spa", price: 599, time: "45 mins", desc: "Gentle organic fruit wax application, standard soothing lotion massage.", image: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=300&q=80" }
       ],
       stylistIds: ["st_2", "st_3", "st_4"]
     },
@@ -169,9 +169,9 @@ const SalonHubData = {
       slotsLeft: 4,
       about: "A vintage-inspired club for modern gentlemen. Premium hair services, signature shaves, and executive facial massages.",
       services: [
-        { id: "s4_1", name: "Signature Haircut & Scalp Scrub", category: "haircut", price: 600, time: "50 mins", desc: "Royal treatment with customized haircut, exfoliating scalp massage, and wash." },
-        { id: "s4_2", name: "Luxury Charcoal Face Mask", category: "facial", price: 799, time: "30 mins", desc: "Pore-clearing peel-off charcoal mask, ice massage and hydrating lotion." },
-        { id: "s4_3", name: "Royal Beard Styling & Shave", category: "haircut", price: 450, time: "35 mins", desc: "Straight-razor clean shave or beard line styling with hot essential oil towels." }
+        { id: "s4_1", name: "Signature Haircut & Scalp Scrub", category: "haircut", price: 600, time: "50 mins", desc: "Royal treatment with customized haircut, exfoliating scalp massage, and wash.", image: "https://images.unsplash.com/photo-1621605815971-fbc98d665033?auto=format&fit=crop&w=300&q=80" },
+        { id: "s4_2", name: "Luxury Charcoal Face Mask", category: "facial", price: 799, time: "30 mins", desc: "Pore-clearing peel-off charcoal mask, ice massage and hydrating lotion.", image: "https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?auto=format&fit=crop&w=300&q=80" },
+        { id: "s4_3", name: "Royal Beard Styling & Shave", category: "haircut", price: 450, time: "35 mins", desc: "Straight-razor clean shave or beard line styling with hot essential oil towels.", image: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=300&q=80" }
       ],
       stylistIds: ["st_1", "st_5"]
     },
@@ -193,9 +193,9 @@ const SalonHubData = {
       slotsLeft: 0,
       about: "An oasis of peace. Restorative therapy, Swedish oil massages and deep-tissue body treatments that wash your stress away.",
       services: [
-        { id: "s5_1", name: "Swedish Full Body Massage", category: "spa", price: 1999, time: "60 mins", desc: "Traditional therapeutic massage using natural aroma oils to release muscle tension." },
-        { id: "s5_2", name: "Deep Tissue Muscle Therapy", category: "spa", price: 2499, time: "90 mins", desc: "Focuses on deeper muscle layers to target chronic stiffness. Includes hot therapy stones." },
-        { id: "s5_3", name: "Aroma Steam Bath & Body Polish", category: "spa", price: 1200, time: "40 mins", desc: "Full body sea-salt exfoliation scrub followed by detox steam cabin treatment." }
+        { id: "s5_1", name: "Swedish Full Body Massage", category: "spa", price: 1999, time: "60 mins", desc: "Traditional therapeutic massage using natural aroma oils to release muscle tension.", image: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=300&q=80" },
+        { id: "s5_2", name: "Deep Tissue Muscle Therapy", category: "spa", price: 2499, time: "90 mins", desc: "Focuses on deeper muscle layers to target chronic stiffness. Includes hot therapy stones.", image: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=300&q=80" },
+        { id: "s5_3", name: "Aroma Steam Bath & Body Polish", category: "spa", price: 1200, time: "40 mins", desc: "Full body sea-salt exfoliation scrub followed by detox steam cabin treatment.", image: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=300&q=80" }
       ],
       stylistIds: ["st_5"]
     },
@@ -217,9 +217,9 @@ const SalonHubData = {
       slotsLeft: 1,
       about: "Specialized in luxury bridal treatments, pre-bridal grooming rituals and wedding ceremony makeup by celebrated professionals.",
       services: [
-        { id: "s6_1", name: "Pre-Bridal Glow Package (Gold)", category: "bridal", price: 9999, time: "180 mins", desc: "Ultimate pre-wedding glow combo: facial, body polishing, hair spa, threading and manicure." },
-        { id: "s6_2", name: "Bridal Airbrush Makeup", category: "bridal", price: 15000, time: "120 mins", desc: "High-definition flawless airbrush bridal makeup application, includes hair styling." },
-        { id: "s6_3", name: "Mehendi & Sangeet Makeup Look", category: "makeup", price: 4999, time: "90 mins", desc: "Traditional luminous makeup matching your festival outfit theme." }
+        { id: "s6_1", name: "Pre-Bridal Glow Package (Gold)", category: "bridal", price: 9999, time: "180 mins", desc: "Ultimate pre-wedding glow combo: facial, body polishing, hair spa, threading and manicure.", image: "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=300&q=80" },
+        { id: "s6_2", name: "Bridal Airbrush Makeup", category: "bridal", price: 15000, time: "120 mins", desc: "High-definition flawless airbrush bridal makeup application, includes hair styling.", image: "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=300&q=80" },
+        { id: "s6_3", name: "Mehendi & Sangeet Makeup Look", category: "makeup", price: 4999, time: "90 mins", desc: "Traditional luminous makeup matching your festival outfit theme.", image: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=300&q=80" }
       ],
       stylistIds: ["st_4", "st_2"]
     }

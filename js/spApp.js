@@ -12,7 +12,11 @@ const SPState = {
 // ----------------------------------------------------
 // SP TAB NAVIGATION
 // ----------------------------------------------------
-function spNavigateToTab(tabId) {
+function spNavigateToTab(tabId, isBack = false) {
+  if (!isBack && typeof pushNavHistory === 'function') {
+    pushNavHistory({ role: 'sp', tabId });
+  }
+
   SPState.currentTab = tabId;
 
   const spScreens = document.querySelectorAll('.sp-screen');

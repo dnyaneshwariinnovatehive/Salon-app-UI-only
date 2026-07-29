@@ -372,7 +372,11 @@
         <div class="featured-section mt-15">
           <div class="section-header">
             <h3>Featured Salons</h3>
-            <a href="#" onclick="navigateToTab('explore')">View Map</a>
+            <div class="home-sort-chips" id="homeSortChips">
+              <button class="home-sort-chip active" onclick="setHomeSort('popular')">Popular</button>
+              <button class="home-sort-chip" onclick="setHomeSort('top_rated')">Top Rated</button>
+              <button class="home-sort-chip" onclick="setHomeSort('nearest')">Nearest</button>
+            </div>
           </div>
           <div id="homeFeaturedSalonsList">
             <!-- Dynamic featured salons -->
@@ -395,12 +399,17 @@
 
         <!-- Pinned Search & Sort Header -->
         <div class="explore-header px-20">
-          <div class="flex-row-between" style="gap: 12px;">
+          <div class="flex-row-between" style="gap: 8px;">
             <div class="search-bar-wrapper" style="flex:1;">
               <i data-lucide="search"></i>
               <input type="text" id="exploreSearchInput" placeholder="Search salons or services..."
                 oninput="handleSearchFilter()">
             </div>
+
+            <!-- Filter Drawer Toggle Button -->
+            <button class="header-btn" id="btnFilterToggle" onclick="openFilterDrawer()" title="Filters & Sorting">
+              <i data-lucide="sliders"></i>
+            </button>
 
             <!-- Map Toggle Button -->
             <button class="header-btn map-toggle-btn" id="btnMapToggle" onclick="toggleMapView()">
@@ -559,47 +568,6 @@
               <strong id="statCountFavs">3</strong>
               <p>Fav Salons</p>
             </div>
-            <div class="profile-stat-box">
-              <strong id="statSavedMoney">₹1,850</strong>
-              <p>Saved Money</p>
-            </div>
-            <div class="profile-stat-box">
-              <strong id="statRewardPoints">1,240</strong>
-              <p>Reward Pts</p>
-            </div>
-          </div>
-
-          <!-- Gold Membership Progress bar Card -->
-          <div class="membership-progress-card">
-            <span class="gold-tier-badge">Gold Tier Benefit Progress</span>
-            <h4 class="membership-progress-title">1,240 / 2,000 Points</h4>
-            <div class="membership-progress-bar-wrapper">
-              <div class="membership-progress-bar-fill" id="membershipProgressBar"></div>
-            </div>
-            <div class="membership-points-text">
-              <span>760 points to Diamond Tier VIP</span>
-              <strong style="color: var(--accent-color);">Details &rarr;</strong>
-            </div>
-
-            <!-- Benefits badges icons row -->
-            <div class="membership-benefits-icons">
-              <div class="benefit-icon-item">
-                <i data-lucide="percent"></i>
-                <span>10% Off Cash</span>
-              </div>
-              <div class="benefit-icon-item">
-                <i data-lucide="cup-straw"></i>
-                <span>Free Drinks</span>
-              </div>
-              <div class="benefit-icon-item">
-                <i data-lucide="zap"></i>
-                <span>Fast Slot</span>
-              </div>
-              <div class="benefit-icon-item">
-                <i data-lucide="user-check"></i>
-                <span>VIP Support</span>
-              </div>
-            </div>
           </div>
 
           <!-- Account Settings Options section -->
@@ -613,19 +581,6 @@
               <div class="option-row-right">
                 <label class="switch">
                   <input type="checkbox" id="toggleDarkMode" onchange="toggleDarkModeSetting(this)">
-                  <span class="slider"></span>
-                </label>
-              </div>
-            </div>
-
-            <div class="option-row">
-              <div class="option-row-left">
-                <i data-lucide="scan-face"></i>
-                <span>Face ID Login</span>
-              </div>
-              <div class="option-row-right">
-                <label class="switch">
-                  <input type="checkbox" id="toggleFaceId" checked>
                   <span class="slider"></span>
                 </label>
               </div>
@@ -682,20 +637,6 @@
               <div class="option-row-left">
                 <i data-lucide="map-pin"></i>
                 <span>Saved Addresses</span>
-              </div>
-              <div class="option-row-right"><i data-lucide="chevron-right"></i></div>
-            </div>
-            <div class="option-row" onclick="triggerToast('Reward milestones opened')">
-              <div class="option-row-left">
-                <i data-lucide="gift"></i>
-                <span>Rewards & Membership Perks</span>
-              </div>
-              <div class="option-row-right"><i data-lucide="chevron-right"></i></div>
-            </div>
-            <div class="option-row" onclick="triggerToast('Referral link copied to clipboard!')">
-              <div class="option-row-left">
-                <i data-lucide="users"></i>
-                <span>Invite Friends & Earn Points</span>
               </div>
               <div class="option-row-right"><i data-lucide="chevron-right"></i></div>
             </div>

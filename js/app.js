@@ -8,6 +8,7 @@ const AppState = {
   selectedRegisterRole: 'customer',
   selectedLocation: "Koregaon Park, Pune",
   homeGender: 'unisex', // 'unisex', 'male', 'female'
+  homeSort: 'popular', // 'popular', 'top_rated', 'nearest'
 
   // Search & Filter Settings on Explore
   searchQuery: "",
@@ -45,6 +46,8 @@ const AppState = {
   adminMode: false,
 };
 
+let isHandlingPopState = false;
+
 // Initial Setup on Document Load
 window.addEventListener('DOMContentLoaded', () => {
   // Setup system time clock in status bar
@@ -52,8 +55,11 @@ window.addEventListener('DOMContentLoaded', () => {
   setInterval(updateSystemTime, 60000);
 
   // Initialize display with Splash Screen
-  showScreen('splash');
+  showScreen('splash', true);
   document.getElementById('navigationBar').style.display = 'none';
+
+  // Setup browser history back button navigation
+  setupBrowserHistory();
 
   // Transition directly to Home screen after splash (no login required upfront)
   setTimeout(() => {
@@ -61,10 +67,10 @@ window.addEventListener('DOMContentLoaded', () => {
     if (splashScreen && splashScreen.classList.contains('active')) {
       if (AppState.spMode) {
         document.getElementById('spNavigationBar').style.display = 'flex';
-        spNavigateToTab('sp_home');
+        spNavigateToTab('sp_home', true);
       } else {
         document.getElementById('navigationBar').style.display = 'flex';
-        showScreen('home');
+        showScreen('home', true);
         renderHomeScreen();
       }
     }
@@ -76,6 +82,61 @@ window.addEventListener('DOMContentLoaded', () => {
   // Setup Pull to Refresh gesture mock listeners
   setupPullToRefresh();
 });
+
+// Browser History Back Button Navigation Handler
+function setupBrowserHistory() {
+  window.addEventListener('popstate', (event) => {
+    isHandlingPopState = true;
+
+    // 1. Check if any drawer/overlay is open - close top open drawer first
+    const openOverlay = document.querySelector('.overlay.open');
+    if (openOverlay) {
+      if (openOverlay.id === 'drawerOverlay') closeAllDrawers();
+      else if (openOverlay.id === 'cartOverlay') closeCartDrawer();
+      else if (openOverlay.id === 'slotPickerOverlay') closeSlotPickerDrawer();
+      else if (openOverlay.id === 'filterOverlay') closeFilterDrawer();
+      else if (openOverlay.id === 'locationOverlay') closeLocationDrawer();
+      else if (openOverlay.id === 'notificationsOverlay') closeNotificationsDrawer();
+      else if (openOverlay.id === 'addCardOverlay') closeAddCardDrawer();
+      else if (openOverlay.id === 'guestLoginPromptOverlay') closeGuestLoginPrompt();
+      else if (openOverlay.id === 'successModalOverlay') closeSuccessModal();
+      
+      isHandlingPopState = false;
+      return;
+    }
+
+    // 2. Tab & Screen navigation back handling
+    if (AppState.adminMode) {
+      if (AppState.currentTab !== 'admin_home') {
+        adminNavigateToTab('admin_home', true);
+      }
+    } else if (AppState.spMode) {
+      if (AppState.currentTab !== 'sp_home') {
+        spNavigateToTab('sp_home', true);
+      }
+    } else {
+      // Customer Mode
+      const registerScreen = document.getElementById('screen_register');
+      const notBuiltScreen = document.getElementById('screen_not_built');
+      
+      if (registerScreen && registerScreen.classList.contains('active')) {
+        showScreen('login', true);
+      } else if (notBuiltScreen && notBuiltScreen.classList.contains('active')) {
+        showScreen('register', true);
+      } else if (AppState.currentTab !== 'home') {
+        navigateToTab('home', true);
+      }
+    }
+
+    isHandlingPopState = false;
+  });
+}
+
+function pushNavHistory(stateObj = {}) {
+  if (!isHandlingPopState) {
+    history.pushState({ ...stateObj, timestamp: Date.now() }, '');
+  }
+}
 
 // Start application from onboarding splash
 function startApp() {
@@ -98,7 +159,11 @@ function updateSystemTime() {
 // ----------------------------------------------------
 // SCREEN TRANSITIONS & NAV SYSTEM
 // ----------------------------------------------------
-function showScreen(screenId) {
+function showScreen(screenId, isBack = false) {
+  if (!isBack) {
+    pushNavHistory({ screenId });
+  }
+
   // Hide all screens
   const screens = document.querySelectorAll('.screen');
   screens.forEach(s => s.classList.remove('active'));
@@ -113,14 +178,14 @@ function showScreen(screenId) {
   document.getElementById('mainContent').scrollTop = 0;
 }
 
-function navigateToTab(tabId) {
+function navigateToTab(tabId, isBack = false) {
   if (!AppState.isAuthenticated && (tabId === 'bookings' || tabId === 'favourites' || tabId === 'profile')) {
     showGuestLoginPrompt();
     return;
   }
 
   AppState.currentTab = tabId;
-  showScreen(tabId);
+  showScreen(tabId, isBack);
 
   // Update navbar items CSS active state
   const navItems = document.querySelectorAll('.nav-item');
@@ -447,6 +512,19 @@ function renderHomeCategories() {
   lucide.createIcons();
 }
 
+function setHomeSort(sortKey) {
+  AppState.homeSort = sortKey;
+  const chips = document.querySelectorAll('#homeSortChips .home-sort-chip');
+  chips.forEach(c => {
+    if (c.getAttribute('onclick').includes(sortKey)) {
+      c.classList.add('active');
+    } else {
+      c.classList.remove('active');
+    }
+  });
+  renderHomeScreen();
+}
+
 function renderHomeScreen() {
   // Update greeting name dynamically
   const greetingEl = document.getElementById('homeUserGreeting');
@@ -570,7 +648,7 @@ function renderHomeScreen() {
     bookAgainContainer.appendChild(el);
   });
 
-  // 4. Featured Salons vertical list - Filtered by active gender
+  // 4. Featured Salons vertical list - De-cluttered & Sorted
   const featuredContainer = document.getElementById('homeFeaturedSalonsList');
   featuredContainer.innerHTML = "";
 
@@ -581,51 +659,48 @@ function renderHomeScreen() {
     filteredSalons = filteredSalons.filter(s => s.type === "Women Only" || s.type === "Unisex");
   }
 
-  const sortedSalons = filteredSalons.sort((a, b) => b.rating - a.rating);
-  sortedSalons.forEach(s => {
+  // Sorting
+  if (AppState.homeSort === 'top_rated') {
+    filteredSalons.sort((a, b) => b.rating - a.rating);
+  } else if (AppState.homeSort === 'nearest') {
+    filteredSalons.sort((a, b) => parseFloat(a.distance) - parseFloat(b.distance));
+  } else {
+    // popular by review count & rating
+    filteredSalons.sort((a, b) => b.reviewsCount - a.reviewsCount);
+  }
+
+  filteredSalons.forEach(s => {
     const isFav = SalonHubData.favourites.salonIds.includes(s.id);
     const el = document.createElement('div');
     el.className = 'salon-vertical-card';
     el.onclick = () => openSalonDetail(s.id);
     el.innerHTML = `
-      <div class="salon-img-wrapper">
+      <div class="salon-img-wrapper" style="height:150px;">
         <img src="${s.image}" alt="${s.name}">
         <span class="salon-status-tag ${s.isOpen ? 'badge-open' : 'badge-closed'}">${s.openStatus}</span>
-        ${s.type === 'Unisex' ? '<span class="salon-badge-unisex">Unisex</span>' : ''}
         <button class="salon-favorite-btn ${isFav ? 'active' : ''}" onclick="event.stopPropagation(); toggleFavSalon('${s.id}')">
           <i data-lucide="heart"></i>
         </button>
       </div>
-      <div class="salon-card-info">
+      <div class="salon-card-info" style="padding:12px 14px;">
         <div class="salon-info-header">
           <div>
-            <h4 class="salon-title">${s.name}</h4>
-            <div class="salon-meta-subtitle">
+            <h4 class="salon-title" style="font-size:15px; font-weight:800;">${s.name}</h4>
+            <div class="salon-meta-subtitle" style="font-size:12px; color:var(--text-body); margin-top:2px;">
               <span>${s.type}</span> • <span>${s.location}</span>
             </div>
           </div>
-          <span class="book-again-rating" style="font-size:14px;"><i data-lucide="star"></i>${s.rating} (${s.reviewsCount})</span>
+          <span class="book-again-rating" style="font-size:13px; font-weight:700;"><i data-lucide="star"></i>${s.rating}</span>
         </div>
         
-        ${s.slotsLeft > 0 ? `
-        <div class="salon-urgency-tag">
-          <i data-lucide="flame"></i>
-          <span>Hurry! Only ${s.slotsLeft} booking slots left today</span>
-        </div>` : ''}
-
-        <div class="salon-card-footer-row">
-          <div class="salon-footer-left">
-            <div class="salon-footer-item">
-              <i data-lucide="navigation"></i>
-              <span>${s.distance}</span>
-            </div>
-            <div class="salon-footer-item">
-              <i data-lucide="clock"></i>
-              <span>${s.duration}</span>
-            </div>
+        <div class="salon-card-footer-row" style="margin-top:10px; padding-top:8px; border-top:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center;">
+          <div class="salon-footer-left" style="font-size:11px; color:var(--text-body); display:flex; align-items:center; gap:8px;">
+            <span><i data-lucide="navigation" style="width:12px; height:12px; display:inline; vertical-align:middle;"></i> ${s.distance}</span>
+            <span>•</span>
+            <span>${s.duration}</span>
           </div>
-          <div class="salon-starting-price">
-            Starts at <span>₹${s.startingPrice}</span>
+          <div class="salon-starting-price" style="font-size:12px; font-weight:700; color:var(--accent-color);">
+            From ₹${s.startingPrice}
           </div>
         </div>
       </div>
@@ -1129,6 +1204,31 @@ function renderExploreList() {
 
     list.forEach(s => {
       const isFav = SalonHubData.favourites.salonIds.includes(s.id);
+      
+      let categoryServicesHtml = '';
+      if (catObj) {
+        const matchingServices = s.services.filter(serv => serv.category === AppState.activeCategoryFilter);
+        if (matchingServices.length > 0) {
+          categoryServicesHtml = `
+            <div style="margin-top:10px; border-top:1px dashed var(--border-color); padding-top:10px;" onclick="event.stopPropagation();">
+              <div style="font-size:11px; font-weight:800; color:var(--accent-color); margin-bottom:6px;">Available ${catObj.name} Services:</div>
+              ${matchingServices.map(serv => `
+                <div style="display:flex; align-items:center; justify-content:space-between; padding:6px 0; border-bottom:1px solid var(--border-color);">
+                  <div style="display:flex; align-items:center; gap:8px;">
+                    <img src="${serv.image || s.image}" style="width:36px; height:36px; border-radius:8px; object-fit:cover;" alt="${serv.name}">
+                    <div>
+                      <div style="font-size:12px; font-weight:700; color:var(--text-heading);">${serv.name}</div>
+                      <div style="font-size:10px; color:var(--text-body);">${serv.time} • ₹${serv.price}</div>
+                    </div>
+                  </div>
+                  <button class="btn-primary" style="padding:4px 10px; font-size:10px; width:auto; box-shadow:none;" onclick="event.stopPropagation(); quickBookService('${s.id}', '${serv.id}')">Book</button>
+                </div>
+              `).join('')}
+            </div>
+          `;
+        }
+      }
+
       const el = document.createElement('div');
       el.className = 'salon-vertical-card';
       el.onclick = () => openSalonDetail(s.id);
@@ -1159,14 +1259,15 @@ function renderExploreList() {
                 <span>${s.distance}</span>
               </div>
               <div class="salon-footer-item">
-                <i data-lucide="flame"></i>
-                <span style="color:var(--color-danger); font-weight:700;">${s.slotsLeft > 0 ? s.slotsLeft + ' slots today' : 'No slots'}</span>
+                <i data-lucide="clock"></i>
+                <span>${s.duration}</span>
               </div>
             </div>
             <div class="salon-starting-price" style="font-size:12px;">
-              Starts ₹<span>${s.startingPrice}</span>
+              From <span>₹${s.startingPrice}</span>
             </div>
           </div>
+          ${categoryServicesHtml}
         </div>
       `;
       container.appendChild(el);
@@ -1544,9 +1645,12 @@ function renderProfileScreen() {
   // Bind stats values
   const upcomingCount = SalonHubData.bookings.filter(b => b.isUpcoming).length;
   const historyCount = SalonHubData.bookings.filter(b => !b.isUpcoming).length;
-  document.getElementById('statCountAppointments').innerText = upcomingCount + historyCount;
-  document.getElementById('statCountFavs').innerText = SalonHubData.favourites.salonIds.length;
-  document.getElementById('statRewardPoints').innerText = user.membership.points;
+  if (document.getElementById('statCountAppointments')) {
+    document.getElementById('statCountAppointments').innerText = upcomingCount + historyCount;
+  }
+  if (document.getElementById('statCountFavs')) {
+    document.getElementById('statCountFavs').innerText = SalonHubData.favourites.salonIds.length;
+  }
 
   // Bind payment cards option list
   const cardsList = document.getElementById('profilePaymentCardsList');
@@ -1626,6 +1730,8 @@ function toggleDarkModeSetting(checkbox) {
 // INTERACTIVE DETAILED FLOW: SALON DETAILS OVERLAY
 // ----------------------------------------------------
 function openSalonDetail(salonId, preserveSelection) {
+  pushNavHistory({ drawer: 'salonDetail', salonId });
+
   AppState.selectedSalonId = salonId;
   AppState.selectedDetailCategory = "all";
   if (!preserveSelection) {
@@ -1708,29 +1814,47 @@ function renderDetailServicesList(salon) {
     services = services.filter(s => s.category === AppState.selectedDetailCategory);
   }
 
+  const categoryThumbnails = {
+    haircut: "https://images.unsplash.com/photo-1621605815971-fbc98d665033?auto=format&fit=crop&w=200&q=80",
+    colour: "https://images.unsplash.com/photo-1562322140-8baeececf3df?auto=format&fit=crop&w=200&q=80",
+    facial: "https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?auto=format&fit=crop&w=200&q=80",
+    nails: "https://images.unsplash.com/photo-1604654894610-df63bc536371?auto=format&fit=crop&w=200&q=80",
+    spa: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=200&q=80",
+    makeup: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=200&q=80",
+    bridal: "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=200&q=80",
+    combos: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=200&q=80"
+  };
+
   services.forEach(s => {
     const isSelected = AppState.selectedServices.some(selected => selected.id === s.id);
     const isFavourited = SalonHubData.favourites.serviceIds.includes(s.id);
+    const serviceThumb = s.image || categoryThumbnails[s.category] || categoryThumbnails['haircut'];
+
     const el = document.createElement('div');
     el.className = 'drawer-service-item';
     el.onclick = () => toggleServiceSelection(s.id);
     el.innerHTML = `
-      <div class="service-item-title-row">
-        <div class="service-item-info">
-          <h4>${s.name}</h4>
-          <span class="service-item-time"><i data-lucide="clock"></i>${s.time}</span>
+      <div class="service-item-wrapper">
+        <img src="${serviceThumb}" class="service-item-thumb" alt="${s.name}">
+        <div class="service-item-details-body">
+          <div class="service-item-title-row">
+            <div class="service-item-info">
+              <h4>${s.name}</h4>
+              <span class="service-item-time"><i data-lucide="clock"></i>${s.time}</span>
+            </div>
+            <button class="salon-favorite-btn ${isFavourited ? 'active' : ''}" style="position:static; border:1px solid var(--border-color);" onclick="event.stopPropagation(); toggleDetailServiceFav('${s.id}')">
+              <i data-lucide="heart" style="width:15px; height:15px;"></i>
+            </button>
+          </div>
+          <p class="service-item-desc">${s.desc}</p>
+          <div class="service-item-price-btn">
+            <span class="service-item-price">₹${s.price}</span>
+            <button class="service-select-btn ${isSelected ? 'selected' : ''}" onclick="event.stopPropagation(); toggleServiceSelection('${s.id}')">
+              <i data-lucide="${isSelected ? 'check' : 'plus'}"></i>
+              <span>${isSelected ? 'Added' : 'Add'}</span>
+            </button>
+          </div>
         </div>
-        <button class="salon-favorite-btn ${isFavourited ? 'active' : ''}" style="position:static; border:1px solid var(--border-color);" onclick="event.stopPropagation(); toggleDetailServiceFav('${s.id}')">
-          <i data-lucide="heart" style="width:15px; height:15px;"></i>
-        </button>
-      </div>
-      <p class="service-item-desc">${s.desc}</p>
-      <div class="service-item-price-btn">
-        <span class="service-item-price">₹${s.price}</span>
-        <button class="service-select-btn ${isSelected ? 'selected' : ''}" onclick="event.stopPropagation(); toggleServiceSelection('${s.id}')">
-          <i data-lucide="${isSelected ? 'check' : 'plus'}"></i>
-          <span>${isSelected ? 'Added' : 'Add'}</span>
-        </button>
       </div>
     `;
     container.appendChild(el);

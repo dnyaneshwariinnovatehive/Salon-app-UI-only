@@ -80,7 +80,11 @@ function getStatusBadge(status) {
 // ----------------------------------------------------
 // ADMIN NAVIGATION
 // ----------------------------------------------------
-function adminNavigateToTab(tabId) {
+function adminNavigateToTab(tabId, isBack = false) {
+  if (!isBack && typeof pushNavHistory === 'function') {
+    pushNavHistory({ role: 'admin', tabId });
+  }
+
   AdminState.currentTab = tabId;
 
   const adminScreens = document.querySelectorAll('.admin-screen');
