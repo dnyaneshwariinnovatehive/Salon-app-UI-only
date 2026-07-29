@@ -399,17 +399,12 @@
 
         <!-- Pinned Search & Sort Header -->
         <div class="explore-header px-20">
-          <div class="flex-row-between" style="gap: 8px;">
+          <div class="flex-row-between" style="gap: 12px;">
             <div class="search-bar-wrapper" style="flex:1;">
               <i data-lucide="search"></i>
               <input type="text" id="exploreSearchInput" placeholder="Search salons or services..."
                 oninput="handleSearchFilter()">
             </div>
-
-            <!-- Filter Drawer Toggle Button -->
-            <button class="header-btn" id="btnFilterToggle" onclick="openFilterDrawer()" title="Filters & Sorting">
-              <i data-lucide="sliders"></i>
-            </button>
 
             <!-- Map Toggle Button -->
             <button class="header-btn map-toggle-btn" id="btnMapToggle" onclick="toggleMapView()">

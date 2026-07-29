@@ -903,6 +903,13 @@ function setGenderFilter(gender) {
 
 function filterHomeCategory(catId) {
   AppState.activeCategoryFilter = catId;
+  AppState.activeQuickFilter = "all";
+  AppState.searchQuery = "";
+  
+  // Unset quick filter chips active highlight
+  const chips = document.querySelectorAll('#exploreFilterChips .filter-chip');
+  chips.forEach(c => c.classList.remove('active'));
+
   navigateToTab('explore');
 }
 
@@ -956,12 +963,15 @@ function copyPromoCode(code) {
 // SCREEN 3: EXPLORE & FILTER / MAP SYSTEM
 // ----------------------------------------------------
 function toggleQuickFilter(btnElement, filterKey) {
+  // Reset category filter when clicking quick filter chip
+  AppState.activeCategoryFilter = "all";
+  AppState.activeQuickFilter = filterKey;
+
   // Update chip styles
   const chips = document.querySelectorAll('#exploreFilterChips .filter-chip');
   chips.forEach(c => c.classList.remove('active'));
   btnElement.classList.add('active');
 
-  AppState.activeQuickFilter = filterKey;
   renderExploreList();
 }
 
@@ -990,48 +1000,23 @@ function handleSearchFilter() {
   renderExploreList();
 }
 
-function selectFilterSort(option) {
-  AppState.advancedFilters.sort = option;
-  document.getElementById('sortRating').classList.toggle('active', option === 'rating');
-  document.getElementById('sortDistance').classList.toggle('active', option === 'distance');
-}
-
-function selectFilterGender(option) {
-  AppState.advancedFilters.gender = option;
-  document.getElementById('genderAll').classList.toggle('active', option === 'all');
-  document.getElementById('genderMen').classList.toggle('active', option === 'men');
-  document.getElementById('genderWomen').classList.toggle('active', option === 'women');
-}
-
-function selectFilterPrice(option) {
-  AppState.advancedFilters.price = option;
-  document.getElementById('priceAll').classList.toggle('active', option === 'all');
-  document.getElementById('priceUnder500').classList.toggle('active', option === '500');
-  document.getElementById('pricePremium').classList.toggle('active', option === 'premium');
-}
-
-function applyAdvancedFilters() {
-  closeFilterDrawer();
-  renderExploreList();
-}
-
 function getFilteredSalons() {
   let list = [...SalonHubData.salons];
 
-  // 1. Search Query filter (Salon name or matching services)
+  // 1. Search Query filter (Salon name, location, or matching services)
   if (AppState.searchQuery !== "") {
+    const q = AppState.searchQuery.toLowerCase();
     list = list.filter(s => {
-      const matchName = s.name.toLowerCase().includes(AppState.searchQuery);
-      const matchLoc = s.location.toLowerCase().includes(AppState.searchQuery);
-      const matchService = s.services.some(serv => serv.name.toLowerCase().includes(AppState.searchQuery));
+      const matchName = s.name.toLowerCase().includes(q);
+      const matchLoc = s.location.toLowerCase().includes(q);
+      const matchService = s.services.some(serv => serv.name.toLowerCase().includes(q) || serv.category.toLowerCase().includes(q));
       return matchName || matchLoc || matchService;
     });
   }
 
-  // 2. Category Filter (triggered from home or detail views)
+  // 2. Category Filter (triggered from home tab categories)
   if (AppState.activeCategoryFilter !== "all") {
     list = list.filter(s => s.services.some(serv => serv.category === AppState.activeCategoryFilter));
-    // Sort by rating descending so top-rated salons providing best category services come first
     list.sort((a, b) => b.rating - a.rating);
   }
 
@@ -1039,34 +1024,11 @@ function getFilteredSalons() {
   if (AppState.activeQuickFilter === "open") {
     list = list.filter(s => s.isOpen);
   } else if (AppState.activeQuickFilter === "price500") {
-    list = list.filter(s => s.startingPrice < 500);
+    list = list.filter(s => s.startingPrice <= 500 || s.services.some(serv => serv.price <= 500));
   } else if (AppState.activeQuickFilter === "top_rated") {
-    list = list.filter(s => s.rating >= 4.8);
+    list = list.filter(s => s.rating >= 4.7);
   } else if (AppState.activeQuickFilter === "nearby") {
-    // distance < 2.0 km
-    list = list.filter(s => parseFloat(s.distance) < 2.0);
-  }
-
-  // 4. Advanced popup filters
-  // Gender category target
-  if (AppState.advancedFilters.gender === 'men') {
-    list = list.filter(s => s.type === "Men Only" || s.type === "Unisex");
-  } else if (AppState.advancedFilters.gender === 'women') {
-    list = list.filter(s => s.type === "Women Only" || s.type === "Unisex");
-  }
-
-  // Price ranges
-  if (AppState.advancedFilters.price === '500') {
-    list = list.filter(s => s.startingPrice < 500);
-  } else if (AppState.advancedFilters.price === 'premium') {
-    list = list.filter(s => s.startingPrice >= 1000);
-  }
-
-  // 5. Sorting
-  if (AppState.advancedFilters.sort === 'rating') {
-    list.sort((a, b) => b.rating - a.rating);
-  } else if (AppState.advancedFilters.sort === 'distance') {
-    list.sort((a, b) => parseFloat(a.distance) - parseFloat(b.distance));
+    list = list.filter(s => parseFloat(s.distance) <= 2.5);
   }
 
   return list;
@@ -1075,7 +1037,20 @@ function getFilteredSalons() {
 function renderExploreScreen() {
   // Sync search input box
   const searchInp = document.getElementById('exploreSearchInput');
-  searchInp.value = AppState.searchQuery;
+  if (searchInp) searchInp.value = AppState.searchQuery;
+
+  // Sync quick filter chips active state if category is "all"
+  if (AppState.activeCategoryFilter === "all") {
+    const chips = document.querySelectorAll('#exploreFilterChips .filter-chip');
+    chips.forEach(c => {
+      const isMatch = (AppState.activeQuickFilter === "all" && c.innerText.includes("All")) ||
+                      (AppState.activeQuickFilter === "open" && c.innerText.includes("Open")) ||
+                      (AppState.activeQuickFilter === "price500" && c.innerText.includes("500")) ||
+                      (AppState.activeQuickFilter === "top_rated" && c.innerText.includes("Top Rated")) ||
+                      (AppState.activeQuickFilter === "nearby" && c.innerText.includes("Nearby"));
+      c.classList.toggle('active', isMatch);
+    });
+  }
 
   // Render Favorites row in list view if there are any
   const favSection = document.getElementById('exploreFavouritesSection');
@@ -1120,7 +1095,7 @@ function renderExploreScreen() {
     });
   });
 
-  if (allCombos.length > 0) {
+  if (allCombos.length > 0 && AppState.activeCategoryFilter === "all") {
     combosSection.style.display = 'block';
     allCombos.forEach(item => {
       const el = document.createElement('div');
@@ -1161,119 +1136,145 @@ function renderExploreList() {
   const container = document.getElementById('exploreSalonsList');
   const resultsHeader = document.getElementById('exploreResultsCountHeader');
 
-  // Show skeleton loading effect briefly to simulate api
-  container.innerHTML = `
-    <div class="skeleton-card skeleton"></div>
-    <div class="skeleton-card skeleton"></div>
-    <div class="skeleton-card skeleton"></div>
-  `;
+  const list = getFilteredSalons();
+  container.innerHTML = "";
 
-  setTimeout(() => {
-    const list = getFilteredSalons();
-    container.innerHTML = "";
-
-    if (list.length === 0) {
-      resultsHeader.innerText = "No Results Match";
-      container.innerHTML = `
-        <div class="empty-state">
-          <div class="empty-state-icon">
-            <i data-lucide="frown"></i>
-          </div>
-          <h4>No matching salons found</h4>
-          <p>Try adjustments to your filters, changing parameters, or search using simplified keyword terms.</p>
-          <button class="btn-primary" onclick="resetExploreFilters()">Clear All Filters</button>
+  if (list.length === 0) {
+    resultsHeader.innerText = "No Results Match";
+    container.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-state-icon">
+          <i data-lucide="frown"></i>
         </div>
-      `;
-      lucide.createIcons();
-      return;
-    }
-
-    const catObj = SalonHubData.categories.find(c => c.id === AppState.activeCategoryFilter);
-    if (catObj) {
-      resultsHeader.innerHTML = `
-        <div class="active-category-header-row" style="display:flex; align-items:center; justify-content:space-between; width:100%;">
-          <span>Best ${catObj.name} Salons near you</span>
-          <span class="clear-category-tag" onclick="clearCategoryFilter()" style="font-size:11px; background-color:var(--accent-soft); color:var(--accent-color); padding:4px 8px; border-radius:12px; cursor:pointer; font-weight:700;">
-            ${catObj.name} &times;
-          </span>
-        </div>
-      `;
-    } else {
-      resultsHeader.innerText = `${list.length} Salon${list.length > 1 ? 's' : ''} near you`;
-    }
-
-    list.forEach(s => {
-      const isFav = SalonHubData.favourites.salonIds.includes(s.id);
-      
-      let categoryServicesHtml = '';
-      if (catObj) {
-        const matchingServices = s.services.filter(serv => serv.category === AppState.activeCategoryFilter);
-        if (matchingServices.length > 0) {
-          categoryServicesHtml = `
-            <div style="margin-top:10px; border-top:1px dashed var(--border-color); padding-top:10px;" onclick="event.stopPropagation();">
-              <div style="font-size:11px; font-weight:800; color:var(--accent-color); margin-bottom:6px;">Available ${catObj.name} Services:</div>
-              ${matchingServices.map(serv => `
-                <div style="display:flex; align-items:center; justify-content:space-between; padding:6px 0; border-bottom:1px solid var(--border-color);">
-                  <div style="display:flex; align-items:center; gap:8px;">
-                    <img src="${serv.image || s.image}" style="width:36px; height:36px; border-radius:8px; object-fit:cover;" alt="${serv.name}">
-                    <div>
-                      <div style="font-size:12px; font-weight:700; color:var(--text-heading);">${serv.name}</div>
-                      <div style="font-size:10px; color:var(--text-body);">${serv.time} • ₹${serv.price}</div>
-                    </div>
-                  </div>
-                  <button class="btn-primary" style="padding:4px 10px; font-size:10px; width:auto; box-shadow:none;" onclick="event.stopPropagation(); quickBookService('${s.id}', '${serv.id}')">Book</button>
-                </div>
-              `).join('')}
-            </div>
-          `;
-        }
-      }
-
-      const el = document.createElement('div');
-      el.className = 'salon-vertical-card';
-      el.onclick = () => openSalonDetail(s.id);
-      el.innerHTML = `
-        <div class="salon-img-wrapper" style="height:140px;">
-          <img src="${s.image}" alt="${s.name}">
-          <span class="salon-status-tag ${s.isOpen ? 'badge-open' : 'badge-closed'}">${s.openStatus}</span>
-          ${s.type === 'Unisex' ? '<span class="salon-badge-unisex">Unisex</span>' : ''}
-          <button class="salon-favorite-btn ${isFav ? 'active' : ''}" onclick="event.stopPropagation(); toggleFavSalon('${s.id}')">
-            <i data-lucide="heart"></i>
-          </button>
-        </div>
-        <div class="salon-card-info" style="padding:14px;">
-          <div class="salon-info-header">
-            <div>
-              <h4 class="salon-title" style="font-size:15px;">${s.name}</h4>
-              <div class="salon-meta-subtitle">
-                <span class="badge-amber" style="padding:2px 6px; border-radius:4px;">${s.type}</span> • <span>${s.location}</span>
-              </div>
-            </div>
-            <span class="book-again-rating"><i data-lucide="star"></i>${s.rating}</span>
-          </div>
-          
-          <div class="salon-card-footer-row" style="margin-top:8px; padding-top:8px;">
-            <div class="salon-footer-left">
-              <div class="salon-footer-item">
-                <i data-lucide="navigation"></i>
-                <span>${s.distance}</span>
-              </div>
-              <div class="salon-footer-item">
-                <i data-lucide="clock"></i>
-                <span>${s.duration}</span>
-              </div>
-            </div>
-            <div class="salon-starting-price" style="font-size:12px;">
-              From <span>₹${s.startingPrice}</span>
-            </div>
-          </div>
-          ${categoryServicesHtml}
-        </div>
-      `;
-      container.appendChild(el);
-    });
+        <h4>No matching salons found</h4>
+        <p>Try clearing your active filters or searching for different terms.</p>
+        <button class="btn-primary" onclick="resetExploreFilters()">Clear All Filters</button>
+      </div>
+    `;
     lucide.createIcons();
-  }, 350); // Small fluid lag simulation
+    return;
+  }
+
+  // Build Header Title
+  const catObj = SalonHubData.categories.find(c => c.id === AppState.activeCategoryFilter);
+  if (catObj) {
+    resultsHeader.innerHTML = `
+      <div class="active-category-header-row" style="display:flex; align-items:center; justify-content:space-between; width:100%;">
+        <span>Showing <strong>${catObj.name}</strong> Salons & Services</span>
+        <span class="clear-category-tag" onclick="clearCategoryFilter()" style="font-size:11px; background-color:var(--accent-soft); color:var(--accent-color); padding:4px 10px; border-radius:12px; cursor:pointer; font-weight:700;">
+          ${catObj.name} &times;
+        </span>
+      </div>
+    `;
+  } else if (AppState.activeQuickFilter === "open") {
+    resultsHeader.innerText = `Open Now Salons (${list.length})`;
+  } else if (AppState.activeQuickFilter === "price500") {
+    resultsHeader.innerText = `Salons & Services Under ₹500 (${list.length})`;
+  } else if (AppState.activeQuickFilter === "top_rated") {
+    resultsHeader.innerText = `Top Rated Salons 4.7+ (${list.length})`;
+  } else if (AppState.activeQuickFilter === "nearby") {
+    resultsHeader.innerText = `Nearby Salons < 2.5km (${list.length})`;
+  } else if (AppState.searchQuery !== "") {
+    resultsHeader.innerText = `Search Results for "${AppState.searchQuery}" (${list.length})`;
+  } else {
+    resultsHeader.innerText = `All Salons near you (${list.length})`;
+  }
+
+  list.forEach(s => {
+    const isFav = SalonHubData.favourites.salonIds.includes(s.id);
+    
+    let subServicesHtml = '';
+
+    if (catObj) {
+      // Show specific category services
+      const matchingServices = s.services.filter(serv => serv.category === AppState.activeCategoryFilter);
+      if (matchingServices.length > 0) {
+        subServicesHtml = `
+          <div style="margin-top:10px; border-top:1px dashed var(--border-color); padding-top:10px;" onclick="event.stopPropagation();">
+            <div style="font-size:11px; font-weight:800; color:var(--accent-color); margin-bottom:6px;">Available ${catObj.name} Services:</div>
+            ${matchingServices.map(serv => `
+              <div style="display:flex; align-items:center; justify-content:space-between; padding:6px 0; border-bottom:1px solid var(--border-color);">
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <img src="${serv.image || s.image}" style="width:38px; height:38px; border-radius:8px; object-fit:cover;" alt="${serv.name}">
+                  <div>
+                    <div style="font-size:12px; font-weight:700; color:var(--text-heading);">${serv.name}</div>
+                    <div style="font-size:10px; color:var(--text-body);">${serv.time} • ₹${serv.price}</div>
+                  </div>
+                </div>
+                <button class="btn-primary" style="padding:4px 10px; font-size:10px; width:auto; box-shadow:none;" onclick="event.stopPropagation(); quickBookService('${s.id}', '${serv.id}')">Book</button>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+    } else if (AppState.activeQuickFilter === "price500") {
+      // Show under ₹500 services
+      const cheapServices = s.services.filter(serv => serv.price <= 500);
+      if (cheapServices.length > 0) {
+        subServicesHtml = `
+          <div style="margin-top:10px; border-top:1px dashed var(--border-color); padding-top:10px;" onclick="event.stopPropagation();">
+            <div style="font-size:11px; font-weight:800; color:#2E7D32; margin-bottom:6px;">Services Under ₹500:</div>
+            ${cheapServices.map(serv => `
+              <div style="display:flex; align-items:center; justify-content:space-between; padding:6px 0; border-bottom:1px solid var(--border-color);">
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <img src="${serv.image || s.image}" style="width:38px; height:38px; border-radius:8px; object-fit:cover;" alt="${serv.name}">
+                  <div>
+                    <div style="font-size:12px; font-weight:700; color:var(--text-heading);">${serv.name}</div>
+                    <div style="font-size:10px; color:var(--text-body);">${serv.time} • ₹${serv.price}</div>
+                  </div>
+                </div>
+                <button class="btn-primary" style="padding:4px 10px; font-size:10px; width:auto; box-shadow:none;" onclick="event.stopPropagation(); quickBookService('${s.id}', '${serv.id}')">Book</button>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+    }
+
+    const el = document.createElement('div');
+    el.className = 'salon-vertical-card';
+    el.onclick = () => openSalonDetail(s.id);
+    el.innerHTML = `
+      <div class="salon-img-wrapper" style="height:140px;">
+        <img src="${s.image}" alt="${s.name}">
+        <span class="salon-status-tag ${s.isOpen ? 'badge-open' : 'badge-closed'}">${s.openStatus}</span>
+        ${s.type === 'Unisex' ? '<span class="salon-badge-unisex">Unisex</span>' : ''}
+        <button class="salon-favorite-btn ${isFav ? 'active' : ''}" onclick="event.stopPropagation(); toggleFavSalon('${s.id}')">
+          <i data-lucide="heart"></i>
+        </button>
+      </div>
+      <div class="salon-card-info" style="padding:14px;">
+        <div class="salon-info-header">
+          <div>
+            <h4 class="salon-title" style="font-size:15px;">${s.name}</h4>
+            <div class="salon-meta-subtitle">
+              <span class="badge-amber" style="padding:2px 6px; border-radius:4px;">${s.type}</span> • <span>${s.location}</span>
+            </div>
+          </div>
+          <span class="book-again-rating"><i data-lucide="star"></i>${s.rating}</span>
+        </div>
+        
+        <div class="salon-card-footer-row" style="margin-top:8px; padding-top:8px;">
+          <div class="salon-footer-left">
+            <div class="salon-footer-item">
+              <i data-lucide="navigation"></i>
+              <span>${s.distance}</span>
+            </div>
+            <div class="salon-footer-item">
+              <i data-lucide="clock"></i>
+              <span>${s.duration}</span>
+            </div>
+          </div>
+          <div class="salon-starting-price" style="font-size:12px;">
+            From <span>₹${s.startingPrice}</span>
+          </div>
+        </div>
+        ${subServicesHtml}
+      </div>
+    `;
+    container.appendChild(el);
+  });
+  lucide.createIcons();
 }
 
 function resetExploreFilters() {
