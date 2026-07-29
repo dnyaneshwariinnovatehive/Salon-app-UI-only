@@ -1151,6 +1151,22 @@
             </div>
           </div>
 
+          <!-- Platform Management -->
+          <div class="px-20 mt-20">
+            <div class="settings-section-title">Platform Management</div>
+            <div class="options-list">
+              <div class="option-row" onclick="saOpenManageSalons()" style="cursor:pointer;">
+                <div class="option-row-left">
+                  <i data-lucide="building-2" style="color:var(--accent-color);"></i>
+                  <span>Manage Salons</span>
+                </div>
+                <div class="option-row-right">
+                  <i data-lucide="chevron-right" style="width:16px; height:16px; color:var(--text-light);"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- Logout -->
           <div class="px-20 mt-20" style="padding-bottom:40px;">
             <button onclick="saLogout()" style="width:100%; padding:14px; background:var(--color-danger-bg); color:#C62828; border:none; border-radius:14px; font-size:14px; font-weight:700; cursor:pointer;">Logout</button>
@@ -1793,6 +1809,30 @@
     <div class="drawer" id="saConfirmDrawer" onclick="event.stopPropagation()" style="max-height:40%;">
       <div class="drawer-drag-bar" onclick="saCloseDrawer('saConfirmDrawer')"></div>
       <div class="drawer-content" id="saConfirmContent"></div>
+    </div>
+  </div>
+
+  <!-- SA: Manage Salons Drawer -->
+  <div class="overlay" id="saManageSalonsDrawerOverlay" onclick="saCloseDrawer('saManageSalonsDrawer')">
+    <div class="drawer" id="saManageSalonsDrawer" onclick="event.stopPropagation()" style="max-height:90%;">
+      <div class="drawer-drag-bar" onclick="saCloseDrawer('saManageSalonsDrawer')"></div>
+      <div class="drawer-header">
+        <h3 style="font-size:18px; font-weight:800;">Manage Salons</h3>
+        <button class="drawer-close-btn" onclick="saCloseDrawer('saManageSalonsDrawer')"><i data-lucide="x" style="width:16px; height:16px;"></i></button>
+      </div>
+      <div class="drawer-content" id="saManageSalonsContent"></div>
+    </div>
+  </div>
+
+  <!-- SA: Manage Salon Action Drawer -->
+  <div class="overlay" id="saManageSalonActionDrawerOverlay" onclick="saCloseDrawer('saManageSalonActionDrawer')">
+    <div class="drawer" id="saManageSalonActionDrawer" onclick="event.stopPropagation()" style="max-height:50%;">
+      <div class="drawer-drag-bar" onclick="saCloseDrawer('saManageSalonActionDrawer')"></div>
+      <div class="drawer-header">
+        <h3 style="font-size:18px; font-weight:800;" id="saManageSalonActionTitle">Salon Actions</h3>
+        <button class="drawer-close-btn" onclick="saCloseDrawer('saManageSalonActionDrawer')"><i data-lucide="x" style="width:16px; height:16px;"></i></button>
+      </div>
+      <div class="drawer-content" id="saManageSalonActionContent"></div>
     </div>
   </div>
 

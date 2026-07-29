@@ -6,7 +6,8 @@ const SuperAdminState = {
   platformSegment: "categories",
   editingCategory: null,
   editingBanner: null,
-  selectedSalonId: null
+  selectedSalonId: null,
+  manageSalonsFilter: "all"
 };
 
 // ============================================================
@@ -454,22 +455,7 @@ function saOpenSalonDetail(salonId) {
         <div style="font-size:12px; color:var(--text-body);">No complaint data available. (Future scope)</div>
       </div>
 
-      <!-- Actions -->
-      <div style="display:flex; flex-direction:column; gap:8px;">
-        ${isSuspended ? `
-          <button onclick="saReactivateSalon('${s.id}')" style="padding:14px; background:#2E7D32; color:#fff; border:none; border-radius:12px; font-size:14px; font-weight:700; cursor:pointer;">
-            <i data-lucide="check-circle" style="width:16px; height:16px; display:inline; vertical-align:middle; margin-right:6px;"></i> Reactivate Salon
-          </button>` : (isDeactivated ? "" : `
-          <button onclick="saOpenSuspendForm('${s.id}')" style="padding:14px; background:var(--color-warning-bg); color:#EF6C00; border:none; border-radius:12px; font-size:14px; font-weight:700; cursor:pointer;">
-            <i data-lucide="pause-circle" style="width:16px; height:16px; display:inline; vertical-align:middle; margin-right:6px;"></i> Suspend Salon
-          </button>`)
-        }
-        ${!isDeactivated ? `
-          <button onclick="saOpenDeactivateConfirm('${s.id}')" style="padding:14px; background:var(--color-danger-bg); color:#C62828; border:none; border-radius:12px; font-size:14px; font-weight:700; cursor:pointer;">
-            <i data-lucide="trash-2" style="width:16px; height:16px; display:inline; vertical-align:middle; margin-right:6px;"></i> Deactivate / Offboard Salon
-          </button>` : ""}
-        <button onclick="saCloseDrawer('saSalonDetailDrawer')" style="padding:12px; background:var(--surface-color); color:var(--text-body); border:1px solid var(--border-color); border-radius:12px; font-size:13px; font-weight:600; cursor:pointer;">Close</button>
-      </div>
+      <button onclick="saCloseDrawer('saSalonDetailDrawer')" style="width:100%; padding:12px; background:var(--surface-color); color:var(--text-body); border:1px solid var(--border-color); border-radius:12px; font-size:13px; font-weight:600; cursor:pointer;">Close</button>
     </div>
   `;
   saOpenDrawer("saSalonDetailDrawer");
@@ -1000,4 +986,121 @@ function saRenderProfileScreen() {
   document.getElementById("saProfileName").innerText = u.name;
   document.getElementById("saProfileEmail").innerText = u.email;
   document.getElementById("saProfileRole").innerText = "Platform Owner";
+}
+
+// ----------------------------------------------------
+// MANAGE SALONS (from Profile tab)
+// ----------------------------------------------------
+function saOpenManageSalons() {
+  saOpenDrawer("saManageSalonsDrawer");
+  saRenderManageSalonsList("all");
+}
+
+function saRenderManageSalonsList(filter) {
+  const container = document.getElementById("saManageSalonsContent");
+  SuperAdminState.manageSalonsFilter = filter || "all";
+
+  let list = [...SuperAdminData.salons];
+  if (SuperAdminState.manageSalonsFilter === "active") list = list.filter(s => s.status === "active");
+  else if (SuperAdminState.manageSalonsFilter === "suspended") list = list.filter(s => s.status === "suspended");
+
+  container.innerHTML = `
+    <div style="padding:16px 20px;">
+      <div style="display:flex; gap:8px; margin-bottom:14px;">
+        <button onclick="saRenderManageSalonsList('all')" style="flex:1; padding:10px; border-radius:30px; border:none; font-size:12px; font-weight:700; cursor:pointer; ${SuperAdminState.manageSalonsFilter === 'all' ? 'background:#9C54F2; color:#fff;' : 'background:var(--accent-soft); color:var(--accent-color);'}">All (${SuperAdminData.salons.length})</button>
+        <button onclick="saRenderManageSalonsList('active')" style="flex:1; padding:10px; border-radius:30px; border:none; font-size:12px; font-weight:700; cursor:pointer; ${SuperAdminState.manageSalonsFilter === 'active' ? 'background:#2E7D32; color:#fff;' : 'background:var(--color-success-bg); color:#2E7D32;'}">Active (${SuperAdminData.salons.filter(s => s.status === 'active').length})</button>
+        <button onclick="saRenderManageSalonsList('suspended')" style="flex:1; padding:10px; border-radius:30px; border:none; font-size:12px; font-weight:700; cursor:pointer; ${SuperAdminState.manageSalonsFilter === 'suspended' ? 'background:#EF6C00; color:#fff;' : 'background:var(--color-warning-bg); color:#EF6C00;'}">Suspended (${SuperAdminData.salons.filter(s => s.status === 'suspended').length})</button>
+      </div>
+      <div style="max-height:60vh; overflow-y:auto;">${list.length ? list.map(s => {
+        const statusColor = s.status === "active" ? "#2E7D32" : s.status === "suspended" ? "#EF6C00" : "#C62828";
+        const statusBg = s.status === "active" ? "var(--color-success-bg)" : s.status === "suspended" ? "var(--color-warning-bg)" : "var(--color-danger-bg)";
+        return `<div onclick="saOpenManageSalonAction('${s.id}')" style="display:flex; align-items:center; gap:12px; padding:12px 14px; background:var(--surface-color); border-radius:12px; border:1px solid var(--border-color); margin-bottom:8px; cursor:pointer;">
+          <img src="${s.image}" style="width:44px; height:44px; border-radius:10px; object-fit:cover;">
+          <div style="flex:1; min-width:0;">
+            <div style="font-size:13px; font-weight:700; color:var(--text-heading);">${s.name}</div>
+            <div style="font-size:11px; color:var(--text-body); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${s.location}</div>
+          </div>
+          <span style="font-size:10px; font-weight:700; padding:3px 8px; border-radius:8px; background:${statusBg}; color:${statusColor}; text-transform:capitalize;">${s.status}</span>
+        </div>`;
+      }).join("") : '<div style="text-align:center; padding:30px 0; font-size:13px; color:var(--text-light);">No salons found.</div>'}</div>
+    </div>
+  `;
+  lucide.createIcons();
+}
+
+// ----------------------------------------------------
+// MANAGE SALON ACTION (suspend / reactivate / deactivate)
+// ----------------------------------------------------
+function saOpenManageSalonAction(salonId) {
+  SuperAdminState.selectedSalonId = salonId;
+  const s = SuperAdminData.salons.find(sl => sl.id === salonId);
+  if (!s) return;
+
+  const isSuspended = s.status === "suspended";
+  const isDeactivated = s.status === "deactivated";
+
+  const content = document.getElementById("saManageSalonActionContent");
+  content.innerHTML = `
+    <div style="padding:16px 20px;">
+      <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
+        <img src="${s.image}" style="width:48px; height:48px; border-radius:12px; object-fit:cover;">
+        <div>
+          <div style="font-size:16px; font-weight:800; color:var(--text-heading);">${s.name}</div>
+          <div style="font-size:12px; color:var(--text-body);">${s.location}</div>
+        </div>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:8px;">
+        ${isDeactivated ? "" : (isSuspended ? `
+          <button onclick="saReactivateFromManage('${s.id}')" style="padding:14px; background:#2E7D32; color:#fff; border:none; border-radius:12px; font-size:14px; font-weight:700; cursor:pointer;">
+            <i data-lucide="check-circle" style="width:16px; height:16px; display:inline; vertical-align:middle; margin-right:6px;"></i> Reactivate Salon
+          </button>` : `
+          <button onclick="saManageSuspend('${s.id}')" style="padding:14px; background:var(--color-warning-bg); color:#EF6C00; border:none; border-radius:12px; font-size:14px; font-weight:700; cursor:pointer;">
+            <i data-lucide="pause-circle" style="width:16px; height:16px; display:inline; vertical-align:middle; margin-right:6px;"></i> Suspend Salon
+          </button>`)
+        }
+        ${!isDeactivated ? `
+          <button onclick="saManageDeactivate('${s.id}')" style="padding:14px; background:var(--color-danger-bg); color:#C62828; border:none; border-radius:12px; font-size:14px; font-weight:700; cursor:pointer;">
+            <i data-lucide="trash-2" style="width:16px; height:16px; display:inline; vertical-align:middle; margin-right:6px;"></i> Deactivate / Offboard
+          </button>` : ""}
+        <button onclick="saCloseDrawer('saManageSalonActionDrawer')" style="padding:12px; background:var(--surface-color); color:var(--text-body); border:1px solid var(--border-color); border-radius:12px; font-size:13px; font-weight:600; cursor:pointer;">Close</button>
+      </div>
+    </div>
+  `;
+  saOpenDrawer("saManageSalonActionDrawer");
+  lucide.createIcons();
+}
+
+function saReactivateFromManage(salonId) {
+  saReactivateSalon(salonId);
+  saCloseDrawer("saManageSalonActionDrawer");
+  saRenderManageSalonsList(SuperAdminState.manageSalonsFilter);
+}
+
+function saManageSuspend(salonId) {
+  const s = SuperAdminData.salons.find(sl => sl.id === salonId);
+  if (!s) return;
+  const reason = prompt(`Enter reason to suspend "${s.name}":`);
+  if (!reason || !reason.trim()) { triggerToast("Suspension cancelled."); return; }
+  s.status = "suspended";
+  s.suspended_reason = reason.trim();
+  s.suspended_at = formatDateShort(new Date());
+  s.suspended_by = SuperAdminData.user.email;
+  SuperAdminBus.emit("salon:suspended", { salonId, salonName: s.name });
+  triggerToast(`${s.name} has been suspended.`);
+  saCloseDrawer("saManageSalonActionDrawer");
+  saRenderManageSalonsList(SuperAdminState.manageSalonsFilter);
+}
+
+function saManageDeactivate(salonId) {
+  const s = SuperAdminData.salons.find(sl => sl.id === salonId);
+  if (!s) return;
+  const name = prompt(`Type the salon name "${s.name}" to confirm permanent deactivation:`);
+  if (!name) return;
+  if (name.trim() !== s.name) { triggerToast("Salon name does not match. Deactivation cancelled."); return; }
+  s.status = "deactivated";
+  s.deactivated_at = formatDateShort(new Date());
+  SuperAdminBus.emit("salon:deactivated", { salonId, salonName: s.name });
+  triggerToast(`${s.name} has been permanently offboarded.`);
+  saCloseDrawer("saManageSalonActionDrawer");
+  saRenderManageSalonsList(SuperAdminState.manageSalonsFilter);
 }
