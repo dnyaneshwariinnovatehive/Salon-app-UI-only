@@ -132,44 +132,47 @@ function renderAdminHomeScreen() {
   // Today's stats
   const todayStr = getTodayDateStr();
   const todayAppts = AdminData.appointments.filter(a => a.date === todayStr);
-  const todayCompleted = todayAppts.filter(a => a.status === 'completed');
-  const todayPayments = AdminData.payments.filter(p => {
-    const payDate = p.paid_at.split(' ')[0] + ' ' + p.paid_at.split(' ')[1] + ' ' + p.paid_at.split(' ')[2];
-    return payDate === todayStr;
-  });
-  const todayRevenue = todayPayments.reduce((sum, p) => sum + p.amount, 0);
 
-  document.getElementById('adminStatAppts').innerText = todayAppts.length;
-  document.getElementById('adminStatRevenue').innerText = `₹${todayRevenue.toLocaleString()}`;
+  const apptStatEl = document.getElementById('adminStatAppts');
+  if (apptStatEl) apptStatEl.innerText = todayAppts.length;
 
   // Staff on duty vs on leave
   const activeProviders = AdminData.serviceProviders.filter(p => p.is_active);
   const onLeaveToday = AdminData.providerLeaves.filter(l => l.date === todayStr && l.status === 'approved');
-  document.getElementById('adminStatOnDuty').innerText = activeProviders.length - onLeaveToday.length;
-  document.getElementById('adminStatOnLeave').innerText = onLeaveToday.length;
+  
+  const onDutyStatEl = document.getElementById('adminStatOnDuty');
+  if (onDutyStatEl) onDutyStatEl.innerText = activeProviders.length - onLeaveToday.length;
 
-  // Pending leave requests (all)
+  const onLeaveStatEl = document.getElementById('adminStatOnLeave');
+  if (onLeaveStatEl) onLeaveStatEl.innerText = onLeaveToday.length;
+
+  // Pending leave requests (keep 1 for demo)
   const pendingLeaves = AdminData.providerLeaves.filter(l => l.status === 'pending');
-  document.getElementById('adminPendingLeaveCount').innerText = pendingLeaves.length;
+  const demoLeaves = pendingLeaves.slice(0, 1);
+  const pendingCountEl = document.getElementById('adminPendingLeaveCount');
+  if (pendingCountEl) pendingCountEl.innerText = demoLeaves.length;
+  
   const pendingContainer = document.getElementById('adminPendingLeaveList');
-  pendingContainer.innerHTML = '';
-  pendingLeaves.forEach(lv => {
-    const pName = getProviderName(lv.provider_id);
-    const card = document.createElement('div');
-    card.style.cssText = 'display:flex; align-items:center; justify-content:space-between; padding:12px; background:var(--color-warning-bg); border-radius:12px; margin-bottom:8px;';
-    card.innerHTML = `
-      <div>
-        <div style="font-size:13px; font-weight:700; color:var(--text-heading);">${pName}</div>
-        <div style="font-size:11px; color:var(--text-body);">${lv.date} • ${lv.type === 'full_day' ? 'Full Day' : lv.timeRange}</div>
-        <div style="font-size:10px; color:var(--text-light);">${lv.reason}</div>
-      </div>
-      <div style="display:flex; gap:6px;">
-        <button onclick="adminApproveLeave('${lv.id}')" style="padding:6px 12px; background:#2E7D32; color:#fff; border:none; border-radius:8px; font-size:11px; font-weight:700; cursor:pointer;">Approve</button>
-        <button onclick="adminRejectLeave('${lv.id}')" style="padding:6px 12px; background:#C62828; color:#fff; border:none; border-radius:8px; font-size:11px; font-weight:700; cursor:pointer;">Reject</button>
-      </div>
-    `;
-    pendingContainer.appendChild(card);
-  });
+  if (pendingContainer) {
+    pendingContainer.innerHTML = '';
+    demoLeaves.forEach(lv => {
+      const pName = getProviderName(lv.provider_id);
+      const card = document.createElement('div');
+      card.style.cssText = 'display:flex; align-items:center; justify-content:space-between; padding:12px; background:var(--color-warning-bg); border-radius:12px; margin-bottom:8px;';
+      card.innerHTML = `
+        <div>
+          <div style="font-size:13px; font-weight:700; color:var(--text-heading);">${pName}</div>
+          <div style="font-size:11px; color:var(--text-body);">${lv.date} • ${lv.type === 'full_day' ? 'Full Day' : lv.timeRange}</div>
+          <div style="font-size:10px; color:var(--text-light);">${lv.reason}</div>
+        </div>
+        <div style="display:flex; gap:6px;">
+          <button onclick="adminApproveLeave('${lv.id}')" style="padding:6px 12px; background:#2E7D32; color:#fff; border:none; border-radius:8px; font-size:11px; font-weight:700; cursor:pointer;">Approve</button>
+          <button onclick="adminRejectLeave('${lv.id}')" style="padding:6px 12px; background:#C62828; color:#fff; border:none; border-radius:8px; font-size:11px; font-weight:700; cursor:pointer;">Reject</button>
+        </div>
+      `;
+      pendingContainer.appendChild(card);
+    });
+  }
 
   // Daily load per provider (grid 2 per row)
   const loadContainer = document.getElementById('adminProviderLoad');
@@ -1276,13 +1279,9 @@ function adminOpenCreateCombo() {
 function renderAdminProfileScreen() {
   const salon = AdminData.salon;
 
-  document.getElementById('adminProfileName').innerText = salon.name;
-  document.getElementById('adminProfileAddress').innerText = salon.address;
-  document.getElementById('adminProfileCover').src = salon.coverPhoto;
-
-  // Financial oversight
-  renderAdminFinancials();
-  renderAdminClosureCalendar();
+  if (document.getElementById('adminProfileName')) document.getElementById('adminProfileName').innerText = salon.name;
+  if (document.getElementById('adminProfileAddress')) document.getElementById('adminProfileAddress').innerText = salon.address;
+  if (document.getElementById('adminProfileCover')) document.getElementById('adminProfileCover').src = salon.coverPhoto;
 }
 
 function renderAdminFinancials() {

@@ -776,36 +776,23 @@
           </button>
         </div>
 
-        <!-- Today's Stats Cards -->
-        <div class="px-20 mt-10" style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
-          <div style="background:var(--surface-color); border-radius:14px; padding:14px; border:1px solid var(--border-color); box-shadow:var(--shadow-card);">
-            <div style="font-size:11px; color:var(--text-light);">Today's Appointments</div>
-            <div style="font-size:26px; font-weight:800; color:var(--accent-color);" id="adminStatAppts">0</div>
+        <!-- Today's Stats Cards (1:1:1 Ratio) -->
+        <div class="px-20 mt-10" style="display:flex; gap:8px;">
+          <div style="flex:1; min-width:0; background:var(--accent-soft); border-radius:12px; padding:12px 6px; text-align:center;">
+            <div style="font-size:10px; font-weight:700; color:var(--text-body); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Today's Appts</div>
+            <div style="font-size:20px; font-weight:800; color:var(--accent-color); margin-top:2px;" id="adminStatAppts">0</div>
           </div>
-          <div style="background:var(--surface-color); border-radius:14px; padding:14px; border:1px solid var(--border-color); box-shadow:var(--shadow-card);">
-            <div style="font-size:11px; color:var(--text-light);">Today's Revenue</div>
-            <div style="font-size:26px; font-weight:800; color:#2E7D32;" id="adminStatRevenue">₹0</div>
+          <div style="flex:1; min-width:0; background:var(--color-info-bg); border-radius:12px; padding:12px 6px; text-align:center;">
+            <div style="font-size:10px; font-weight:700; color:var(--text-body); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Staff on Duty</div>
+            <div style="font-size:20px; font-weight:800; color:#1565C0; margin-top:2px;" id="adminStatOnDuty">0</div>
           </div>
-          <div style="background:var(--surface-color); border-radius:14px; padding:14px; border:1px solid var(--border-color); box-shadow:var(--shadow-card);">
-            <div style="font-size:11px; color:var(--text-light);">Staff on Duty</div>
-            <div style="font-size:26px; font-weight:800; color:var(--text-heading);" id="adminStatOnDuty">0</div>
-          </div>
-          <div style="background:var(--surface-color); border-radius:14px; padding:14px; border:1px solid var(--border-color); box-shadow:var(--shadow-card);">
-            <div style="font-size:11px; color:var(--text-light);">On Leave Today</div>
-            <div style="font-size:26px; font-weight:800; color:#C62828;" id="adminStatOnLeave">0</div>
+          <div style="flex:1; min-width:0; background:var(--color-danger-bg); border-radius:12px; padding:12px 6px; text-align:center;">
+            <div style="font-size:10px; font-weight:700; color:var(--text-body); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">On Leave Today</div>
+            <div style="font-size:20px; font-weight:800; color:#C62828; margin-top:2px;" id="adminStatOnLeave">0</div>
           </div>
         </div>
 
-        <!-- Pending Leave Requests -->
-        <div class="px-20 mt-15">
-          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
-            <h3 style="font-size:14px; font-weight:800;">Pending Leave Requests</h3>
-            <span style="font-size:12px; color:var(--accent-color); font-weight:700;" id="adminPendingLeaveCount">0</span>
-          </div>
-          <div id="adminPendingLeaveList"></div>
-        </div>
-
-        <!-- Quick Actions -->
+        <!-- Quick Actions (Moved above Pending Leave Requests) -->
         <div class="px-20 mt-15">
           <h3 style="font-size:14px; font-weight:800; margin-bottom:10px;">Quick Actions</h3>
           <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px;">
@@ -819,6 +806,15 @@
               <i data-lucide="calendar-x" style="width:20px; height:20px;"></i> Mark Closed
             </button>
           </div>
+        </div>
+
+        <!-- Pending Leave Requests -->
+        <div class="px-20 mt-15">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
+            <h3 style="font-size:14px; font-weight:800;">Pending Leave Requests</h3>
+            <span style="font-size:12px; color:var(--accent-color); font-weight:700;" id="adminPendingLeaveCount">0</span>
+          </div>
+          <div id="adminPendingLeaveList"></div>
         </div>
 
         <!-- Daily Provider Load -->
@@ -944,46 +940,8 @@
           </div>
         </div>
 
-        <!-- Financial Oversight -->
-        <div class="px-20 mt-15">
-          <h3 style="font-size:14px; font-weight:800; margin-bottom:10px;">Financial Overview</h3>
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px;">
-            <div style="background:var(--surface-color); border-radius:12px; padding:12px; border:1px solid var(--border-color);">
-              <div style="font-size:10px; color:var(--text-light); text-transform:uppercase;">Total Advance</div>
-              <div style="font-size:18px; font-weight:800; color:var(--accent-color);" id="adminFinAdvance">₹0</div>
-            </div>
-            <div style="background:var(--surface-color); border-radius:12px; padding:12px; border:1px solid var(--border-color);">
-              <div style="font-size:10px; color:var(--text-light); text-transform:uppercase;">Total Balance</div>
-              <div style="font-size:18px; font-weight:800; color:#1565C0;" id="adminFinBalance">₹0</div>
-            </div>
-            <div style="background:var(--surface-color); border-radius:12px; padding:12px; border:1px solid var(--border-color);">
-              <div style="font-size:10px; color:var(--text-light); text-transform:uppercase;">Total Revenue</div>
-              <div style="font-size:18px; font-weight:800; color:#2E7D32;" id="adminFinTotal">₹0</div>
-            </div>
-            <div style="background:var(--surface-color); border-radius:12px; padding:12px; border:1px solid var(--border-color);">
-              <div style="font-size:10px; color:var(--text-light); text-transform:uppercase;">Forfeited</div>
-              <div style="font-size:18px; font-weight:800; color:#C62828;" id="adminFinForfeited">₹0</div>
-            </div>
-          </div>
-          <h3 style="font-size:12px; font-weight:700; color:var(--text-body); margin-bottom:8px;">Per-Service Revenue (Top 6)</h3>
-          <div id="adminFinPerService" style="background:var(--surface-color); border-radius:12px; padding:12px; border:1px solid var(--border-color);"></div>
-        </div>
-
-        <!-- Closure Calendar -->
-        <div class="px-20 mt-15">
-          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
-            <h3 style="font-size:14px; font-weight:800;">Closure Calendar</h3>
-            <div style="display:flex; align-items:center; gap:8px;">
-              <button onclick="adminClosureNav(-1)" style="background:none; border:none; cursor:pointer; padding:4px;"><i data-lucide="chevron-left" style="width:16px; height:16px; color:var(--text-body);"></i></button>
-              <span id="adminClosureMonthLabel" style="font-size:13px; font-weight:700; min-width:100px; text-align:center;"></span>
-              <button onclick="adminClosureNav(1)" style="background:none; border:none; cursor:pointer; padding:4px;"><i data-lucide="chevron-right" style="width:16px; height:16px; color:var(--text-body);"></i></button>
-            </div>
-          </div>
-          <div id="adminClosureCalendar" style="padding-bottom:24px;"></div>
-        </div>
-
         <!-- Logout -->
-        <div class="px-20" style="padding-bottom:40px;">
+        <div class="px-20 mt-20" style="padding-bottom:40px;">
           <button onclick="adminLogout()" style="width:100%; padding:14px; background:var(--color-danger-bg); color:#C62828; border:none; border-radius:14px; font-size:14px; font-weight:700; cursor:pointer;">Logout</button>
         </div>
       </div>
