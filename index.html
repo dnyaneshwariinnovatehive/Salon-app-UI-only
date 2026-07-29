@@ -67,6 +67,7 @@
             <div>• <strong>Customer:</strong> dnyaneshwari@gmail.com | pass: pune123</div>
             <div>• <strong>Provider:</strong> serviceprovider@gmail.com | pass: 123456</div>
             <div>• <strong>Admin:</strong> admin@gmail.com | pass: 123456</div>
+            <div>• <strong>SuperAdmin:</strong> rootadmin@gmail.com | pass: 123456</div>
           </div>
 
           <!-- Login Fields -->
@@ -946,6 +947,198 @@
         </div>
       </div>
 
+      <!-- ================= SUPERADMIN SCREEN: HOME (DASHBOARD) ================= -->
+      <div class="screen sa-screen" id="screen_sa_home">
+        <div class="sp-header" style="padding-bottom:0;">
+          <img id="saHomeAvatar" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80" alt="SuperAdmin" style="width:40px; height:40px; border-radius:50%; object-fit:cover; border:2px solid var(--accent-soft);">
+          <div class="sp-header-info" style="flex:1; margin-left:10px;">
+            <span class="sp-greeting" id="saHomeGreeting" style="font-size:17px;">Hi Platform Owner 👋</span>
+            <span class="sp-salon-name" style="font-size:12px;">SalonHub Platform Dashboard</span>
+          </div>
+          <button class="header-btn" onclick="openNotificationsDrawer()" style="width:36px; height:36px;">
+            <i data-lucide="bell" style="width:18px; height:18px;"></i>
+            <div class="badge-dot"></div>
+          </button>
+        </div>
+
+        <!-- Stat Cards Row -->
+        <div class="px-20 mt-10" style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+          <div style="background:var(--accent-soft); border-radius:12px; padding:12px 8px; text-align:center;">
+            <div style="font-size:10px; font-weight:700; color:var(--text-body);">Active Salons</div>
+            <div style="font-size:22px; font-weight:800; color:var(--accent-color); margin-top:2px;" id="saStatActiveSalons">0</div>
+          </div>
+          <div style="background:var(--color-info-bg); border-radius:12px; padding:12px 8px; text-align:center;">
+            <div style="font-size:10px; font-weight:700; color:var(--text-body);">Avg Rating</div>
+            <div style="font-size:22px; font-weight:800; color:#1565C0; margin-top:2px;" id="saStatAvgRating">0</div>
+          </div>
+          <div style="background:var(--color-success-bg); border-radius:12px; padding:12px 8px; text-align:center;">
+            <div style="font-size:10px; font-weight:700; color:var(--text-body);">Bookings Today</div>
+            <div style="font-size:22px; font-weight:800; color:#2E7D32; margin-top:2px;" id="saStatBookingsToday">0</div>
+          </div>
+          <div style="background:var(--color-warning-bg); border-radius:12px; padding:12px 8px; text-align:center;">
+            <div style="font-size:10px; font-weight:700; color:var(--text-body);">This Week</div>
+            <div style="font-size:22px; font-weight:800; color:#EF6C00; margin-top:2px;" id="saStatBookingsWeek">0</div>
+          </div>
+        </div>
+        <div class="px-20" style="margin-top:-4px; display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+          <div style="background:var(--surface-color); border-radius:12px; padding:10px 8px; text-align:center; border:1px solid var(--border-color);">
+            <div style="font-size:10px; font-weight:700; color:var(--text-body);">This Month</div>
+            <div style="font-size:18px; font-weight:800; color:var(--text-heading); margin-top:2px;" id="saStatBookingsMonth">0</div>
+          </div>
+          <div style="background:var(--surface-color); border-radius:12px; padding:10px 8px; text-align:center; border:1px solid var(--border-color);">
+            <div style="font-size:10px; font-weight:700; color:var(--text-body);">Cancel / No-Show Rate</div>
+            <div style="font-size:18px; font-weight:800; color:#C62828; margin-top:2px;" id="saNoShowRate">0%</div>
+          </div>
+        </div>
+
+        <!-- Quick Access: New Salons -->
+        <div class="px-20 mt-10" id="saNewSalonsCard" style="display:none;">
+          <div style="background:var(--accent-soft); border-radius:12px; padding:12px 14px; display:flex; align-items:center; gap:10px;">
+            <i data-lucide="store" style="width:20px; height:20px; color:var(--accent-color);"></i>
+            <span style="font-size:12px; font-weight:600; color:var(--text-heading);" id="saNewSalonsCount">0 new salon(s) registered this week.</span>
+          </div>
+        </div>
+
+        <!-- Top Performing Salons -->
+        <div class="px-20 mt-15">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
+            <h3 style="font-size:14px; font-weight:800;">Top Performing Salons</h3>
+            <div style="display:flex; gap:4px;">
+              <button id="saPerf7Btn" onclick="saTogglePerformanceDays(7)" style="padding:4px 12px; background:var(--accent-color); color:#fff; border:none; border-radius:10px; font-size:10px; font-weight:700; cursor:pointer;">7 Days</button>
+              <button id="saPerf30Btn" onclick="saTogglePerformanceDays(30)" style="padding:4px 12px; background:var(--accent-soft); color:var(--accent-color); border:none; border-radius:10px; font-size:10px; font-weight:700; cursor:pointer;">30 Days</button>
+            </div>
+          </div>
+          <div id="saTopSalonsList"></div>
+        </div>
+
+        <!-- Salons to Review (High Cancel/No-Show) -->
+        <div class="px-20 mt-15" style="padding-bottom:24px;">
+          <h3 style="font-size:14px; font-weight:800; margin-bottom:10px;">Salons to Review</h3>
+          <div id="saSalonsToReview"></div>
+        </div>
+      </div>
+
+      <!-- ================= SUPERADMIN SCREEN: SALONS ================= -->
+      <div class="screen sa-screen" id="screen_sa_salons">
+        <div class="sp-header">
+          <h2 class="screen-title">All Salons</h2>
+        </div>
+
+        <!-- Search -->
+        <div class="px-20 mt-10">
+          <div class="search-bar-wrapper" style="flex:1;">
+            <i data-lucide="search"></i>
+            <input type="text" id="saSalonSearch" placeholder="Search by name or city..." oninput="saSearchSalons()">
+          </div>
+        </div>
+
+        <!-- Filter chips -->
+        <div class="px-20 mt-10" style="display:flex; gap:6px;">
+          <button id="saFilterAll" class="filter-chip active" onclick="saSetSalonFilter('all')" style="flex:1; padding:8px; border-radius:10px; font-size:11px; font-weight:700; cursor:pointer; border:1.5px solid var(--border-color); background:var(--surface-color); color:var(--text-body); text-align:center;">All</button>
+          <button id="saFilterActive" class="filter-chip" onclick="saSetSalonFilter('active')" style="flex:1; padding:8px; border-radius:10px; font-size:11px; font-weight:700; cursor:pointer; border:1.5px solid var(--border-color); background:var(--surface-color); color:var(--text-body); text-align:center;">Active</button>
+          <button id="saFilterSuspended" class="filter-chip" onclick="saSetSalonFilter('suspended')" style="flex:1; padding:8px; border-radius:10px; font-size:11px; font-weight:700; cursor:pointer; border:1.5px solid var(--border-color); background:var(--surface-color); color:var(--text-body); text-align:center;">Suspended</button>
+        </div>
+
+        <div class="px-20 mt-10" id="saSalonsList" style="padding-bottom:24px;"></div>
+      </div>
+
+      <!-- ================= SUPERADMIN SCREEN: PLATFORM (Categories + Banners) ================= -->
+      <div class="screen sa-screen" id="screen_sa_platform">
+        <div class="sp-header">
+          <h2 class="screen-title">Platform Settings</h2>
+        </div>
+
+        <div class="tab-switcher-header">
+          <div class="tab-switcher">
+            <button class="tab-switch-btn active" id="saPlatCategoriesBtn" onclick="saSetPlatformSegment('categories')">Categories</button>
+            <button class="tab-switch-btn" id="saPlatBannersBtn" onclick="saSetPlatformSegment('banners')">Banners</button>
+          </div>
+        </div>
+
+        <!-- Categories Tab -->
+        <div id="saPlatformCategories">
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:10px 20px 0;">
+            <h3 style="font-size:14px; font-weight:800;">Service Categories</h3>
+            <button onclick="saOpenAddCategory()" style="display:flex; align-items:center; gap:4px; padding:8px 14px; background:var(--accent-color); color:#fff; border:none; border-radius:10px; font-size:12px; font-weight:700; cursor:pointer;">
+              <i data-lucide="plus" style="width:14px; height:14px;"></i> Add
+            </button>
+          </div>
+          <div class="px-20 mt-10" id="saCategoriesList"></div>
+          <div class="px-20 mt-15">
+            <h4 style="font-size:12px; font-weight:800; color:var(--text-body); margin-bottom:8px;">Reorder Categories</h4>
+            <div id="saCategoriesReorder"></div>
+          </div>
+        </div>
+
+        <!-- Banners Tab -->
+        <div id="saPlatformBanners" style="display:none;">
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:10px 20px 0;">
+            <h3 style="font-size:14px; font-weight:800;">Platform Banners</h3>
+            <button onclick="saOpenAddBanner()" style="display:flex; align-items:center; gap:4px; padding:8px 14px; background:var(--accent-color); color:#fff; border:none; border-radius:10px; font-size:12px; font-weight:700; cursor:pointer;">
+              <i data-lucide="plus" style="width:14px; height:14px;"></i> Add Banner
+            </button>
+          </div>
+          <div class="px-20 mt-10" id="saBannersList" style="padding-bottom:24px;"></div>
+        </div>
+      </div>
+
+      <!-- ================= SUPERADMIN SCREEN: PROFILE ================= -->
+      <div class="screen sa-screen" id="screen_sa_profile">
+        <div class="sp-header">
+          <h2 class="screen-title">My Profile</h2>
+        </div>
+
+        <div class="profile-scroll" style="padding-bottom:24px;">
+          <!-- Profile Card -->
+          <div class="px-20 mt-15">
+            <div style="display:flex; align-items:center; gap:14px; background:var(--surface-color); border-radius:16px; padding:18px; border:1px solid var(--border-color); box-shadow:var(--shadow-card);">
+              <img id="saProfileAvatar" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80" style="width:64px; height:64px; border-radius:50%; object-fit:cover; border:3px solid var(--accent-color);">
+              <div style="flex:1;">
+                <div style="font-size:18px; font-weight:800; color:var(--text-heading);" id="saProfileName">Platform Owner</div>
+                <div style="font-size:12px; color:var(--text-body);" id="saProfileEmail">rootadmin@gmail.com</div>
+                <span style="display:inline-block; margin-top:4px; background:var(--accent-soft); color:var(--accent-color); padding:3px 10px; border-radius:10px; font-size:10px; font-weight:700;" id="saProfileRole">Platform Owner</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Settings -->
+          <div class="px-20 mt-20">
+            <div class="settings-section-title">Account Settings</div>
+            <div class="options-list">
+              <div class="option-row">
+                <div class="option-row-left">
+                  <i data-lucide="bell-ring"></i>
+                  <span>Push Notifications</span>
+                </div>
+                <div class="option-row-right">
+                  <label class="switch">
+                    <input type="checkbox" id="saToggleNotification" checked>
+                    <span class="slider"></span>
+                  </label>
+                </div>
+              </div>
+              <div class="option-row">
+                <div class="option-row-left">
+                  <i data-lucide="moon"></i>
+                  <span>Dark Mode</span>
+                </div>
+                <div class="option-row-right">
+                  <label class="switch">
+                    <input type="checkbox" id="saToggleDarkMode" onchange="toggleDarkModeSetting(this)">
+                    <span class="slider"></span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Logout -->
+          <div class="px-20 mt-20" style="padding-bottom:40px;">
+            <button onclick="saLogout()" style="width:100%; padding:14px; background:var(--color-danger-bg); color:#C62828; border:none; border-radius:14px; font-size:14px; font-weight:700; cursor:pointer;">Logout</button>
+          </div>
+        </div>
+      </div>
+
     </div>
 
     <!-- ================= FIXED BOTTOM TAB NAVIGATION BAR ================= -->
@@ -1013,6 +1206,26 @@
       <a class="nav-item admin-nav-item" data-tab="admin_profile" onclick="adminNavigateToTab('admin_profile')">
         <i data-lucide="settings"></i>
         <span>More</span>
+      </a>
+    </div>
+
+    <!-- SuperAdmin Bottom Navigation -->
+    <div class="nav-footer sa-nav-footer" id="saNavigationBar" style="display: none;">
+      <a class="nav-item sa-nav-item active" data-tab="sa_home" onclick="saNavigateToTab('sa_home')">
+        <i data-lucide="home"></i>
+        <span>Home</span>
+      </a>
+      <a class="nav-item sa-nav-item" data-tab="sa_salons" onclick="saNavigateToTab('sa_salons')">
+        <i data-lucide="store"></i>
+        <span>Salons</span>
+      </a>
+      <a class="nav-item sa-nav-item" data-tab="sa_platform" onclick="saNavigateToTab('sa_platform')">
+        <i data-lucide="settings"></i>
+        <span>Platform</span>
+      </a>
+      <a class="nav-item sa-nav-item" data-tab="sa_profile" onclick="saNavigateToTab('sa_profile')">
+        <i data-lucide="user"></i>
+        <span>Profile</span>
       </a>
     </div>
 
@@ -1494,6 +1707,64 @@
     </div>
   </div>
 
+  <!-- ================= SUPERADMIN DRAWERS ================= -->
+
+  <!-- SA: Salon Detail Drawer -->
+  <div class="overlay" id="saSalonDetailDrawerOverlay" onclick="saCloseDrawer('saSalonDetailDrawer')">
+    <div class="drawer" id="saSalonDetailDrawer" onclick="event.stopPropagation()" style="max-height:90%;">
+      <div class="drawer-drag-bar" onclick="saCloseDrawer('saSalonDetailDrawer')"></div>
+      <div class="drawer-header">
+        <h3 style="font-size:18px; font-weight:800;">Salon Details</h3>
+        <button class="drawer-close-btn" onclick="saCloseDrawer('saSalonDetailDrawer')"><i data-lucide="x" style="width:16px; height:16px;"></i></button>
+      </div>
+      <div class="drawer-content" id="saSalonDetailContent"></div>
+    </div>
+  </div>
+
+  <!-- SA: Suspend / Reactivate / Deactivate Form Drawer -->
+  <div class="overlay" id="saSuspendFormDrawerOverlay" onclick="saCloseDrawer('saSuspendFormDrawer')">
+    <div class="drawer" id="saSuspendFormDrawer" onclick="event.stopPropagation()" style="max-height:60%;">
+      <div class="drawer-drag-bar" onclick="saCloseDrawer('saSuspendFormDrawer')"></div>
+      <div class="drawer-header">
+        <h3 style="font-size:18px; font-weight:800;" id="saSuspendFormTitle">Suspend Salon</h3>
+        <button class="drawer-close-btn" onclick="saCloseDrawer('saSuspendFormDrawer')"><i data-lucide="x" style="width:16px; height:16px;"></i></button>
+      </div>
+      <div class="drawer-content" id="saSuspendFormContent"></div>
+    </div>
+  </div>
+
+  <!-- SA: Category Form Drawer (Add/Edit) -->
+  <div class="overlay" id="saCategoryFormDrawerOverlay" onclick="saCloseDrawer('saCategoryFormDrawer')">
+    <div class="drawer" id="saCategoryFormDrawer" onclick="event.stopPropagation()" style="max-height:60%;">
+      <div class="drawer-drag-bar" onclick="saCloseDrawer('saCategoryFormDrawer')"></div>
+      <div class="drawer-header">
+        <h3 style="font-size:18px; font-weight:800;" id="saCategoryFormTitle">Add Category</h3>
+        <button class="drawer-close-btn" onclick="saCloseDrawer('saCategoryFormDrawer')"><i data-lucide="x" style="width:16px; height:16px;"></i></button>
+      </div>
+      <div class="drawer-content" id="saCategoryFormContent"></div>
+    </div>
+  </div>
+
+  <!-- SA: Banner Form Drawer (Add/Edit) -->
+  <div class="overlay" id="saBannerFormDrawerOverlay" onclick="saCloseDrawer('saBannerFormDrawer')">
+    <div class="drawer" id="saBannerFormDrawer" onclick="event.stopPropagation()" style="max-height:75%;">
+      <div class="drawer-drag-bar" onclick="saCloseDrawer('saBannerFormDrawer')"></div>
+      <div class="drawer-header">
+        <h3 style="font-size:18px; font-weight:800;" id="saBannerFormTitle">Add Banner</h3>
+        <button class="drawer-close-btn" onclick="saCloseDrawer('saBannerFormDrawer')"><i data-lucide="x" style="width:16px; height:16px;"></i></button>
+      </div>
+      <div class="drawer-content" id="saBannerFormContent"></div>
+    </div>
+  </div>
+
+  <!-- SA: Confirm Action Drawer -->
+  <div class="overlay" id="saConfirmDrawerOverlay" onclick="saCloseDrawer('saConfirmDrawer')">
+    <div class="drawer" id="saConfirmDrawer" onclick="event.stopPropagation()" style="max-height:40%;">
+      <div class="drawer-drag-bar" onclick="saCloseDrawer('saConfirmDrawer')"></div>
+      <div class="drawer-content" id="saConfirmContent"></div>
+    </div>
+  </div>
+
   <!-- ================= EXTERNAL SCRIPTS ================= -->
   <!-- Lucide icons CDN -->
   <script src="https://unpkg.com/lucide@latest"></script>
@@ -1507,6 +1778,9 @@
   <!-- Admin Data & Logic -->
   <script src="js/adminData.js"></script>
   <script src="js/adminApp.js"></script>
+  <!-- SuperAdmin Data & Logic -->
+  <script src="js/superAdminData.js"></script>
+  <script src="js/superAdminApp.js"></script>
 
 </body>
 

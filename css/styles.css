@@ -4167,3 +4167,17 @@ input:checked+.slider:before {
   stroke: var(--accent-color);
   fill: rgba(156, 84, 242, 0.1);
 }
+
+/* --- SUPERADMIN SCREENS --- */
+.sa-screen {
+  /* Inherits .screen display behavior */
+}
+
+.sa-nav-footer .nav-item.active {
+  color: var(--accent-color);
+}
+
+.sa-nav-footer .nav-item.active svg {
+  stroke: var(--accent-color);
+  fill: rgba(156, 84, 242, 0.1);
+}

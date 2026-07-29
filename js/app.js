@@ -44,6 +44,8 @@ const AppState = {
   spMode: false,
   // Admin Mode
   adminMode: false,
+  // SuperAdmin Mode
+  saMode: false,
 };
 
 let isHandlingPopState = false;
@@ -65,7 +67,13 @@ window.addEventListener('DOMContentLoaded', () => {
   setTimeout(() => {
     const splashScreen = document.getElementById('screen_splash');
     if (splashScreen && splashScreen.classList.contains('active')) {
-      if (AppState.spMode) {
+      if (AppState.saMode) {
+        document.getElementById('saNavigationBar').style.display = 'flex';
+        saNavigateToTab('sa_home', true);
+      } else if (AppState.adminMode) {
+        document.getElementById('adminNavigationBar').style.display = 'flex';
+        adminNavigateToTab('admin_home', true);
+      } else if (AppState.spMode) {
         document.getElementById('spNavigationBar').style.display = 'flex';
         spNavigateToTab('sp_home', true);
       } else {
@@ -100,13 +108,21 @@ function setupBrowserHistory() {
       else if (openOverlay.id === 'addCardOverlay') closeAddCardDrawer();
       else if (openOverlay.id === 'guestLoginPromptOverlay') closeGuestLoginPrompt();
       else if (openOverlay.id === 'successModalOverlay') closeSuccessModal();
+      else if (AppState.saMode && openOverlay.id.endsWith('Overlay')) {
+        const drawerName = openOverlay.id.replace('Overlay', '');
+        if (typeof saCloseDrawer === 'function') saCloseDrawer(drawerName);
+      }
       
       isHandlingPopState = false;
       return;
     }
 
     // 2. Tab & Screen navigation back handling
-    if (AppState.adminMode) {
+    if (AppState.saMode) {
+      if (AppState.currentTab !== 'sa_home') {
+        saNavigateToTab('sa_home', true);
+      }
+    } else if (AppState.adminMode) {
       if (AppState.currentTab !== 'admin_home') {
         adminNavigateToTab('admin_home', true);
       }
@@ -314,6 +330,9 @@ function validateSystemCredentials(email, password) {
   if (cleanEmail === 'admin@gmail.com' && cleanPass === '123456') {
     return { valid: true, role: 'admin', name: 'System Admin' };
   }
+  if (cleanEmail === 'rootadmin@gmail.com' && cleanPass === '123456') {
+    return { valid: true, role: 'superadmin', name: 'Platform Owner' };
+  }
   return { valid: false };
 }
 
@@ -333,18 +352,38 @@ function performAuth() {
 
   const auth = validateSystemCredentials(email, pass);
   if (!auth.valid) {
-    triggerToast("Invalid credentials! Allowed accounts:\n• Customer: dnyaneshwari@gmail.com (pune123)\n• Provider: serviceprovider@gmail.com (123456)\n• Admin: admin@gmail.com (123456)");
+    triggerToast("Invalid credentials! Allowed accounts:\n• Customer: dnyaneshwari@gmail.com (pune123)\n• Provider: serviceprovider@gmail.com (123456)\n• Admin: admin@gmail.com (123456)\n• SuperAdmin: rootadmin@gmail.com (123456)");
     return;
   }
 
   AppState.isAuthenticated = true;
 
+  if (auth.role === 'superadmin') {
+    AppState.saMode = true;
+    AppState.adminMode = false;
+    AppState.spMode = false;
+    AppState.currentTab = 'sa_home';
+    document.getElementById('navigationBar').style.display = 'none';
+    document.getElementById('spNavigationBar').style.display = 'none';
+    document.getElementById('adminNavigationBar').style.display = 'none';
+    document.getElementById('saNavigationBar').style.display = 'flex';
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('screen_sa_home').classList.add('active');
+    saInitPlatformData();
+    saRenderHomeScreen();
+    lucide.createIcons();
+    triggerToast("Logged in as SuperAdmin");
+    return;
+  }
+
   if (auth.role === 'admin') {
     AppState.adminMode = true;
+    AppState.saMode = false;
     AppState.spMode = false;
     AppState.currentTab = 'admin_home';
     document.getElementById('navigationBar').style.display = 'none';
     document.getElementById('spNavigationBar').style.display = 'none';
+    document.getElementById('saNavigationBar').style.display = 'none';
     document.getElementById('adminNavigationBar').style.display = 'flex';
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById('screen_admin_home').classList.add('active');
@@ -357,9 +396,11 @@ function performAuth() {
   if (auth.role === 'provider') {
     AppState.spMode = true;
     AppState.adminMode = false;
+    AppState.saMode = false;
     AppState.currentTab = 'sp_home';
     document.getElementById('navigationBar').style.display = 'none';
     document.getElementById('adminNavigationBar').style.display = 'none';
+    document.getElementById('saNavigationBar').style.display = 'none';
     document.getElementById('spNavigationBar').style.display = 'flex';
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById('screen_sp_home').classList.add('active');
@@ -372,8 +413,10 @@ function performAuth() {
   // Customer Login
   AppState.spMode = false;
   AppState.adminMode = false;
+  AppState.saMode = false;
   document.getElementById('spNavigationBar').style.display = 'none';
   document.getElementById('adminNavigationBar').style.display = 'none';
+  document.getElementById('saNavigationBar').style.display = 'none';
   document.getElementById('navigationBar').style.display = 'flex';
 
   const nameInput = document.getElementById('signupName')?.value.trim();
@@ -399,9 +442,11 @@ function performLogout() {
   AppState.isAuthenticated = false;
   AppState.spMode = false;
   AppState.adminMode = false;
+  AppState.saMode = false;
   document.getElementById('navigationBar').style.display = 'none';
   document.getElementById('spNavigationBar').style.display = 'none';
   document.getElementById('adminNavigationBar').style.display = 'none';
+  document.getElementById('saNavigationBar').style.display = 'none';
   showScreen('login');
   toggleAuthTab('login');
 }
@@ -453,17 +498,36 @@ function performRegister() {
 
   const auth = validateSystemCredentials(email, password);
   if (!auth.valid) {
-    triggerToast("Registration allowed ONLY for authorized credentials:\n• Customer: dnyaneshwari@gmail.com (pune123)\n• Provider: serviceprovider@gmail.com (123456)\n• Admin: admin@gmail.com (123456)");
+    triggerToast("Registration allowed ONLY for authorized credentials:\n• Customer: dnyaneshwari@gmail.com (pune123)\n• Provider: serviceprovider@gmail.com (123456)\n• Admin: admin@gmail.com (123456)\n• SuperAdmin: rootadmin@gmail.com (123456)");
     return;
   }
 
   AppState.isAuthenticated = true;
 
-  if (auth.role === 'admin') {
-    AppState.adminMode = true;
+  if (auth.role === 'superadmin') {
+    AppState.saMode = true;
+    AppState.adminMode = false;
     AppState.spMode = false;
     document.getElementById('navigationBar').style.display = 'none';
     document.getElementById('spNavigationBar').style.display = 'none';
+    document.getElementById('adminNavigationBar').style.display = 'none';
+    document.getElementById('saNavigationBar').style.display = 'flex';
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('screen_sa_home').classList.add('active');
+    saInitPlatformData();
+    saRenderHomeScreen();
+    lucide.createIcons();
+    triggerToast("Registered & logged in as SuperAdmin");
+    return;
+  }
+
+  if (auth.role === 'admin') {
+    AppState.adminMode = true;
+    AppState.saMode = false;
+    AppState.spMode = false;
+    document.getElementById('navigationBar').style.display = 'none';
+    document.getElementById('spNavigationBar').style.display = 'none';
+    document.getElementById('saNavigationBar').style.display = 'none';
     document.getElementById('adminNavigationBar').style.display = 'flex';
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById('screen_admin_home').classList.add('active');
@@ -476,8 +540,10 @@ function performRegister() {
   if (auth.role === 'provider') {
     AppState.spMode = true;
     AppState.adminMode = false;
+    AppState.saMode = false;
     document.getElementById('navigationBar').style.display = 'none';
     document.getElementById('adminNavigationBar').style.display = 'none';
+    document.getElementById('saNavigationBar').style.display = 'none';
     document.getElementById('spNavigationBar').style.display = 'flex';
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById('screen_sp_home').classList.add('active');
@@ -490,8 +556,10 @@ function performRegister() {
   // Customer registration
   AppState.spMode = false;
   AppState.adminMode = false;
+  AppState.saMode = false;
   document.getElementById('spNavigationBar').style.display = 'none';
   document.getElementById('adminNavigationBar').style.display = 'none';
+  document.getElementById('saNavigationBar').style.display = 'none';
   document.getElementById('navigationBar').style.display = 'flex';
 
   SalonHubData.user.name = name;
