@@ -7,7 +7,7 @@ const AppState = {
   currentTab: 'home',
   selectedRegisterRole: 'customer',
   selectedLocation: "Koregaon Park, Pune",
-  homeGender: 'unisex', // 'unisex', 'male', 'female'
+  homeGender: 'all', // 'all', 'men', 'women'
   homeSort: 'popular', // 'popular', 'top_rated', 'nearest'
 
   // Search & Filter Settings on Explore
@@ -108,6 +108,8 @@ function setupBrowserHistory() {
       else if (openOverlay.id === 'addCardOverlay') closeAddCardDrawer();
       else if (openOverlay.id === 'guestLoginPromptOverlay') closeGuestLoginPrompt();
       else if (openOverlay.id === 'successModalOverlay') closeSuccessModal();
+      else if (openOverlay.id === 'homeFilterOverlay') closeHomeFilterSheet();
+      else if (openOverlay.id === 'salonRegOverlay') closeSalonRegistration();
       else if (AppState.saMode && openOverlay.id.endsWith('Overlay')) {
         const drawerName = openOverlay.id.replace('Overlay', '');
         if (typeof saCloseDrawer === 'function') saCloseDrawer(drawerName);
@@ -317,6 +319,15 @@ function moveOtpFocus(current, nextFieldId) {
   }
 }
 
+// Support dynamically registered accounts (salon registration)
+if (!window._extraCredentials) window._extraCredentials = [];
+
+function addSystemCredential(email, password, role, name) {
+  const cleanEmail = (email || '').trim().toLowerCase();
+  const cleanPass = (password || '').trim();
+  window._extraCredentials.push({ email: cleanEmail, pass: cleanPass, role: role, name: name });
+}
+
 function validateSystemCredentials(email, password) {
   const cleanEmail = (email || '').trim().toLowerCase();
   const cleanPass = (password || '').trim();
@@ -333,6 +344,14 @@ function validateSystemCredentials(email, password) {
   if (cleanEmail === 'rootadmin@gmail.com' && cleanPass === '123456') {
     return { valid: true, role: 'superadmin', name: 'Platform Owner' };
   }
+
+  // Check dynamically registered credentials
+  for (const cred of window._extraCredentials) {
+    if (cred.email === cleanEmail && cred.pass === cleanPass) {
+      return { valid: true, role: cred.role, name: cred.name };
+    }
+  }
+
   return { valid: false };
 }
 
@@ -577,6 +596,214 @@ function performRegister() {
 }
 
 // ----------------------------------------------------
+// SALON REGISTRATION FLOW
+// ----------------------------------------------------
+const SalonRegState = {
+  step: 1,
+  editingSalonId: null
+};
+
+function openSalonRegistration() {
+  SalonRegState.step = 1;
+  const el = document.getElementById('salonRegOverlay');
+  if (el) el.classList.add('open');
+  document.getElementById('salonRegDrawer').classList.add('open');
+  srRenderStep(1);
+}
+
+function closeSalonRegistration() {
+  document.getElementById('salonRegOverlay').classList.remove('open');
+  document.getElementById('salonRegDrawer').classList.remove('open');
+  // Clear fields
+  ['srName','srEmail','srPhone','srPassword','srConfirmPassword','srSalonName','srSalonDesc','srSalonAddress','srSalonCity','srSalonState','srSalonPincode'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  document.getElementById('srTermsCheckbox').checked = false;
+  srToggleSubmitBtn();
+  SalonRegState.step = 1;
+}
+
+function srRenderStep(step) {
+  document.getElementById('srStep1').style.display = step === 1 ? 'block' : 'none';
+  document.getElementById('srStep2').style.display = step === 2 ? 'block' : 'none';
+  document.getElementById('srStep3').style.display = step === 3 ? 'block' : 'none';
+  document.getElementById('srStepLabel').innerText = 'Step ' + step + ' of 3';
+
+  [1,2,3].forEach(i => {
+    const dot = document.getElementById('srStep' + i + 'Dot');
+    if (dot) dot.style.background = i <= step ? 'var(--accent-color)' : 'var(--border-color)';
+  });
+  if (step >= 2) {
+    const line1 = document.getElementById('srStep1Line');
+    if (line1) line1.style.background = 'var(--accent-color)';
+  }
+  if (step >= 3) {
+    const line2 = document.getElementById('srStep2Line');
+    if (line2) line2.style.background = 'var(--accent-color)';
+  }
+
+  lucide.createIcons();
+}
+
+function srGoToStep1() {
+  SalonRegState.step = 1;
+  srRenderStep(1);
+}
+
+function srGoToStep2() {
+  const name = document.getElementById('srName').value.trim();
+  const email = document.getElementById('srEmail').value.trim();
+  const phone = document.getElementById('srPhone').value.trim();
+  const pass = document.getElementById('srPassword').value;
+  const confirmPass = document.getElementById('srConfirmPassword').value;
+
+  if (!name || !email || !phone || !pass) {
+    triggerToast("Please fill in all required fields.");
+    return;
+  }
+  if (pass !== confirmPass) {
+    triggerToast("Passwords do not match.");
+    return;
+  }
+
+  SalonRegState.step = 2;
+  srRenderStep(2);
+}
+
+function srGoToStep3() {
+  const salonName = document.getElementById('srSalonName').value.trim();
+  const address = document.getElementById('srSalonAddress').value.trim();
+  const city = document.getElementById('srSalonCity').value.trim();
+  const state = document.getElementById('srSalonState').value.trim();
+  const pincode = document.getElementById('srSalonPincode').value.trim();
+
+  if (!salonName || !address || !city || !state || !pincode) {
+    triggerToast("Please fill in all required salon details.");
+    return;
+  }
+
+  SalonRegState.step = 3;
+  srRenderStep(3);
+  srToggleSubmitBtn();
+}
+
+function srSelectGender(value) {
+  document.querySelectorAll('.sr-gender-pill').forEach(b => {
+    b.style.border = '1.5px solid var(--border-color)';
+    b.style.background = 'var(--surface-color)';
+    b.style.color = 'var(--text-body)';
+  });
+  const btn = document.getElementById('srGender' + value.charAt(0).toUpperCase() + value.slice(1));
+  if (btn) {
+    btn.style.border = '1.5px solid var(--accent-color)';
+    btn.style.background = 'var(--accent-soft)';
+    btn.style.color = 'var(--accent-color)';
+  }
+}
+
+function srToggleSubmitBtn() {
+  const checked = document.getElementById('srTermsCheckbox').checked;
+  const btn = document.getElementById('srSubmitBtn');
+  btn.disabled = !checked;
+  btn.style.background = checked ? '#000' : '#aaa';
+}
+
+function srSubmitRegistration() {
+  const name = document.getElementById('srName').value.trim();
+  const email = document.getElementById('srEmail').value.trim().toLowerCase();
+  const phone = document.getElementById('srPhone').value.trim();
+  const pass = document.getElementById('srPassword').value;
+  const salonName = document.getElementById('srSalonName').value.trim();
+  const desc = document.getElementById('srSalonDesc').value.trim();
+  const address = document.getElementById('srSalonAddress').value.trim();
+  const city = document.getElementById('srSalonCity').value.trim();
+  const state = document.getElementById('srSalonState').value.trim();
+  const pincode = document.getElementById('srSalonPincode').value.trim();
+
+  let genderFocus = 'Unisex';
+  if (document.getElementById('srGenderMen')) {
+    const menBtn = document.getElementById('srGenderMen');
+    if (menBtn.style.border.includes('var(--accent-color)')) genderFocus = 'Men Only';
+    const womenBtn = document.getElementById('srGenderWomen');
+    if (womenBtn.style.border.includes('var(--accent-color)')) genderFocus = 'Women Only';
+  }
+
+  const salonId = 'salon_' + Date.now();
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+
+  // Add to SalonHubData.salons
+  SalonHubData.salons.push({
+    id: salonId,
+    name: salonName,
+    type: genderFocus,
+    rating: 0,
+    reviewsCount: 0,
+    distance: '0 km',
+    duration: '0 min',
+    priceRange: '₹',
+    startingPrice: 0,
+    image: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=400&q=80',
+    location: city + ', ' + state,
+    coordinates: { x: 50, y: 50 },
+    openStatus: 'Open now',
+    isOpen: true,
+    slotsLeft: 10,
+    about: desc || 'Welcome to ' + salonName + '!',
+    services: [],
+    stylistIds: [],
+    _registeredAt: now.toISOString(),
+    _registeredBy: email
+  });
+
+  // Add to mock credentials
+  if (typeof addSystemCredential === 'function') {
+    addSystemCredential(email, pass, 'admin', name);
+  } else {
+    // Fallback: directly add to validateSystemCredentials
+    if (!window._extraCredentials) window._extraCredentials = [];
+    window._extraCredentials.push({ email, pass, role: 'admin', name });
+  }
+
+  // Rebuild SuperAdmin salon registry so new salon appears in SA dashboard
+  if (typeof saBuildSalonRegistry === 'function') {
+    saBuildSalonRegistry();
+  }
+
+  // Close registration overlay
+  closeSalonRegistration();
+
+  // Log in as the new admin
+  AppState.isAuthenticated = true;
+  AppState.adminMode = true;
+  AppState.saMode = false;
+  AppState.spMode = false;
+  AppState.currentTab = 'admin_home';
+  document.getElementById('navigationBar').style.display = 'none';
+  document.getElementById('spNavigationBar').style.display = 'none';
+  document.getElementById('saNavigationBar').style.display = 'none';
+  document.getElementById('adminNavigationBar').style.display = 'flex';
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen_admin_home').classList.add('active');
+
+  // Update SalonHubData.user for the admin
+  SalonHubData.user.name = name;
+  SalonHubData.user.email = email;
+  SalonHubData.user.phone = phone;
+
+  // Also update AdminData if it exists
+  if (typeof AdminData !== 'undefined') {
+    AdminData.salon.name = salonName;
+    AdminData.salon.adminName = name;
+  }
+
+  renderAdminHomeScreen();
+  lucide.createIcons();
+  triggerToast('Salon "' + salonName + '" registered! Logged in as Admin.');
+}
+
+// ----------------------------------------------------
 // SCREEN 2: HOME SCREEN RENDER & CAROUSEL
 // ----------------------------------------------------
 function renderHomeCategories() {
@@ -587,7 +814,7 @@ function renderHomeCategories() {
   let list = [...SalonHubData.categories];
   
   // Filter categories for Men Only to omit Bridal, Nails, Makeup
-  if (AppState.homeGender === 'male') {
+  if (AppState.homeGender === 'men') {
     list = list.filter(cat => cat.id !== 'bridal' && cat.id !== 'nails' && cat.id !== 'makeup');
   }
 
@@ -707,9 +934,9 @@ function renderHomeScreen() {
   const historyBookings = SalonHubData.bookings.filter(b => !b.isUpcoming).filter(hb => {
     const salon = SalonHubData.salons.find(s => s.id === hb.salonId);
     if (!salon) return false;
-    if (AppState.homeGender === 'male') {
+    if (AppState.homeGender === 'men') {
       return salon.type === 'Men Only' || salon.type === 'Unisex';
-    } else if (AppState.homeGender === 'female') {
+    } else if (AppState.homeGender === 'women') {
       return salon.type === 'Women Only' || salon.type === 'Unisex';
     }
     return true;
@@ -745,9 +972,9 @@ function renderHomeScreen() {
   featuredContainer.innerHTML = "";
 
   let filteredSalons = [...SalonHubData.salons];
-  if (AppState.homeGender === 'male') {
+  if (AppState.homeGender === 'men') {
     filteredSalons = filteredSalons.filter(s => s.type === "Men Only" || s.type === "Unisex");
-  } else if (AppState.homeGender === 'female') {
+  } else if (AppState.homeGender === 'women') {
     filteredSalons = filteredSalons.filter(s => s.type === "Women Only" || s.type === "Unisex");
   }
 
@@ -845,7 +1072,7 @@ function renderHomeScreen() {
   filteredSalons.forEach(s => {
     s.services.forEach(serv => {
       // Exclude gender-specific categories for male recommendations
-      if (AppState.homeGender === 'male' && (serv.category === 'bridal' || serv.category === 'nails' || serv.category === 'makeup')) {
+      if (AppState.homeGender === 'men' && (serv.category === 'bridal' || serv.category === 'nails' || serv.category === 'makeup')) {
         return;
       }
       
@@ -872,7 +1099,7 @@ function renderHomeScreen() {
     filteredSalons.forEach(s => {
       s.services.forEach(serv => {
         // Exclude gender-specific categories for male recommendations
-        if (AppState.homeGender === 'male' && (serv.category === 'bridal' || serv.category === 'nails' || serv.category === 'makeup')) {
+        if (AppState.homeGender === 'men' && (serv.category === 'bridal' || serv.category === 'nails' || serv.category === 'makeup')) {
           return;
         }
         if (finalRecs.length < 4 && !finalRecs.some(r => r.service.id === serv.id)) {
@@ -972,25 +1199,56 @@ function updateCarouselDots(index) {
 // ----------------------------------------------------
 // HOMEPAGE GENDER FILTERING TOGGLE
 // ----------------------------------------------------
-function setGenderFilter(gender) {
-  AppState.homeGender = gender;
+// ============================================================
+// HOME FILTER SHEET (replaces old gender toggle)
+// ============================================================
+function openHomeFilterSheet() {
+  renderHomeFilterContent();
+  document.getElementById('homeFilterOverlay').classList.add('open');
+  document.getElementById('homeFilterDrawer').classList.add('open');
+}
 
-  // Toggle active class on toggle buttons
-  const btnFemale = document.getElementById('btnGenderFemale');
-  const btnUnisex = document.getElementById('btnGenderUnisex');
-  const btnMale = document.getElementById('btnGenderMale');
+function closeHomeFilterSheet() {
+  document.getElementById('homeFilterOverlay').classList.remove('open');
+  document.getElementById('homeFilterDrawer').classList.remove('open');
+}
 
-  if (btnFemale && btnUnisex && btnMale) {
-    btnFemale.classList.toggle('active', gender === 'female');
-    btnUnisex.classList.toggle('active', gender === 'unisex');
-    btnMale.classList.toggle('active', gender === 'male');
-  }
+function renderHomeFilterContent() {
+  const container = document.getElementById('homeFilterContent');
+  const currentGender = AppState.homeGender || 'all';
 
-  // Re-render categories (since categories shown change based on gender)
+  container.innerHTML = `
+    <div style="padding:10px 20px 24px;">
+      <div style="font-size:13px; font-weight:700; color:var(--text-heading); margin-bottom:10px;">Gender</div>
+      <div style="display:flex; gap:8px;">
+        <button id="hfGenderAll" class="filter-chip ${currentGender === 'all' ? 'active' : ''}" onclick="hfSelectGender('all')" style="flex:1; padding:10px; border-radius:30px; font-size:13px; font-weight:700; cursor:pointer; border:1.5px solid ${currentGender === 'all' ? 'var(--accent-color)' : 'var(--border-color)'}; background:${currentGender === 'all' ? 'var(--accent-soft)' : 'var(--surface-color)'}; color:${currentGender === 'all' ? 'var(--accent-color)' : 'var(--text-body)'};">All</button>
+        <button id="hfGenderMen" class="filter-chip ${currentGender === 'men' ? 'active' : ''}" onclick="hfSelectGender('men')" style="flex:1; padding:10px; border-radius:30px; font-size:13px; font-weight:700; cursor:pointer; border:1.5px solid ${currentGender === 'men' ? 'var(--accent-color)' : 'var(--border-color)'}; background:${currentGender === 'men' ? 'var(--accent-soft)' : 'var(--surface-color)'}; color:${currentGender === 'men' ? 'var(--accent-color)' : 'var(--text-body)'};">Men</button>
+        <button id="hfGenderWomen" class="filter-chip ${currentGender === 'women' ? 'active' : ''}" onclick="hfSelectGender('women')" style="flex:1; padding:10px; border-radius:30px; font-size:13px; font-weight:700; cursor:pointer; border:1.5px solid ${currentGender === 'women' ? 'var(--accent-color)' : 'var(--border-color)'}; background:${currentGender === 'women' ? 'var(--accent-soft)' : 'var(--surface-color)'}; color:${currentGender === 'women' ? 'var(--accent-color)' : 'var(--text-body)'};">Women</button>
+      </div>
+
+      <div style="display:flex; gap:10px; margin-top:24px;">
+        <button onclick="hfResetFilter()" style="flex:1; padding:12px; background:transparent; color:var(--text-body); border:none; font-size:13px; font-weight:600; cursor:pointer; text-decoration:underline;">Reset</button>
+        <button onclick="hfApplyFilter()" style="flex:2; padding:14px; background:#000; color:#fff; border:none; border-radius:14px; font-size:14px; font-weight:700; cursor:pointer;">Apply</button>
+      </div>
+    </div>
+  `;
+  lucide.createIcons();
+}
+
+function hfSelectGender(value) {
+  AppState.homeGender = value;
+  renderHomeFilterContent();
+}
+
+function hfApplyFilter() {
+  closeHomeFilterSheet();
   renderHomeCategories();
-
-  // Re-render the Home screen elements
   renderHomeScreen();
+}
+
+function hfResetFilter() {
+  AppState.homeGender = 'all';
+  renderHomeFilterContent();
 }
 
 function filterHomeCategory(catId) {

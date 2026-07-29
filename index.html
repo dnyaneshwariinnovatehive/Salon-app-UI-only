@@ -272,10 +272,17 @@
           <span>Already have an account? </span>
           <a href="#" onclick="showScreen('login')" style="color: var(--accent-color); font-weight: 600; text-decoration: none;">Sign in</a>
         </div>
-        <div class="login-footer-text" style="margin-top: 16px; border-top: 1px solid var(--border-color); padding-top: 16px;">
+        <div class="login-footer-text" style="margin-top: 12px; border-top: 1px solid var(--border-color); padding-top: 16px;">
           <a href="#" onclick="continueAsGuest()" style="color: var(--accent-color); font-weight: 700; font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 6px;">
             <i data-lucide="eye" style="width: 14px; height: 14px;"></i> Explore as Guest
           </a>
+        </div>
+
+        <!-- Register Your Salon -->
+        <div style="padding:20px; text-align:center;">
+          <button onclick="openSalonRegistration()" style="padding:10px 20px; background:transparent; color:var(--accent-color); border:1.5px solid var(--accent-color); border-radius:30px; font-size:13px; font-weight:700; cursor:pointer; width:80%;">
+            <i data-lucide="store" style="width:15px; height:15px; display:inline; vertical-align:middle; margin-right:6px;"></i> Register Your Salon
+          </button>
         </div>
       </div>
 
@@ -333,17 +340,9 @@
             <i data-lucide="search"></i>
             <input type="text" placeholder="Search salons, services..." readonly onclick="focusSearchExplore()">
           </div>
-          <div class="gender-toggle-container">
-            <button class="gender-btn" id="btnGenderFemale" onclick="setGenderFilter('female')" title="Female Services">
-              <i data-lucide="venus"></i>
-            </button>
-            <button class="gender-btn active" id="btnGenderUnisex" onclick="setGenderFilter('unisex')" title="All Services">
-              <span>All</span>
-            </button>
-            <button class="gender-btn" id="btnGenderMale" onclick="setGenderFilter('male')" title="Male Services">
-              <i data-lucide="mars"></i>
-            </button>
-          </div>
+          <button class="home-filter-btn" id="homeFilterBtn" onclick="openHomeFilterSheet()" title="Filters" style="width:46px; height:46px; flex-shrink:0; background:var(--surface-color); border:1px solid var(--border-color); border-radius:30px; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:var(--shadow-card);">
+            <i data-lucide="filter" style="width:18px; height:18px; color:var(--text-body);"></i>
+          </button>
         </div>
 
         <!-- Hero Promotional Banner Slider -->
@@ -1707,6 +1706,18 @@
     </div>
   </div>
 
+  <!-- ================= HOME FILTER BOTTOM SHEET ================= -->
+  <div class="overlay" id="homeFilterOverlay" onclick="closeHomeFilterSheet()">
+    <div class="drawer" id="homeFilterDrawer" onclick="event.stopPropagation()" style="max-height:60%;">
+      <div class="drawer-drag-bar" onclick="closeHomeFilterSheet()"></div>
+      <div class="drawer-header">
+        <h3 style="font-size:18px; font-weight:800;">Filters</h3>
+        <button class="drawer-close-btn" onclick="closeHomeFilterSheet()"><i data-lucide="x" style="width:16px; height:16px;"></i></button>
+      </div>
+      <div class="drawer-content" id="homeFilterContent"></div>
+    </div>
+  </div>
+
   <!-- ================= SUPERADMIN DRAWERS ================= -->
 
   <!-- SA: Salon Detail Drawer -->
@@ -1781,6 +1792,174 @@
   <!-- SuperAdmin Data & Logic -->
   <script src="js/superAdminData.js"></script>
   <script src="js/superAdminApp.js"></script>
+
+  <!-- ================= SALON REGISTRATION OVERLAY ================= -->
+  <div class="overlay" id="salonRegOverlay" onclick="" style="z-index:200;">
+    <div class="drawer" id="salonRegDrawer" onclick="event.stopPropagation()" style="max-height:100%; height:100%; border-radius:0; padding-bottom:0;">
+      <div class="drawer-header" style="border-bottom:1px solid var(--border-color); padding:12px 20px;">
+        <button onclick="closeSalonRegistration()" style="background:none; border:none; cursor:pointer; padding:4px;">
+          <i data-lucide="x" style="width:20px; height:20px; color:var(--text-body);"></i>
+        </button>
+        <h3 style="font-size:16px; font-weight:800; flex:1; text-align:center;">Register Your Salon</h3>
+        <div style="width:28px;"></div>
+      </div>
+
+      <!-- Step Indicator -->
+      <div style="display:flex; align-items:center; justify-content:center; gap:8px; padding:14px 20px 0;">
+        <div id="srStep1Dot" style="width:8px; height:8px; border-radius:50%; background:var(--accent-color);"></div>
+        <div style="flex:1; max-width:60px; height:2px; background:var(--border-color);" id="srStep1Line"></div>
+        <div id="srStep2Dot" style="width:8px; height:8px; border-radius:50%; background:var(--border-color);"></div>
+        <div style="flex:1; max-width:60px; height:2px; background:var(--border-color);" id="srStep2Line"></div>
+        <div id="srStep3Dot" style="width:8px; height:8px; border-radius:50%; background:var(--border-color);"></div>
+      </div>
+      <div style="display:flex; align-items:center; justify-content:center; gap:8px; padding:6px 20px 0;">
+        <span id="srStepLabel" style="font-size:11px; color:var(--text-body); font-weight:600;">Step 1 of 3</span>
+      </div>
+
+      <div class="drawer-content" id="salonRegContent" style="overflow-y:auto; flex:1; padding:20px;">
+        <!-- STEP 1: Owner Account -->
+        <div id="srStep1">
+          <h4 style="font-size:15px; font-weight:800; margin-bottom:4px;">Owner Account Details</h4>
+          <p style="font-size:12px; color:var(--text-light); margin-bottom:16px;">Create your admin credentials for managing your salon.</p>
+
+          <div class="form-group">
+            <label for="srName">Full Name *</label>
+            <div class="input-icon-wrapper">
+              <input type="text" id="srName" class="input-field has-left-icon" placeholder="Full name">
+              <i data-lucide="user" class="input-icon-left"></i>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="srEmail">Email Address *</label>
+            <div class="input-icon-wrapper">
+              <input type="email" id="srEmail" class="input-field has-left-icon" placeholder="name@domain.com">
+              <i data-lucide="mail" class="input-icon-left"></i>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="srPhone">Phone Number *</label>
+            <div class="input-icon-wrapper">
+              <input type="tel" id="srPhone" class="input-field has-left-icon" placeholder="Phone number">
+              <i data-lucide="phone" class="input-icon-left"></i>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="srPassword">Password *</label>
+            <div class="input-icon-wrapper">
+              <input type="password" id="srPassword" class="input-field has-left-icon" placeholder="Password">
+              <i data-lucide="lock" class="input-icon-left"></i>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="srConfirmPassword">Confirm Password *</label>
+            <div class="input-icon-wrapper">
+              <input type="password" id="srConfirmPassword" class="input-field has-left-icon" placeholder="Confirm password">
+              <i data-lucide="lock" class="input-icon-left"></i>
+            </div>
+          </div>
+
+          <div style="display:flex; gap:10px; margin-top:20px;">
+            <button onclick="closeSalonRegistration()" style="flex:1; padding:14px; background:var(--surface-color); color:var(--text-body); border:1px solid var(--border-color); border-radius:14px; font-size:14px; font-weight:700; cursor:pointer;">Cancel</button>
+            <button onclick="srGoToStep2()" style="flex:2; padding:14px; background:#000; color:#fff; border:none; border-radius:14px; font-size:14px; font-weight:700; cursor:pointer;">Next</button>
+          </div>
+        </div>
+
+        <!-- STEP 2: Salon Details -->
+        <div id="srStep2" style="display:none;">
+          <h4 style="font-size:15px; font-weight:800; margin-bottom:4px;">Salon Details</h4>
+          <p style="font-size:12px; color:var(--text-light); margin-bottom:16px;">Tell us about your salon.</p>
+
+          <div class="form-group">
+            <label for="srSalonName">Salon Name *</label>
+            <div class="input-icon-wrapper">
+              <input type="text" id="srSalonName" class="input-field has-left-icon" placeholder="Salon name">
+              <i data-lucide="store" class="input-icon-left"></i>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="srSalonDesc">Description</label>
+            <div class="input-icon-wrapper">
+              <textarea id="srSalonDesc" class="input-field has-left-icon" placeholder="Brief description of your salon..." style="padding:12px 12px 12px 46px; min-height:80px; resize:none; font-family:inherit;"></textarea>
+              <i data-lucide="file-text" class="input-icon-left" style="top:16px;"></i>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="srSalonAddress">Address *</label>
+            <div class="input-icon-wrapper">
+              <input type="text" id="srSalonAddress" class="input-field has-left-icon" placeholder="Street address">
+              <i data-lucide="map-pin" class="input-icon-left"></i>
+            </div>
+          </div>
+
+          <div style="display:flex; gap:10px;">
+            <div class="form-group" style="flex:2;">
+              <label for="srSalonCity">City *</label>
+              <input type="text" id="srSalonCity" class="input-field" placeholder="City">
+            </div>
+            <div class="form-group" style="flex:1;">
+              <label for="srSalonState">State *</label>
+              <input type="text" id="srSalonState" class="input-field" placeholder="State">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="srSalonPincode">Pincode *</label>
+            <input type="text" id="srSalonPincode" class="input-field" placeholder="Pincode">
+          </div>
+
+          <div class="form-group">
+            <label>Gender Focus *</label>
+            <div style="display:flex; gap:8px; margin-top:6px;">
+              <button id="srGenderUnisex" class="sr-gender-pill active" onclick="srSelectGender('unisex')" style="flex:1; padding:10px; border-radius:30px; font-size:13px; font-weight:700; cursor:pointer; border:1.5px solid var(--accent-color); background:var(--accent-soft); color:var(--accent-color);">Unisex</button>
+              <button id="srGenderMen" class="sr-gender-pill" onclick="srSelectGender('men')" style="flex:1; padding:10px; border-radius:30px; font-size:13px; font-weight:700; cursor:pointer; border:1.5px solid var(--border-color); background:var(--surface-color); color:var(--text-body);">Men Only</button>
+              <button id="srGenderWomen" class="sr-gender-pill" onclick="srSelectGender('women')" style="flex:1; padding:10px; border-radius:30px; font-size:13px; font-weight:700; cursor:pointer; border:1.5px solid var(--border-color); background:var(--surface-color); color:var(--text-body);">Women Only</button>
+            </div>
+          </div>
+
+          <div style="display:flex; gap:10px; margin-top:20px;">
+            <button onclick="srGoToStep1()" style="flex:1; padding:14px; background:var(--surface-color); color:var(--text-body); border:1px solid var(--border-color); border-radius:14px; font-size:14px; font-weight:700; cursor:pointer;">Back</button>
+            <button onclick="srGoToStep3()" style="flex:2; padding:14px; background:#000; color:#fff; border:none; border-radius:14px; font-size:14px; font-weight:700; cursor:pointer;">Next</button>
+          </div>
+        </div>
+
+        <!-- STEP 3: Terms & Submit -->
+        <div id="srStep3" style="display:none;">
+          <h4 style="font-size:15px; font-weight:800; margin-bottom:4px;">Terms & Conditions</h4>
+          <p style="font-size:12px; color:var(--text-light); margin-bottom:16px;">Please review and accept the partner terms.</p>
+
+          <div style="background:var(--surface-color); border:1px solid var(--border-color); border-radius:12px; padding:14px; max-height:200px; overflow-y:auto; font-size:11px; color:var(--text-body); line-height:1.6; margin-bottom:14px;">
+            <p><strong>SalonHub Partner Terms & Conditions</strong></p>
+            <p>1. By registering as a SalonHub partner, you agree to provide accurate and up-to-date information about your salon, services, and pricing.</p>
+            <p>2. You authorize SalonHub to list your salon on the platform and allow customers to book appointments through the app.</p>
+            <p>3. You agree to honor the prices and services listed on your SalonHub profile.</p>
+            <p>4. You are responsible for maintaining the confidentiality of your admin account credentials.</p>
+            <p>5. SalonHub reserves the right to suspend or remove your listing in case of violations of platform policies.</p>
+            <p>6. You agree to provide quality service to all customers who book through the platform.</p>
+            <p>7. Commissions and payment terms will be communicated separately via the admin dashboard.</p>
+            <p>8. You may update your salon profile, services, and availability at any time through the admin dashboard.</p>
+            <p>9. SalonHub may use your salon's name and images for promotional purposes on the platform.</p>
+            <p>10. These terms may be updated from time to time. Continued use of the platform constitutes acceptance of updated terms.</p>
+          </div>
+
+          <label style="display:flex; align-items:center; gap:10px; font-size:13px; font-weight:600; color:var(--text-heading); cursor:pointer;">
+            <input type="checkbox" id="srTermsCheckbox" onchange="srToggleSubmitBtn()" style="width:18px; height:18px; accent-color:#000;">
+            I agree to the SalonHub Partner Terms & Conditions
+          </label>
+
+          <div style="display:flex; gap:10px; margin-top:24px;">
+            <button onclick="srGoToStep2()" style="flex:1; padding:14px; background:var(--surface-color); color:var(--text-body); border:1px solid var(--border-color); border-radius:14px; font-size:14px; font-weight:700; cursor:pointer;">Back</button>
+            <button id="srSubmitBtn" onclick="srSubmitRegistration()" style="flex:2; padding:14px; background:#aaa; color:#fff; border:none; border-radius:14px; font-size:14px; font-weight:700; cursor:pointer; transition:background 0.2s;" disabled>Register Salon</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
 </body>
 

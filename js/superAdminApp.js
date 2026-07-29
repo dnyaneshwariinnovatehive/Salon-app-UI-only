@@ -121,7 +121,13 @@ function saGetTopSalons(days) {
 }
 
 function saGetNewSalonsCount() {
-  return Math.min(3, SalonHubData.salons.length);
+  const now = Date.now();
+  const sevenDays = 7 * 24 * 60 * 60 * 1000;
+  return SalonHubData.salons.filter(s => {
+    if (!s._registeredAt) return false;
+    const t = new Date(s._registeredAt).getTime();
+    return (now - t) <= sevenDays;
+  }).length;
 }
 
 function formatDateShort(date) {
