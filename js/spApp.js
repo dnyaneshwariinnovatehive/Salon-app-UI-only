@@ -208,29 +208,24 @@ function renderSPHomeScreen() {
   if (timelineContainer) {
     timelineContainer.innerHTML = "";
     sorted.forEach((appt) => {
-      const sc = spGetStatusColor(appt.status);
       const servicesText = appt.services.map(s => s.name).join(', ');
       const gc = spGenderColor(appt.customerGender);
-      const balance = appt.finalBilledAmount - appt.advancePaid;
       const card = document.createElement('div');
-      card.style.cssText = `background:var(--surface-color); border-radius:14px; padding:14px 16px; cursor:pointer; border-left:4px solid ${sc.color}; box-shadow:var(--shadow-card); display:flex; align-items:center; justify-content:space-between;`;
+      card.style.cssText = `background:var(--surface-color); border-radius:14px; padding:14px 16px; cursor:pointer; border-left:4px solid #9C54F2; box-shadow:var(--shadow-card); display:flex; align-items:center; justify-content:space-between;`;
       card.onclick = () => openSPAppointmentDetail(appt.id);
       card.innerHTML = `
-        <div style="flex:1; min-width:0; padding-right:12px;">
-          <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px; flex-wrap:wrap;">
-            <span style="font-size:13px; font-weight:800; color:${sc.color};">${appt.time}</span>
-            ${spGetStatusBadge(appt.status)}
-            <span style="display:inline-flex; align-items:center; gap:3px; background:${gc.bg}; color:${gc.color}; padding:2px 8px; border-radius:8px; font-size:10px; font-weight:700;">
-              <i data-lucide="${spGenderIcon(appt.customerGender)}" style="width:10px; height:10px;"></i>${appt.customerGender}
-            </span>
+        <div style="display:flex; align-items:center; gap:12px; flex:1; min-width:0;">
+          <div style="width:44px; height:44px; border-radius:12px; background:${gc.bg}; display:flex; flex-direction:column; align-items:center; justify-content:center; flex-shrink:0;">
+            <div style="font-size:13px; font-weight:800; color:${gc.color};">${appt.time.split(':')[0]}</div>
+            <div style="font-size:9px; font-weight:600; color:${gc.color};">${appt.time.split(':')[1]}</div>
           </div>
-          <div style="font-size:14px; font-weight:800; color:var(--text-heading); margin-bottom:2px;">${appt.customerName}</div>
-          <div style="font-size:11px; color:var(--text-body); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${servicesText}</div>
-        </div>
-        <div style="text-align:right; flex-shrink:0;">
-          <div style="font-size:14px; font-weight:800; color:var(--text-heading);">₹${appt.totalAmount}</div>
-          <div style="font-size:11px; color:var(--text-light); margin-top:2px;">${appt.duration} mins</div>
-          ${balance > 0 ? `<div style="font-size:10px; color:var(--color-danger); font-weight:700; margin-top:2px;">Due ₹${balance}</div>` : ''}
+          <div style="flex:1; min-width:0;">
+            <div style="font-size:14px; font-weight:800; color:var(--text-heading);">${appt.customerName}</div>
+            <div style="font-size:11px; color:var(--text-body); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:1px;">${servicesText}</div>
+          </div>
+          <div style="text-align:right; flex-shrink:0;">
+            <div style="font-size:15px; font-weight:800; color:var(--text-heading);">₹${appt.totalAmount}</div>
+          </div>
         </div>
       `;
       timelineContainer.appendChild(card);
