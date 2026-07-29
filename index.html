@@ -61,17 +61,25 @@
 
         <!-- Forms Container -->
         <div id="authFormWrapper">
+          <!-- Authorized Credentials Guide Banner -->
+          <div style="background:var(--accent-soft); border-radius:12px; padding:10px 12px; margin-bottom:14px; font-size:11px; color:var(--accent-color); border:1px solid var(--accent-color)33;">
+            <div style="font-weight:800; margin-bottom:4px;">🔑 Authorized Credentials:</div>
+            <div>• <strong>Customer:</strong> dnyaneshwari@gmail.com | pass: pune123</div>
+            <div>• <strong>Provider:</strong> serviceprovider@gmail.com | pass: 123456</div>
+            <div>• <strong>Admin:</strong> admin@gmail.com | pass: 123456</div>
+          </div>
+
           <!-- Login Fields -->
           <div id="loginFormFields">
             <div class="form-group">
               <label for="loginEmail">Email Address</label>
-              <input type="email" id="loginEmail" class="input-field" placeholder="name@domain.com"
+              <input type="email" id="loginEmail" class="input-field" placeholder="dnyaneshwari@gmail.com"
                 value="dnyaneshwari@gmail.com">
             </div>
             <div class="form-group">
               <label for="loginPassword">Password</label>
               <div class="input-icon-wrapper">
-                <input type="password" id="loginPassword" class="input-field" placeholder="••••••••" value="pune1234">
+                <input type="password" id="loginPassword" class="input-field" placeholder="••••••••" value="pune123">
                 <button class="input-icon-btn" onclick="togglePasswordVisibility('loginPassword')">
                   <i data-lucide="eye" id="loginPasswordEye"></i>
                 </button>

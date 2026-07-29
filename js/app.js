@@ -301,19 +301,47 @@ function moveOtpFocus(current, nextFieldId) {
   }
 }
 
+function validateSystemCredentials(email, password) {
+  const cleanEmail = (email || '').trim().toLowerCase();
+  const cleanPass = (password || '').trim();
+
+  if (cleanEmail === 'dnyaneshwari@gmail.com' && cleanPass === 'pune123') {
+    return { valid: true, role: 'customer', name: 'Dnyaneshwari' };
+  }
+  if (cleanEmail === 'serviceprovider@gmail.com' && cleanPass === '123456') {
+    return { valid: true, role: 'provider', name: 'Rahul (Provider)' };
+  }
+  if (cleanEmail === 'admin@gmail.com' && cleanPass === '123456') {
+    return { valid: true, role: 'admin', name: 'System Admin' };
+  }
+  return { valid: false };
+}
+
 function performAuth() {
+  const isSignupTab = AppState.authMode === 'signup';
+  const email = (document.getElementById(isSignupTab ? 'signupEmail' : 'loginEmail')?.value || '').trim();
+  const pass = (document.getElementById(isSignupTab ? 'signupPassword' : 'loginPassword')?.value || '').trim();
+
+  if (!email) {
+    triggerToast("Please enter your Email Address.");
+    return;
+  }
+  if (!pass) {
+    triggerToast("Please enter your Password.");
+    return;
+  }
+
+  const auth = validateSystemCredentials(email, pass);
+  if (!auth.valid) {
+    triggerToast("Invalid credentials! Allowed accounts:\n• Customer: dnyaneshwari@gmail.com (pune123)\n• Provider: serviceprovider@gmail.com (123456)\n• Admin: admin@gmail.com (123456)");
+    return;
+  }
+
   AppState.isAuthenticated = true;
 
-  const loginEmail = (document.getElementById('loginEmail')?.value || '').trim().toLowerCase();
-  const loginPass = (document.getElementById('loginPassword')?.value || '').trim();
-  const regEmail = (document.getElementById('signupEmail')?.value || '').trim().toLowerCase();
-  const regPass = (document.getElementById('signupPassword')?.value || '').trim();
-
-  const isAdminLogin = (loginEmail === 'admin@gmail.com' && loginPass === '123456') ||
-                        (AppState.authMode === 'signup' && regEmail === 'admin@gmail.com' && regPass === '123456');
-
-  if (isAdminLogin) {
+  if (auth.role === 'admin') {
     AppState.adminMode = true;
+    AppState.spMode = false;
     AppState.currentTab = 'admin_home';
     document.getElementById('navigationBar').style.display = 'none';
     document.getElementById('spNavigationBar').style.display = 'none';
@@ -322,34 +350,42 @@ function performAuth() {
     document.getElementById('screen_admin_home').classList.add('active');
     renderAdminHomeScreen();
     lucide.createIcons();
+    triggerToast("Logged in as Admin");
     return;
   }
 
-  const isSPLogin = (loginEmail === 'serviceprovider@gmail.com' && loginPass === '123456') ||
-                    (AppState.authMode === 'signup' && regEmail === 'serviceprovider@gmail.com' && regPass === '123456');
-
-  if (isSPLogin) {
+  if (auth.role === 'provider') {
     AppState.spMode = true;
+    AppState.adminMode = false;
     AppState.currentTab = 'sp_home';
     document.getElementById('navigationBar').style.display = 'none';
+    document.getElementById('adminNavigationBar').style.display = 'none';
     document.getElementById('spNavigationBar').style.display = 'flex';
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById('screen_sp_home').classList.add('active');
     renderSPHomeScreen();
     lucide.createIcons();
+    triggerToast("Logged in as Service Provider");
     return;
   }
 
-  // Customer Login (existing logic)
+  // Customer Login
   AppState.spMode = false;
   AppState.adminMode = false;
+  document.getElementById('spNavigationBar').style.display = 'none';
+  document.getElementById('adminNavigationBar').style.display = 'none';
   document.getElementById('navigationBar').style.display = 'flex';
-  const nameInput = document.getElementById('signupName').value.trim();
-  if (AppState.authMode === 'signup' && nameInput !== "") {
+
+  const nameInput = document.getElementById('signupName')?.value.trim();
+  if (isSignupTab && nameInput !== "") {
     SalonHubData.user.name = nameInput;
+  } else {
+    SalonHubData.user.name = auth.name;
   }
+  SalonHubData.user.email = email;
   document.getElementById('homeUserAvatar').src = SalonHubData.user.avatar;
   navigateToTab('home');
+  triggerToast("Logged in as Customer");
 }
 
 function performSocialAuth(platform) {
@@ -405,31 +441,9 @@ function performRegister() {
   const email = document.getElementById('regEmail').value.trim();
   const password = document.getElementById('regPassword').value;
   const confirmPassword = document.getElementById('regConfirmPassword').value;
-  const role = AppState.selectedRegisterRole || 'customer';
 
-  // 1. Validation
-  if (!name) {
-    triggerToast("Please enter your Full Name.");
-    return;
-  }
-  if (!phone) {
-    triggerToast("Please enter your Phone Number.");
-    return;
-  }
-  if (!email) {
-    triggerToast("Please enter your Email Address.");
-    return;
-  }
-  if (!email.includes('@') || !email.includes('.')) {
-    triggerToast("Please enter a valid Email Address.");
-    return;
-  }
-  if (!password) {
-    triggerToast("Please enter a Password.");
-    return;
-  }
-  if (password.length < 6) {
-    triggerToast("Password must be at least 6 characters.");
+  if (!name || !phone || !email || !password) {
+    triggerToast("Please fill in all required fields.");
     return;
   }
   if (password !== confirmPassword) {
@@ -437,10 +451,17 @@ function performRegister() {
     return;
   }
 
-  // 2. Route based on selected role
-  if (role === 'admin' || role === 'superadmin') {
-    AppState.isAuthenticated = true;
+  const auth = validateSystemCredentials(email, password);
+  if (!auth.valid) {
+    triggerToast("Registration allowed ONLY for authorized credentials:\n• Customer: dnyaneshwari@gmail.com (pune123)\n• Provider: serviceprovider@gmail.com (123456)\n• Admin: admin@gmail.com (123456)");
+    return;
+  }
+
+  AppState.isAuthenticated = true;
+
+  if (auth.role === 'admin') {
     AppState.adminMode = true;
+    AppState.spMode = false;
     document.getElementById('navigationBar').style.display = 'none';
     document.getElementById('spNavigationBar').style.display = 'none';
     document.getElementById('adminNavigationBar').style.display = 'flex';
@@ -448,40 +469,43 @@ function performRegister() {
     document.getElementById('screen_admin_home').classList.add('active');
     renderAdminHomeScreen();
     lucide.createIcons();
+    triggerToast("Registered & logged in as Admin");
     return;
   }
 
-  if (role === 'provider') {
-    AppState.isAuthenticated = true;
+  if (auth.role === 'provider') {
     AppState.spMode = true;
+    AppState.adminMode = false;
     document.getElementById('navigationBar').style.display = 'none';
+    document.getElementById('adminNavigationBar').style.display = 'none';
     document.getElementById('spNavigationBar').style.display = 'flex';
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById('screen_sp_home').classList.add('active');
     renderSPHomeScreen();
     lucide.createIcons();
+    triggerToast("Registered & logged in as Service Provider");
     return;
   }
 
-  // 3. Complete customer registration & log in
-  AppState.isAuthenticated = true;
+  // Customer registration
+  AppState.spMode = false;
+  AppState.adminMode = false;
+  document.getElementById('spNavigationBar').style.display = 'none';
+  document.getElementById('adminNavigationBar').style.display = 'none';
   document.getElementById('navigationBar').style.display = 'flex';
 
-  // Save credentials to mock state
   SalonHubData.user.name = name;
   SalonHubData.user.phone = phone;
   SalonHubData.user.email = email;
 
-  // Load avatar image into home profile
   document.getElementById('homeUserAvatar').src = SalonHubData.user.avatar;
-
-  // Reset the home screen profile names
   const greetingEl = document.querySelector('.location-picker .greeting');
   if (greetingEl) {
     greetingEl.textContent = `Hi ${name} 👋`;
   }
 
   navigateToTab('home');
+  triggerToast("Registered & logged in as Customer");
 }
 
 // ----------------------------------------------------
